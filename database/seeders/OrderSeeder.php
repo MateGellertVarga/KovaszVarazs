@@ -15,11 +15,14 @@ class OrderSeeder extends Seeder
     public function run()
     {
         $order1 = Order::create([
-            'customer_name' => 'Teszt Elek',
+            'customer_name' => 'John Doe',
             'phone' => '123456789',
-            'note' => 'Házhoz szállítás',
+            'note' => 'Kérlek, gyorsan készítsd el!',
             'status' => 'pending',
             'date' => now(),
+            'is_paying' => true,
+            'total_price' => 0,
+            'order_schedule_id' => 1,
         ]);
 
         OrderItem::insert([
@@ -33,6 +36,9 @@ class OrderSeeder extends Seeder
             'note' => 'Személyes átvétel',
             'status' => 'completed',
             'date' => now(),
+            'is_paying' => false,
+            'total_price' => 0,
+            'order_schedule_id' => 2,
         ]);
 
         OrderItem::insert([

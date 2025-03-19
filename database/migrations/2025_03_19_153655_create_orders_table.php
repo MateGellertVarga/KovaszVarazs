@@ -18,8 +18,9 @@ return new class extends Migration
             $table->string('note')->nullable();
             $table->string('status')->default('pending');
             $table->date('date')->useCurrent();
-            $table->foreignId('order_schedule_id')->nullable()->constrained()->onDelete('cascade');
-
+            $table->boolean('is_paying')->default(true);
+            $table->decimal('total_price', 10, 2)->default(0);
+            $table->foreignId('order_schedule_id')->constrained()->onDelete('cascade');
         });
     }
 

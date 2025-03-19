@@ -21,7 +21,8 @@ class StoreOrderRequest extends FormRequest
             'status'          => 'required|in:pending,processing,completed',
             'order_items'           => 'sometimes|array',
             'order_items.*.product_id' => 'required|exists:products,id',
-            'order_items.*.quantity'   => 'required|integer|min:1'
+            'order_items.*.quantity'   => 'required|integer|min:1',
+            'order_schedule_id' => 'required|exists:order_schedules,id'
         ];
     }
 }
