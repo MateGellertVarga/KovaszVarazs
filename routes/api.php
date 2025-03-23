@@ -6,8 +6,44 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\OrderItemController;
 use App\Http\Controllers\OrderScheduleController;
+use App\Http\Controllers\AuthController;
 
-Route::apiResource('products', ProductController::class);
-Route::apiResource('orders', OrderController::class);
-Route::apiResource('orderItems', OrderItemController::class);
-Route::apiResource('orderSchedules', OrderScheduleController::class);
+/* Public endpoints */
+Route::post('register', [AuthController::class, 'register']);
+Route::post('login', [AuthController::class, 'login']);
+
+Route::get('products', [ProductController::class, 'index']);
+Route::get('products/{product}', [ProductController::class, 'show']);
+
+Route::get('orderSchedules', [OrderScheduleController::class, 'index']);
+Route::get('orderSchedules/{orderSchedule}', [OrderScheduleController::class, 'show']);
+
+Route::post('orders', [OrderController::class, 'store']);
+
+/* Authenticated user endpoints */
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('logout', [AuthController::class, 'logout']);
+
+    Route::get('orders', [OrderController::class, 'index']);
+    Route::get('orders/{order}', [OrderController::class, 'show']);
+    Route::put('orders/{order}', [OrderController::class, 'update']);
+    Route::delete('orders/{order}', [OrderController::class, 'destroy']);
+
+    // Route::get('orderItems/{orderId}', [OrderItemController::class, 'index']);
+    // Route::post('orderItems/{orderId}', [OrderItemController::class, 'store']);
+    // Route::get('orderItems/{orderId}/{orderItem}', [OrderItemController::class, 'show']);
+    // Route::put('orderItems/{orderId}/{orderItem}', [OrderItemController::class, 'update']);
+    // Route::delete('orderItems/{orderId}/{orderItem}', [OrderItemController::class, 'destroy']);
+});
+
+/* Admin-only endpoints */
+Route::middleware(['auth:sanctum', 'admin'])->group(function () {
+    Route::post('products', [ProductController::class, 'store']);
+    Route::put('products/{product}', [ProductController::class, 'update']);
+    Route::delete('products/{product}', [ProductController::class, 'destroy']);
+
+    Route::post('orderSchedules', [OrderScheduleController::class, 'store']);
+    Route::put('orderSchedules/{orderSchedule}', [OrderScheduleController::class, 'update']);
+    Route::delete('orderSchedules/{orderSchedule}', [OrderScheduleController::class, 'destroy']);
+});
+

@@ -12,6 +12,6 @@ class OrderSchedule extends Model
     public function products()
     {
         return $this->belongsToMany(Product::class, 'order_schedule_products')
-            ->withPivot('max_quantity');
+            ->withPivot('max_quantity', 'remaining_quantity');
     }
 }

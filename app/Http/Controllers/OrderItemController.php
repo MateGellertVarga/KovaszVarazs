@@ -2,22 +2,35 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Order;
-use App\Models\OrderItem;
 use App\Http\Requests\StoreOrderItemRequest;
 use App\Http\Requests\UpdateOrderItemRequest;
+use App\Models\Order;
+use App\Models\OrderItem;
+use App\Models\Product;
 
 class OrderItemController extends Controller
 {
-    public function index($id)
+    public function index($orderId)
     {
-        return OrderItem::where('order_id', $id)->get();
+        $order = Order::findOrFail($orderId);
+        $authUser = request()->user();
+        if ($authUser->role !== 'admin' && $order->user_id !== $authUser->id) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+        return OrderItem::where('order_id', $orderId)->get();
     }
 
-    public function store(StoreOrderItemRequest $request, $id)
+    public function store(StoreOrderItemRequest $request, $orderId)
     {
-        $order = Order::findOrFail($id);
-        return $order->orderItems()->create($request->validated());
+        $order = Order::findOrFail($orderId);
+        $authUser = request()->user();
+        if ($authUser->role !== 'admin' && $order->user_id !== $authUser->id) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+        $data = $request->validated();
+        $product = Product::findOrFail($data['product_id']);
+        $data['unit_price'] = $product->price;
+        return $order->orderItems()->create($data);
     }
 
     public function show($orderId, $id)
@@ -25,6 +38,10 @@ class OrderItemController extends Controller
         $orderItem = OrderItem::findOrFail($id);
         if ($orderItem->order_id != $orderId) {
             abort(404);
+        }
+        $authUser = request()->user();
+        if ($authUser->role !== 'admin' && $orderItem->order->user_id !== $authUser->id) {
+            return response()->json(['error' => 'Unauthorized'], 401);
         }
         return $orderItem;
     }
@@ -35,7 +52,16 @@ class OrderItemController extends Controller
         if ($orderItem->order_id != $orderId) {
             abort(404);
         }
-        $orderItem->update($request->validated());
+        $authUser = request()->user();
+        if ($authUser->role !== 'admin' && $orderItem->order->user_id !== $authUser->id) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+        $data = $request->validated();
+        if (isset($data['product_id'])) {
+            $product = Product::findOrFail($data['product_id']);
+            $data['unit_price'] = $product->price;
+        }
+        $orderItem->update($data);
         return $orderItem;
     }
 
@@ -44,6 +70,10 @@ class OrderItemController extends Controller
         $orderItem = OrderItem::findOrFail($id);
         if ($orderItem->order_id != $orderId) {
             abort(404);
+        }
+        $authUser = request()->user();
+        if ($authUser->role !== 'admin' && $orderItem->order->user_id !== $authUser->id) {
+            return response()->json(['error' => 'Unauthorized'], 401);
         }
         $orderItem->delete();
         return response()->noContent();

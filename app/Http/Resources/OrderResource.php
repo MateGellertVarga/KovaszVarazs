@@ -7,7 +7,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class OrderResource extends JsonResource
 {
-    // Ha nem szeretnéd, hogy "data" kulcsba legyen csomagolva az eredmény, beállíthatod:
     public static $wrap = null;
 
     /**
@@ -20,11 +19,10 @@ class OrderResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'customer_name' => $this->customer_name,
-            'phone' => $this->phone,
+            'customer_name' => $this->customer_name ?? optional($this->user)->name,
+            'phone_number' => $this->phone_number ?? optional($this->user)->phone_number,
             'note' => $this->note,
             'status' => $this->status,
-            'date' => $this->date,
             'is_paying' => $this->is_paying,
             'total_price' => $this->total_price,
             'order_schedule_id' => $this->order_schedule_id,

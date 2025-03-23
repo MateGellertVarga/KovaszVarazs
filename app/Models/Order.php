@@ -9,7 +9,16 @@ class Order extends Model
 {
     use HasFactory;
     public $timestamps = false;
-    protected $fillable = ['customer_name', 'phone', 'note', 'status', 'date', 'is_paying', 'total_price', 'order_schedule_id'];
+    protected $fillable = [
+        'user_id',
+        'customer_name',
+        'phone_number',
+        'note',
+        'status',
+        'is_paying',
+        'total_price',
+        'order_schedule_id',
+    ];
 
     protected $casts = [
         'is_paying' => 'boolean',
@@ -30,9 +39,20 @@ class Order extends Model
         return $this->belongsTo(OrderSchedule::class);
     }
 
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
     public function getTotalPriceAttribute()
     {
-        return $this->orderItems()->with('product')->get()->sum(fn($item) => $item->quantity * $item->product->price);
+        $this->loadMissing('orderItems.product');
+
+        if ($this->status === 'completed') {
+            return $this->orderItems->sum(fn($item) => $item->quantity * $item->unit_price);
+        } else {
+            return $this->orderItems->sum(fn($item) => $item->quantity * $item->product->price);
+        }
     }
 
     public static function boot()

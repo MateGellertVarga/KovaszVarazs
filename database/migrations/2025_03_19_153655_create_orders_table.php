@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->string('customer_name');
-            $table->string('phone')->nullable();
+            $table->foreignId('user_id')->nullable()->constrained()->onDelete('set null');
+            $table->string('customer_name')->nullable();
+            $table->string('phone_number')->nullable();
             $table->string('note')->nullable();
             $table->string('status')->default('pending');
-            $table->date('date')->useCurrent();
             $table->boolean('is_paying')->default(true);
             $table->decimal('total_price', 10, 2)->default(0);
             $table->foreignId('order_schedule_id')->constrained()->onDelete('cascade');

@@ -15,6 +15,10 @@ class ProductController extends Controller
 
     public function store(StoreProductRequest $request)
     {
+        $authUser = $request->user();
+        if (!$authUser || $authUser->role !== 'admin') {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
         return Product::create($request->validated());
     }
 
@@ -25,6 +29,10 @@ class ProductController extends Controller
 
     public function update(UpdateProductRequest $request, $id)
     {
+        $authUser = $request->user();
+        if (!$authUser || $authUser->role !== 'admin') {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
         $product = Product::findOrFail($id);
         $product->update($request->validated());
         return $product;
@@ -32,6 +40,10 @@ class ProductController extends Controller
 
     public function destroy($id)
     {
+        $authUser = request()->user();
+        if (!$authUser || $authUser->role !== 'admin') {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
         $product = Product::findOrFail($id);
         $product->delete();
         return response()->noContent();

@@ -14,7 +14,7 @@ class UpdateOrderItemRequest extends FormRequest
     public function rules()
     {
         return [
-            'quantity' => 'sometimes|required|integer|min:1'
+            'quantity' => 'sometimes|required|integer|min:0'
         ];
     }
 }

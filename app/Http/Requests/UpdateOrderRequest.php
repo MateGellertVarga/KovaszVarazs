@@ -14,15 +14,15 @@ class UpdateOrderRequest extends FormRequest
     public function rules()
     {
         return [
-            'customer_name' => 'sometimes|required|string',
-            'phone'     => 'sometimes|string',
-            'date'    => 'sometimes|required|date',
-            'note'   => 'sometimes|string',
-            'status' => 'sometimes|required|in:pending,processing,completed',
-            'order_items'  => 'sometimes|required|array',
-            'order_items.*.product_id' => 'sometimes|required|exists:products,id',
-            'order_items.*.quantity'   => 'sometimes|required|integer|min:1',
-            'order_schedule_id' => 'sometimes|required|exists:order_schedules,id'
+            'customer_name'       => 'sometimes|nullable|string',
+            'phone_number'        => 'sometimes|nullable|string',
+            'note'                => 'sometimes|nullable|string',
+            'status'              => 'sometimes|required|in:pending,processing,completed',
+            'is_paying'           => 'sometimes|nullable|boolean',
+            'order_schedule_id'   => 'sometimes|required|exists:order_schedules,id',
+            'order_items'         => 'sometimes|array',
+            'order_items.*.product_id' => 'required_with:order_items|exists:products,id',
+            'order_items.*.quantity'   => 'required_with:order_items|integer|min:0',
         ];
     }
 }

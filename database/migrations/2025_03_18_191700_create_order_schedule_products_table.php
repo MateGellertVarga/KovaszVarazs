@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('order_schedule_id')->constrained()->onDelete('cascade');
             $table->foreignId('product_id')->constrained()->onDelete('cascade');
             $table->integer('max_quantity');
+            $table->integer('remaining_quantity');
         });
     }
 

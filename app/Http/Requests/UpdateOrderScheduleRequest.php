@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateOrderScheduleRequest extends FormRequest
 {
@@ -14,8 +15,8 @@ class UpdateOrderScheduleRequest extends FormRequest
     public function rules()
     {
         return [
-            'available_date' => 'required|date|unique:order_schedules,available_date,' . $this->route('orderSchedule')->id,
-            'products' => 'required|array',
+            'available_date' => 'sometimes|required|date',
+            'products' => 'sometimes|required|array',
             'products.*.id' => 'required|exists:products,id',
             'products.*.max_quantity' => 'required|integer|min:1',
         ];

@@ -15,11 +15,9 @@ class OrderSeeder extends Seeder
     public function run()
     {
         $order1 = Order::create([
-            'customer_name' => 'John Doe',
-            'phone' => '123456789',
+            'user_id' => 2,
             'note' => 'Kérlek, gyorsan készítsd el!',
             'status' => 'pending',
-            'date' => now(),
             'is_paying' => true,
             'total_price' => 0,
             'order_schedule_id' => 1,
@@ -32,10 +30,9 @@ class OrderSeeder extends Seeder
 
         $order2 = Order::create([
             'customer_name' => 'Minta Béla',
-            'phone' => '987654321',
+            'phone_number' => '987654321',
             'note' => 'Személyes átvétel',
             'status' => 'completed',
-            'date' => now(),
             'is_paying' => false,
             'total_price' => 0,
             'order_schedule_id' => 2,
