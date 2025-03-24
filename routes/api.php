@@ -7,6 +7,8 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\OrderItemController;
 use App\Http\Controllers\OrderScheduleController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CostController;
+use App\Http\Controllers\StatisticsController;
 
 /* Public endpoints */
 Route::post('register', [AuthController::class, 'register']);
@@ -45,5 +47,13 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::post('orderSchedules', [OrderScheduleController::class, 'store']);
     Route::put('orderSchedules/{orderSchedule}', [OrderScheduleController::class, 'update']);
     Route::delete('orderSchedules/{orderSchedule}', [OrderScheduleController::class, 'destroy']);
+
+    Route::get('costs', [CostController::class, 'index']);
+    Route::post('costs', [CostController::class, 'store']);
+    Route::get('costs/{cost}', [CostController::class, 'show']);
+    Route::put('costs/{cost}', [CostController::class, 'update']);
+    Route::delete('costs/{cost}', [CostController::class, 'destroy']);
+
+    Route::get('statistics', [StatisticsController::class, 'monthly']);
 });
 

@@ -65,10 +65,7 @@ class OrderScheduleController extends Controller
             }
 
             if (isset($validated['products'])) {
-                // Először ellenőrizzük minden megadott termék esetében,
-                // hogy az új max_quantity nem kisebb-e a már leadott mennyiségnél.
                 foreach ($validated['products'] as $product) {
-                    // Összegyűjtjük az adott order_schedule-hez tartozó, adott termékből leadott mennyiséget
                     $orderedQuantity = DB::table('orders')
                         ->join('order_items', 'orders.id', '=', 'order_items.order_id')
                         ->where('orders.order_schedule_id', $orderSchedule->id)
@@ -80,12 +77,9 @@ class OrderScheduleController extends Controller
                     }
                 }
 
-                // Ezután eltávolítjuk a régi kapcsolódó termékeket...
                 $orderSchedule->products()->detach();
 
-                // ... majd újra csatoljuk őket az új értékekkel.
                 foreach ($validated['products'] as $product) {
-                    // Új remaining_quantity kiszámolása: új max_quantity mínusz a leadott mennyiség
                     $orderedQuantity = DB::table('orders')
                         ->join('order_items', 'orders.id', '=', 'order_items.order_id')
                         ->where('orders.order_schedule_id', $orderSchedule->id)

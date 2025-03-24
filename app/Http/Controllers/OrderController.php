@@ -150,21 +150,17 @@ class OrderController extends Controller
         $order = Order::findOrFail($id);
         $authUser = $request->user();
 
-        // Jogosultság ellenőrzés
         if ($authUser->role !== 'admin' && $order->user_id !== $authUser->id) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        // A rendelés összes rendelési tétele
         foreach ($order->orderItems as $orderItem) {
-            // Visszaadjuk a készletet
             DB::table('order_schedule_products')
                 ->where('order_schedule_id', $order->order_schedule_id)
                 ->where('product_id', $orderItem->product_id)
                 ->increment('remaining_quantity', $orderItem->quantity);
         }
 
-        // A rendelés törlése
         $order->delete();
 
         return response()->noContent();
