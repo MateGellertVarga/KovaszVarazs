@@ -9,6 +9,7 @@ use App\Http\Controllers\OrderScheduleController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CostController;
 use App\Http\Controllers\StatisticsController;
+use App\Http\Controllers\UserController;
 
 /* Public endpoints */
 Route::post('register', [AuthController::class, 'register']);
@@ -26,6 +27,9 @@ Route::post('orders', [OrderController::class, 'store']);
 /* Authenticated user endpoints */
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('logout', [AuthController::class, 'logout']);
+
+    Route::get('user', [UserController::class, 'show']);
+    Route::put('user', [UserController::class, 'update']);
 
     Route::get('orders', [OrderController::class, 'index']);
     Route::get('orders/{order}', [OrderController::class, 'show']);
