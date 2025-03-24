@@ -9,6 +9,7 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Response;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\LoginRequest;
+use Laravel\Sanctum\PersonalAccessToken;
 
 class AuthController extends Controller
 {
@@ -21,8 +22,6 @@ class AuthController extends Controller
             'password'     => Hash::make($request->password),
             'role'         => $request->role
         ]);
-
-        $tokenResult = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
             'message' => 'Registration successful.',
@@ -39,17 +38,46 @@ class AuthController extends Controller
             ]);
         }
 
-        $tokenResult = $user->createToken('auth_token')->plainTextToken;
+        $accessToken = $user->createToken('access_token', ['access'], now()->addHour())->plainTextToken;
+        $refreshToken = $user->createToken('refresh_token', ['refresh'])->plainTextToken;
 
         return response()->json([
-            'access_token' => $tokenResult,
+            'access_token' => $accessToken,
+            'refresh_token' => $refreshToken,
             'token_type'   => 'Bearer',
         ]);
     }
 
+    public function refresh(Request $request)
+    {
+        $refreshToken = $request->bearerToken();
+
+        if (!$refreshToken) {
+            return response()->json(['error' => 'Refresh token required'], 401);
+        }
+
+        $token = PersonalAccessToken::findToken($refreshToken);
+        if (!$token || !$token->can('refresh')) {
+            return response()->json(['error' => 'Invalid refresh token'], 401);
+        }
+
+        $user = $token->tokenable;
+
+        $newAccessToken = $user->createToken('access_token', ['access'], now()->addHour())->plainTextToken;
+
+        return response()->json([
+            'access_token' => $newAccessToken,
+            'token_type'   => 'Bearer',
+        ]);
+    }
+
+
+
+
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
+        $user = $request->user();
+        $user->tokens()->where('name', 'refresh_token')->delete();
         return response()->json(['message' => 'Logged out successfully']);
     }
 }
