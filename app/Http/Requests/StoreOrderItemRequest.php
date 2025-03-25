@@ -18,4 +18,14 @@ class StoreOrderItemRequest extends FormRequest
             'quantity'   => 'required|integer|min:1'
         ];
     }
+
+    public function messages():array {
+        return [
+            'product_id.required' => 'Termék hiányzik',
+            'product_id.exists'   => 'Termék nem létezik',
+            'quantity.required'   => 'Mennyiség hiányzik',
+            'quantity.integer'    => 'Mennyiség formátuma nem megfelelő',
+            'quantity.min'        => 'Mennyiségnek legalább 1-nek kell lennie'
+        ];
+    }
 }

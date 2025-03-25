@@ -31,7 +31,7 @@ class OrderController extends Controller
     {
         $orderSchedule = OrderSchedule::find($request->order_schedule_id);
         if (!$orderSchedule) {
-            return response()->json(['error' => 'Invalid order_schedule_id'], 400);
+            return response()->json(['error' => 'Nem található a sütési időpont'], 400);
         }
 
         $data = $request->validated();
@@ -64,7 +64,7 @@ class OrderController extends Controller
                     ->value('remaining_quantity');
 
                 if ($remaining < $orderItem->quantity) {
-                    return response()->json(['error' => "Not enough stock for product {$orderItem->product_name}"], 400);
+                    return response()->json(['error' => "Nincs elég szabad termék: {$orderItem->product_name}"], 400);
                 }
 
                 DB::table('order_schedule_products')
@@ -83,7 +83,7 @@ class OrderController extends Controller
         $order = Order::with(['orderItems.product', 'orderSchedule', 'user'])->findOrFail($id);
         $user = $request->user();
         if ($user->role !== 'admin' && $order->user_id !== $user->id) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['error' => 'Nincs jogod ehhez a művelethez'], 401);
         }
         return new OrderResource($order);
     }
@@ -94,7 +94,7 @@ class OrderController extends Controller
         $authUser = $request->user();
 
         if ($authUser->role !== 'admin' && $order->user_id !== $authUser->id) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['error' => 'Nincs jogod ehhez a művelethez'], 401);
         }
 
         $oldOrderItems = $order->orderItems()->get();
@@ -123,7 +123,7 @@ class OrderController extends Controller
                         ->value('remaining_quantity');
 
                     if ($remaining < $item['quantity']) {
-                        return response()->json(['error' => "Not enough stock for product {$product->name}"], 400);
+                        return response()->json(['error' => "Nincs elég szabad termék: {$product->name}"], 400);
                     }
 
                     DB::table('order_schedule_products')
@@ -151,7 +151,7 @@ class OrderController extends Controller
         $authUser = $request->user();
 
         if ($authUser->role !== 'admin' && $order->user_id !== $authUser->id) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['error' => 'Nincs jogod ehhez a művelethez'], 401);
         }
 
         foreach ($order->orderItems as $orderItem) {

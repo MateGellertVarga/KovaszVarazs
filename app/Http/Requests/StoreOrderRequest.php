@@ -25,4 +25,24 @@ class StoreOrderRequest extends FormRequest
             'order_schedule_id'     => 'required|exists:order_schedules,id'
         ];
     }
+
+    public function messages():array {
+        return [
+            'user_id.required'                => 'Felhasználó hiányzik',
+            'user_id.exists'                  => 'Felhasználó nem létezik',
+            'customer_name.string'            => 'Név formátuma nem megfelelő',
+            'phone_number.string'             => 'Telefonszám formátuma nem megfelelő',
+            'note.string'                     => 'Megjegyzés formátuma nem megfelelő',
+            'status.required'                 => 'Állapot hiányzik',
+            'status.in'                       => 'Állapot nem megfelelő',
+            'order_items.array'               => 'Rendelési tételek formátuma nem megfelelő',
+            'order_items.*.product_id.required' => 'Termék hiányzik',
+            'order_items.*.product_id.exists'   => 'Termék nem létezik',
+            'order_items.*.quantity.required'   => 'Mennyiség hiányzik',
+            'order_items.*.quantity.integer'    => 'Mennyiség formátuma nem megfelelő',
+            'order_items.*.quantity.min'        => 'Mennyiségnek legalább 1-nek kell lennie',
+            'order_schedule_id.required'       => 'Sütés időpont hiányzik',
+            'order_schedule_id.exists'         => 'Sütés időpont nem létezik',
+        ];
+    }
 }

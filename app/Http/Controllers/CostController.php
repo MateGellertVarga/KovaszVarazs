@@ -15,7 +15,7 @@ class CostController extends Controller
     {
         $authUser = $request->user();
         if (!$authUser || $authUser->role !== 'admin') {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['error' => 'Nincs jogod ehhez a művelethez'], 401);
         }
         return response()->json(Cost::all());
     }
@@ -24,7 +24,7 @@ class CostController extends Controller
     {
         $authUser = $request->user();
         if (!$authUser || $authUser->role !== 'admin') {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['error' => 'Nincs jogod ehhez a művelethez'], 401);
         }
 
         $cost = Cost::create($request->validated());
@@ -35,7 +35,7 @@ class CostController extends Controller
     {
         $authUser = $request->user();
         if (!$authUser || $authUser->role !== 'admin') {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['error' => 'Nincs jogod ehhez a művelethez'], 401);
         }
         return response()->json(Cost::findOrFail($id));
     }
@@ -44,7 +44,7 @@ class CostController extends Controller
     {
         $authUser = $request->user();
         if (!$authUser || $authUser->role !== 'admin') {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['error' => 'Nincs jogod ehhez a művelethez'], 401);
         }
         $cost = Cost::findOrFail($id);
         $cost->update($request->validated());
@@ -55,7 +55,7 @@ class CostController extends Controller
     {
         $authUser = $request->user();
         if (!$authUser || $authUser->role !== 'admin') {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['error' => 'Nincs jogod ehhez a művelethez'], 401);
         }
         Cost::destroy($id);
         return response()->noContent();

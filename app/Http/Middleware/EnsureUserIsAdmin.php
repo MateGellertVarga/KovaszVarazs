@@ -16,7 +16,7 @@ class EnsureUserIsAdmin
     public function handle(Request $request, Closure $next): Response
     {
         if ($request->user()->role !== 'admin') {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['error' => 'Nincs jogod ehhez a művelethez'], 401);
         }
         return $next($request);
     }

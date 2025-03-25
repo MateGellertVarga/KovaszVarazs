@@ -28,7 +28,7 @@ class OrderScheduleController extends Controller
     {
         $authUser = $request->user();
         if ($authUser->role !== 'admin') {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['error' => 'Nincs jogod ehhez a művelethez'], 401);
         }
 
         $validated = $request->validated();
@@ -53,7 +53,7 @@ class OrderScheduleController extends Controller
     {
         $authUser = $request->user();
         if ($authUser->role !== 'admin') {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['error' => 'Nincs jogod ehhez a művelethez'], 401);
         }
 
         return DB::transaction(function () use ($request, $id) {
@@ -73,7 +73,7 @@ class OrderScheduleController extends Controller
                         ->sum('order_items.quantity');
 
                     if ($product['max_quantity'] < $orderedQuantity) {
-                        return response()->json(['error' => "New max quantity for product ID {$product['id']} cannot be less than already ordered quantity ($orderedQuantity)."], 400);
+                        return response()->json(['error' => "Maximum mennyiséget nem lehet kisebbre állítani, mint a már leadott rendelések: {$product->name}"], 400);
                     }
                 }
 
@@ -104,7 +104,7 @@ class OrderScheduleController extends Controller
     public function destroy($id)
     {
         if (request()->user()->role !== 'admin') {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['error' => 'Nincs jogod ehhez a művelethez'], 401);
         }
         OrderSchedule::destroy($id);
         return response()->noContent();

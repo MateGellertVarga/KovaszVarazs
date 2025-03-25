@@ -17,10 +17,23 @@ class ProductController extends Controller
     {
         $authUser = $request->user();
         if (!$authUser || $authUser->role !== 'admin') {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['error' => 'Nincs jogod ehhez a művelethez'], 401);
         }
-        return Product::create($request->validated());
+
+        $imagePath = null;
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('products', 'public');
+        }
+
+        $product = Product::create([
+            'name' => $request->name,
+            'price' => $request->price,
+            'image_url' => $imagePath ? asset('storage/' . $imagePath) : null
+        ]);
+
+        return response()->json($product, 201);
     }
+
 
     public function show($id)
     {
@@ -31,18 +44,27 @@ class ProductController extends Controller
     {
         $authUser = $request->user();
         if (!$authUser || $authUser->role !== 'admin') {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['error' => 'Nincs jogod ehhez a művelethez'], 401);
         }
+
         $product = Product::findOrFail($id);
-        $product->update($request->validated());
-        return $product;
+
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('products', 'public');
+            $product->image_url = asset('storage/' . $imagePath);
+        }
+
+        $product->update($request->except('image'));
+
+        return response()->json($product);
     }
+
 
     public function destroy($id)
     {
         $authUser = request()->user();
         if (!$authUser || $authUser->role !== 'admin') {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['error' => 'Nincs jogod ehhez a művelethez'], 401);
         }
         $product = Product::findOrFail($id);
         $product->delete();

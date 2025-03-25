@@ -18,4 +18,12 @@ class LoginRequest extends FormRequest
             'password' => 'required|string'
         ];
     }
+
+    public function messages(): array {
+        return [
+            'email.required'    => 'Email cím hiányzik',
+            'email.email'       => 'Email cím formátuma nem megfelelő',
+            'password.required' => 'Jelszó hiányzik'
+        ];
+    }
 }

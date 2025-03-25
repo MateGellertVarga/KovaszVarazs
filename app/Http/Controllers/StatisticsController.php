@@ -11,7 +11,7 @@ class StatisticsController extends Controller
     {
         $authUser = $request->user();
         if (!$authUser || $authUser->role !== 'admin') {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['error' => 'Nincs jogod ehhez a művelethez'], 401);
         }
 
         $month = $request->query('month');

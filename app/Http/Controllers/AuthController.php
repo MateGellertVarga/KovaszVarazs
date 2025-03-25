@@ -33,9 +33,7 @@ class AuthController extends Controller
         $user = User::where('email', $request->email)->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
-            throw ValidationException::withMessages([
-                'email' => ['The provided credentials are incorrect.']
-            ]);
+            return response()->json(['error' => 'Helytelen email cím vagy jelszó'], 400);
         }
 
         $accessToken = $user->createToken('access_token', ['access'], now()->addHour())->plainTextToken;
@@ -53,12 +51,12 @@ class AuthController extends Controller
         $refreshToken = $request->bearerToken();
 
         if (!$refreshToken) {
-            return response()->json(['error' => 'Refresh token required'], 401);
+            return response()->json(['error' => 'Hiba! Hiáynzó token'], 401);
         }
 
         $token = PersonalAccessToken::findToken($refreshToken);
         if (!$token || !$token->can('refresh')) {
-            return response()->json(['error' => 'Invalid refresh token'], 401);
+            return response()->json(['error' => 'Érvenytelen token'], 401);
         }
 
         $user = $token->tokenable;
@@ -78,6 +76,6 @@ class AuthController extends Controller
     {
         $user = $request->user();
         $user->tokens()->where('name', 'refresh_token')->delete();
-        return response()->json(['message' => 'Logged out successfully']);
+        return response()->json(['message' => 'Sikeres kijelentkezés']);
     }
 }

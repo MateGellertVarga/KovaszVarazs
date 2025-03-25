@@ -17,4 +17,12 @@ class UpdateOrderItemRequest extends FormRequest
             'quantity' => 'sometimes|required|integer|min:0'
         ];
     }
+
+    public function messages():array {
+        return [
+            'quantity.required' => 'Mennyiség hiányzik',
+            'quantity.integer'  => 'Mennyiség formátuma nem megfelelő',
+            'quantity.min'      => 'Mennyiségnek pozitívnak kell lennie, törléshez 0-t adj meg',
+        ];
+    }
 }

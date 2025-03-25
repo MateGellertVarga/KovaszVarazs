@@ -12,11 +12,11 @@ class UserController extends Controller
     {
         $user = $request->user();
         if (!$user) {
-            return response()->json(['message' => 'Unauthorized'], 401);
+            return response()->json(['message' => 'Nincs jogod ehhez a művelethez'], 401);
         }
 
         if ($user->id !== $request->user()->id) {
-            return response()->json(['message' => 'You can only view your own data'], 401);
+            return response()->json(['message' => 'Más adatát nincs jogod elérni'], 401);
         }
 
         return response()->json([
@@ -32,7 +32,7 @@ class UserController extends Controller
     {
         $user = $request->user();
         if (!$user) {
-            return response()->json(['message' => 'Unauthorized'], 401);
+            return response()->json(['message' => 'Nincs jogod ehhez a művelethez'], 401);
         }
 
         $validated = $request->validated();

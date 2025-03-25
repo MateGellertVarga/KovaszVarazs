@@ -15,7 +15,7 @@ class OrderItemController extends Controller
         $order = Order::findOrFail($orderId);
         $authUser = request()->user();
         if ($authUser->role !== 'admin' && $order->user_id !== $authUser->id) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['error' => 'Nincs jogod ehhez a művelethez'], 401);
         }
         return OrderItem::where('order_id', $orderId)->get();
     }
@@ -25,7 +25,7 @@ class OrderItemController extends Controller
         $order = Order::findOrFail($orderId);
         $authUser = request()->user();
         if ($authUser->role !== 'admin' && $order->user_id !== $authUser->id) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['error' => 'Nincs jogod ehhez a művelethez'], 401);
         }
         $data = $request->validated();
         $product = Product::findOrFail($data['product_id']);
@@ -41,7 +41,7 @@ class OrderItemController extends Controller
         }
         $authUser = request()->user();
         if ($authUser->role !== 'admin' && $orderItem->order->user_id !== $authUser->id) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['error' => 'Nincs jogod ehhez a művelethez'], 401);
         }
         return $orderItem;
     }
@@ -54,7 +54,7 @@ class OrderItemController extends Controller
         }
         $authUser = request()->user();
         if ($authUser->role !== 'admin' && $orderItem->order->user_id !== $authUser->id) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['error' => 'Nincs jogod ehhez a művelethez'], 401);
         }
         $data = $request->validated();
         if (isset($data['product_id'])) {
@@ -73,7 +73,7 @@ class OrderItemController extends Controller
         }
         $authUser = request()->user();
         if ($authUser->role !== 'admin' && $orderItem->order->user_id !== $authUser->id) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['error' => 'Nincs jogod ehhez a művelethez'], 401);
         }
         $orderItem->delete();
         return response()->noContent();
