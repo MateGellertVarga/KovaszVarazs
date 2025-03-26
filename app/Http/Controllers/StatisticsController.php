@@ -32,6 +32,7 @@ class StatisticsController extends Controller
                 DB::raw('SUM(order_items.quantity * order_items.unit_price) as income')
             )
             ->where('orders.status', 'completed')
+            ->where('orders.is_paying', true)
             ->whereRaw("strftime('%Y-%m', order_schedules.available_date) = ?", [$month])
             ->groupBy('products.id', 'products.name')
             ->get();

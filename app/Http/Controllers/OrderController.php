@@ -42,6 +42,10 @@ class OrderController extends Controller
             $data['phone_number'] = $data['phone_number'] ?? null;
         }
 
+        if ($request->user_id == null && $request->customer_name == null) {
+            return response()->json(['error' => 'Vevő megadása kötelező'], 400);
+        }
+
         return DB::transaction(function () use ($data, $request) {
             $order = Order::create($data);
 
@@ -52,10 +56,11 @@ class OrderController extends Controller
                 $orderItems[] = $order->orderItems()->create($item);
             }
 
-            $order->refresh();
-            $order->update([
-                'total_price' => collect($orderItems)->sum(fn($item) => $item->quantity * $item->unit_price)
-            ]);
+            $totalPrice = $order->is_paying
+                ? collect($orderItems)->sum(fn($item) => $item->quantity * $item->unit_price)
+                : 0;
+
+            $order->update(['total_price' => $totalPrice]);
 
             foreach ($orderItems as $orderItem) {
                 $remaining = DB::table('order_schedule_products')
@@ -64,7 +69,7 @@ class OrderController extends Controller
                     ->value('remaining_quantity');
 
                 if ($remaining < $orderItem->quantity) {
-                    return response()->json(['error' => "Nincs elég szabad termék: {$orderItem->product_name}"], 400);
+                    return response()->json(['error' => "Nincs elég szabad termék: {$orderItem->product->name}"], 400);
                 }
 
                 DB::table('order_schedule_products')
@@ -77,6 +82,7 @@ class OrderController extends Controller
             return new OrderResource($order);
         });
     }
+
 
     public function show(Request $request, $id)
     {
@@ -136,13 +142,16 @@ class OrderController extends Controller
             }
         }
 
-        $order->update([
-            'total_price' => $order->orderItems->sum(fn($item) => $item->quantity * $item->unit_price)
-        ]);
+        $totalPrice = $order->is_paying
+            ? $order->orderItems->sum(fn($item) => $item->quantity * $item->unit_price)
+            : 0;
+
+        $order->update(['total_price' => $totalPrice]);
 
         $order->load(['orderItems.product', 'orderSchedule', 'user']);
         return new OrderResource($order);
     }
+
 
 
     public function destroy(Request $request, $id)

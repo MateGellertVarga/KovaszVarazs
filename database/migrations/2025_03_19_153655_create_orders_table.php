@@ -17,8 +17,8 @@ return new class extends Migration
             $table->string('customer_name')->nullable();
             $table->string('phone_number')->nullable();
             $table->string('note')->nullable();
-            $table->string('status')->default('pending');
-            $table->boolean('is_paying')->default(true);
+            $table->string('status');
+            $table->boolean('is_paying');
             $table->decimal('total_price', 10, 2)->default(0);
             $table->foreignId('order_schedule_id')->constrained()->onDelete('cascade');
         });

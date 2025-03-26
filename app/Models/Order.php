@@ -48,20 +48,14 @@ class Order extends Model
     {
         $this->loadMissing('orderItems.product');
 
+        if (!$this->is_paying) {
+            return 0;
+        }
+
         if ($this->status === 'completed') {
             return $this->orderItems->sum(fn($item) => $item->quantity * $item->unit_price);
         } else {
             return $this->orderItems->sum(fn($item) => $item->quantity * $item->product->price);
         }
-    }
-
-    public static function boot()
-    {
-        parent::boot();
-
-        static::saving(function ($order) {
-            $order->load('orderItems.product');
-            $order->total_price = $order->orderItems->sum(fn($item) => $item->quantity * $item->product->price);
-        });
     }
 }
