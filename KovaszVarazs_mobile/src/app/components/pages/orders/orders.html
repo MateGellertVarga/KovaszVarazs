@@ -1,0 +1,47 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      Rendelések
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Rendelések</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <!-- <ion-list>
+    <ion-item *ngFor="let order of orders">
+      <ion-card>
+        <ion-label>
+          <h1>{{order.customerName}}</h1>
+          @if (order.phoneNumber) {
+            <h3>{{ order.phoneNumber }}</h3>
+          }
+          @for (item of order.products; track $index) {
+            <h3>{{ item.productName }} - {{ item.productQuantity }} db</h3>
+          }
+          <h1>Rendelés összege: {{ order.totalPrice }}</h1>
+        </ion-label>
+        <ion-button (click)="deleteOrder(order.id)">
+          <ion-icon name="eye-outline"></ion-icon>
+        </ion-button>
+        <ion-button (click)="modifyOrder(order.id)">
+          <ion-icon name="create-outline"></ion-icon>
+        </ion-button>
+        @if (order.status != 'completed') {
+          <ion-button (click)="setReadyOrder(order.id)">
+            <ion-icon name="checkmark-outline"></ion-icon>
+          </ion-button>
+        }
+        @else {
+          <ion-button (click)="setCompletedOrder(order.id)">
+            <ion-icon name="close-outline"></ion-icon>
+          </ion-button>
+        }
+      </ion-card>
+    </ion-item>
+  </ion-list> -->
+</ion-content>
