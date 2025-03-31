@@ -1,15 +1,59 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>
-      Termékek
-    </ion-title>
+    <div class="flex justify-between items-center w-full">
+      <ion-title class="font-bold text-2xl text-center text-black"
+        >Termékek</ion-title
+      >
+      <ion-fab horizontal="end">
+        <ion-fab-button size="small" color="primary">
+          <ion-icon name="add"></ion-icon>
+        </ion-fab-button>
+      </ion-fab>
+    </div>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Termékek</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  @for (product of products; track $index) {
+  <ion-card class="w-3/4 mx-auto mb-4">
+    <img [src]="product.imageUrl" />
+    <ion-card-header>
+      <div class="flex justify-between">
+        <ion-card-title class="font-bold">{{product.name}}</ion-card-title>
+        <ion-card-title>{{product.price}} €/db</ion-card-title>
+      </div>
+    </ion-card-header>
+
+    <ion-card-content>
+      <div class="flex justify-evenly mt-2">
+        <ion-button color="white">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="32"
+            height="32"
+            viewBox="0 0 24 24"
+          >
+            <path
+              fill="red"
+              d="M7 21q-.825 0-1.412-.587T5 19V6q-.425 0-.712-.288T4 5t.288-.712T5 4h4q0-.425.288-.712T10 3h4q.425 0 .713.288T15 4h4q.425 0 .713.288T20 5t-.288.713T19 6v13q0 .825-.587 1.413T17 21zm3-4q.425 0 .713-.288T11 16V9q0-.425-.288-.712T10 8t-.712.288T9 9v7q0 .425.288.713T10 17m4 0q.425 0 .713-.288T15 16V9q0-.425-.288-.712T14 8t-.712.288T13 9v7q0 .425.288.713T14 17"
+            />
+          </svg>
+        </ion-button>
+        <ion-button color="white">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="32"
+            height="32"
+            viewBox="0 0 24 24"
+          >
+            <path
+              fill="grey"
+              d="M3 21v-4.25L17.625 2.175L21.8 6.45L7.25 21zM17.6 7.8L19 6.4L17.6 5l-1.4 1.4z"
+            />
+          </svg>
+        </ion-button>
+      </div>
+    </ion-card-content>
+  </ion-card>
+  }
 </ion-content>

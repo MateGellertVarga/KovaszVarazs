@@ -1,15 +1,86 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>
+    <ion-title class="font-bold text-2xl text-center text-black">
       Statisztika
     </ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Statisztika</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <div class="mx-auto flex justify-between items-center mt-2">
+    <ion-button fill="clear">
+      <ion-icon name="chevron-back-outline"></ion-icon>
+    </ion-button>
+    <h2 class="text-xl font-semibold">
+      {{statistics.month | date: 'yyyy MMMM' : undefined : 'hu' }}
+    </h2>
+    <ion-button fill="clear">
+      <ion-icon name="chevron-forward-outline"></ion-icon>
+    </ion-button>
+  </div>
+
+  <div class="mx-auto mt-10">
+    <ion-title class="text-xl font-semibold">Bevételek</ion-title>
+    <ion-list class="px-1">
+      @for (product of statistics.sales; track $index) {
+      <ion-item>
+        <div class="flex justify-between items-center w-full">
+          <h3>{{product.productName}}</h3>
+          <h3>{{product.quantity}} db</h3>
+          <h3>{{product.income}} €</h3>
+        </div>
+      </ion-item>
+      }
+    </ion-list>
+    <div class="flex justify-between items-center w-full mt-20">
+      <ion-title class="text-xl font-semibold">Kiadások</ion-title>
+      <ion-fab horizontal="end">
+        <ion-fab-button size="small" color="primary">
+          <ion-icon name="add"></ion-icon>
+        </ion-fab-button>
+      </ion-fab>
+    </div>
+    <ion-list class="mt-4 px-1">
+      @for (cost of statistics.costs; track $index) {
+      <ion-item>
+        <div class="w-full">
+          <div class="flex justify-between items-center w-full">
+            <h3>{{cost.name}}</h3>
+            <h3>{{cost.amount}} €</h3>
+          </div>
+
+          <div class="flex justify-evenly w-full mt-2">
+            <ion-button color="white">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="32"
+                height="32"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  fill="red"
+                  d="M7 21q-.825 0-1.412-.587T5 19V6q-.425 0-.712-.288T4 5t.288-.712T5 4h4q0-.425.288-.712T10 3h4q.425 0 .713.288T15 4h4q.425 0 .713.288T20 5t-.288.713T19 6v13q0 .825-.587 1.413T17 21zm3-4q.425 0 .713-.288T11 16V9q0-.425-.288-.712T10 8t-.712.288T9 9v7q0 .425.288.713T10 17m4 0q.425 0 .713-.288T15 16V9q0-.425-.288-.712T14 8t-.712.288T13 9v7q0 .425.288.713T14 17"
+                />
+              </svg>
+            </ion-button>
+
+            <ion-button color="white">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="32"
+                height="32"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  fill="grey"
+                  d="M3 21v-4.25L17.625 2.175L21.8 6.45L7.25 21zM17.6 7.8L19 6.4L17.6 5l-1.4 1.4z"
+                />
+              </svg>
+            </ion-button>
+          </div>
+        </div>
+      </ion-item>
+      }
+    </ion-list>
+  </div>
 </ion-content>
