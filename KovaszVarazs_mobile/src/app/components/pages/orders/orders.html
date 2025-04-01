@@ -1,11 +1,14 @@
-<ion-header [translucent]="true">
+<ion-header
+  [translucent]="true"
+  class="{{editingOrder != null ? 'opacity-50 pointer-events-none' : ''}}"
+>
   <ion-toolbar>
     <div class="flex justify-between items-center w-full">
       <ion-title class="font-bold text-2xl text-center text-black"
         >Rendelések</ion-title
       >
       <ion-fab horizontal="end">
-        <ion-fab-button size="small" color="primary">
+        <ion-fab-button size="small" color="primary" (click)="newOrder()">
           <ion-icon name="add"></ion-icon>
         </ion-fab-button>
       </ion-fab>
@@ -13,7 +16,11 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
+<ion-content
+  [fullscreen]="true"
+  [scrollY]="editingOrder != null ? 'false':'true'"
+  class="relative {{editingOrder != null ? 'pointer-events-none' : ''}}"
+>
   <div class="w-[95%] mx-auto flex justify-between items-center mt-2">
     <ion-button fill="clear">
       <ion-icon name="chevron-back-outline"></ion-icon>
@@ -64,7 +71,7 @@
             class="flex mt-2 {{order.status == 'completed' ? 'justify-center' : 'justify-between'}}"
           >
             @if (order.status === 'pending') {
-            <ion-button color="white" (click)="deleteOrder(order.id)">
+            <ion-button color="white" (click)="deleteOrder(order)">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="32"
@@ -77,7 +84,7 @@
                 />
               </svg>
             </ion-button>
-            <ion-button color="white" (click)="modifyOrder(order.id)">
+            <ion-button color="white" (click)="modifyOrder(order)">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="32"
@@ -104,7 +111,7 @@
               </svg>
             </ion-button>
             } @else if (order.status === 'in progress') {
-            <ion-button color="white" (click)="deleteOrder(order.id)">
+            <ion-button color="white" (click)="deleteOrder(order)">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="32"
@@ -117,7 +124,7 @@
                 />
               </svg>
             </ion-button>
-            <ion-button color="white" (click)="modifyOrder(order.id)">
+            <ion-button color="white" (click)="modifyOrder(order)">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="32"
@@ -186,4 +193,13 @@
       </div>
     </ion-item>
   </ion-list>
+
+  @if (editingOrder !== null) {
+  <app-order-modal
+    [order]="editingOrder"
+    [orderSchedule]="orderSchedules[0]"
+    (canceled)="editingOrder = null"
+    (saved)="saveOrder($event)"
+  ></app-order-modal>
+  }
 </ion-content>

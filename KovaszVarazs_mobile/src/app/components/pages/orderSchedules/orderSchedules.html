@@ -1,11 +1,18 @@
-<ion-header [translucent]="true">
+<ion-header
+  [translucent]="true"
+  class="{{editingOrderSchedule != null ? 'opacity-50 pointer-events-none' : ''}}"
+>
   <ion-toolbar>
     <div class="flex justify-between items-center w-full">
       <ion-title class="font-bold text-2xl text-center text-black"
         >Sütések</ion-title
       >
       <ion-fab horizontal="end">
-        <ion-fab-button size="small" color="primary">
+        <ion-fab-button
+          size="small"
+          color="primary"
+          (click)="newOrderSchedule()"
+        >
           <ion-icon name="add"></ion-icon>
         </ion-fab-button>
       </ion-fab>
@@ -13,7 +20,11 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
+<ion-content
+  [fullscreen]="true"
+  [scrollY]="editingOrderSchedule != null ? 'false':'true'"
+  class="relative {{editingOrderSchedule != null ? 'pointer-events-none' : ''}}"
+>
   <ion-list>
     @for (orderSchedule of orderSchedules; track $index) {
     <ion-item class="w-full flex justify-between">
@@ -27,14 +38,12 @@
 
         <ion-card-content>
           <ul class="w-full space-y-2">
-            <!-- Fejléc sor -->
             <li class="p-2 border-b-2 border-black flex items-center bg-white">
               <h2 class="text-black flex-1 text-left !font-bold">Termék</h2>
               <h2 class="text-black flex-1 text-center !font-bold">Max</h2>
               <h2 class="text-black flex-1 text-right !font-bold">Szabad</h2>
             </li>
 
-            <!-- Dinamikus lista -->
             @for (product of orderSchedule.products; track $index) {
             <li
               class="p-3 border-b border-gray-300 flex items-center bg-white rounded-lg shadow-sm"
@@ -53,7 +62,10 @@
           </ul>
 
           <div class="flex justify-evenly mt-2">
-            <ion-button color="white">
+            <ion-button
+              color="white"
+              (click)="deleteOrderSchedule(orderSchedule)"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="32"
@@ -66,7 +78,10 @@
                 />
               </svg>
             </ion-button>
-            <ion-button color="white">
+            <ion-button
+              color="white"
+              (click)="modifyOrderSchedule(orderSchedule)"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="32"
@@ -85,4 +100,12 @@
     </ion-item>
     }
   </ion-list>
+
+  @if (editingOrderSchedule != null) {
+  <app-order-schedule-modal
+    [orderSchedule]="editingOrderSchedule"
+    (canceled)="editingOrderSchedule=null"
+    (saved)="saveOrderSchedule($event)"
+  ></app-order-schedule-modal>
+  }
 </ion-content>

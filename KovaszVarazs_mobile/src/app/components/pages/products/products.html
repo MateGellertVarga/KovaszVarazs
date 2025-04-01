@@ -1,11 +1,14 @@
-<ion-header [translucent]="true">
+<ion-header
+  [translucent]="true"
+  class="{{editingProduct != null ? 'opacity-50 pointer-events-none' : ''}}"
+>
   <ion-toolbar>
     <div class="flex justify-between items-center w-full">
       <ion-title class="font-bold text-2xl text-center text-black"
         >Termékek</ion-title
       >
       <ion-fab horizontal="end">
-        <ion-fab-button size="small" color="primary">
+        <ion-fab-button size="small" color="primary" (click)="newProduct()">
           <ion-icon name="add"></ion-icon>
         </ion-fab-button>
       </ion-fab>
@@ -13,7 +16,11 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
+<ion-content
+  [fullscreen]="true"
+  [scrollY]="editingProduct != null ? 'false':'true'"
+  class="relative {{editingProduct != null ? 'pointer-events-none' : ''}}"
+>
   @for (product of products; track $index) {
   <ion-card class="w-3/4 mx-auto mb-4">
     <img [src]="product.imageUrl" />
@@ -26,7 +33,7 @@
 
     <ion-card-content>
       <div class="flex justify-evenly mt-2">
-        <ion-button color="white">
+        <ion-button color="white" (click)="deleteProduct(product)">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="32"
@@ -39,7 +46,7 @@
             />
           </svg>
         </ion-button>
-        <ion-button color="white">
+        <ion-button color="white" (click)="modifyProduct(product)">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="32"
@@ -55,5 +62,11 @@
       </div>
     </ion-card-content>
   </ion-card>
+  } @if (editingProduct !== null) {
+  <app-product-modal
+    [product]="editingProduct"
+    (canceled)="editingProduct = null"
+    (saved)="saveProduct($event)"
+  ></app-product-modal>
   }
 </ion-content>

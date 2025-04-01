@@ -1,0 +1,106 @@
+@if (order) {
+<div
+  class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 z-[9999] pointer-events-auto"
+>
+  <div class="p-6 bg-white rounded-lg shadow-lg w-full max-w-lg relative">
+    <h2 class="text-2xl font-bold mb-4 text-center">
+      {{ order.customerName != "" ? "Rendelés módosítása" : "Új rendelés" }}
+    </h2>
+    <form class="space-y-4">
+      <div>
+        <label class="block font-medium text-gray-700">Név</label>
+        <input
+          type="text"
+          name="customerName"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+          [(ngModel)]="order.customerName"
+          required
+        />
+      </div>
+      <div>
+        <label class="block font-medium text-gray-700">Telefonszám</label>
+        <input
+          type="number"
+          name="phoneNumber"
+          placeholder="Opcionális"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+          [(ngModel)]="order.phoneNumber"
+        />
+      </div>
+      <div>
+        <label class="block font-medium text-gray-700">Megjegyzés</label>
+        <textarea
+          rows="2"
+          name="note"
+          placeholder="Opcionális"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+          [(ngModel)]="order.note"
+        ></textarea>
+      </div>
+      <div class="flex items-center">
+        <input
+          type="checkbox"
+          name="isPaying"
+          class="h-4 w-4 text-blue-600 border-gray-300 rounded"
+          [(ngModel)]="order.isPaying"
+        />
+        <label class="ml-2 font-medium text-gray-700">Fizet-e</label>
+      </div>
+      <div>
+        <label class="block font-medium mb-1 text-gray-700">Termékek</label>
+        <div class="space-y-2">
+          @for (item of orderSchedule?.products; track $index) {
+          <div class="flex items-center justify-between border p-2 rounded-md">
+            <span>{{ item.productName }}</span>
+            <div class="flex items-center space-x-2">
+              <button
+                type="button"
+                class="w-6 px-2 py-1 font-bold text-xl text-center bg-gray-300 rounded-md"
+                (click)="decreaseQuantity(item.productName)"
+              >
+                -
+              </button>
+              <input
+                type="number"
+                name="quantity"
+                class="w-12 text-center border rounded-md"
+                [value]="productQuantities[item.productName]"
+                (change)="onQuantityChange(item.productName, $event)"
+              />
+              <button
+                type="button"
+                class="w-6 px-2 py-1 font-bold text-xl text-center bg-gray-300 rounded-md"
+                (click)="increaseQuantity(item.productName)"
+              >
+                +
+              </button>
+            </div>
+          </div>
+          }
+        </div>
+      </div>
+      <div class="flex justify-end space-x-2">
+        <button
+          type="button"
+          class="px-4 py-2 bg-gray-300 rounded-md"
+          (click)="cancel()"
+        >
+          Mégse
+        </button>
+        <button
+          type="submit"
+          class="px-4 py-2 bg-blue-600 text-white rounded-md"
+          (click)="save()"
+        >
+          Mentés
+        </button>
+      </div>
+    </form>
+    @if (errorMessage) {
+    <div class="text-red-500 font-bold text-center mt-2">
+      {{ errorMessage }}
+    </div>
+    }
+  </div>
+</div>
+}

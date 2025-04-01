@@ -15,7 +15,9 @@ import {
   IonIcon,
 } from '@ionic/angular/standalone';
 import { DataService } from 'src/app/services/data.service';
+import { ModalNavbarService } from 'src/app/services/modal-navbar.service';
 import { ProductModel } from 'src/models/productModel';
+import { ProductModalComponent } from '../../modals/product-modal/product-modal.component';
 
 @Component({
   selector: 'products',
@@ -35,10 +37,14 @@ import { ProductModel } from 'src/models/productModel';
     IonToolbar,
     IonTitle,
     IonContent,
+    ProductModalComponent,
   ],
 })
 export class Products implements OnInit {
-  constructor(private dataService: DataService) {}
+  constructor(
+    private dataService: DataService,
+    private modalNavbarService: ModalNavbarService
+  ) {}
 
   products: ProductModel[] = [
     {
@@ -53,7 +59,15 @@ export class Products implements OnInit {
       price: 0.5,
       imageUrl: 'https://ionicframework.com/docs/img/demos/card-media.png',
     },
+    {
+      id: 3,
+      name: 'Kalács',
+      price: 10,
+      imageUrl: 'https://ionicframework.com/docs/img/demos/card-media.png',
+    },
   ];
+
+  editingProduct: ProductModel | null = null;
 
   ngOnInit() {
     // this.dataService.getProducts().subscribe({
@@ -64,5 +78,46 @@ export class Products implements OnInit {
     //     console.log(err);
     //   },
     // });
+  }
+
+  newProduct() {
+    this.editingProduct = {
+      id: 0,
+      name: '',
+      price: 0,
+      imageUrl: '',
+    };
+    this.modalNavbarService.setEditingProduct(true);
+  }
+
+  modifyProduct(product: ProductModel) {
+    this.editingProduct = { ...product };
+    this.modalNavbarService.setEditingProduct(true);
+  }
+
+  saveProduct(product: ProductModel) {
+    if (this.editingProduct) {
+      const index = this.products.findIndex(
+        (p) => p.id === this.editingProduct!.id
+      );
+      if (index !== -1) {
+        this.products[index] = product;
+      } else {
+        this.products.push(product);
+      }
+      this.editingProduct = null;
+    }
+  }
+
+  deleteProduct(product: ProductModel) {
+    this.dataService.deleteProduct(product.id).subscribe({
+      next: (result: any) => {
+        const index = this.products.findIndex((p) => p.id === product.id);
+        this.products.splice(index, 1);
+      },
+      error: (err) => {
+        console.log(err);
+      },
+    });
   }
 }

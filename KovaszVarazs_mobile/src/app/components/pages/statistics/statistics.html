@@ -1,4 +1,8 @@
-<ion-header [translucent]="true">
+<ion-header
+  [translucent]="true"
+  [translucent]="true"
+  class="{{editingCost != null ? 'opacity-50 pointer-events-none' : ''}}"
+>
   <ion-toolbar>
     <ion-title class="font-bold text-2xl text-center text-black">
       Statisztika
@@ -6,7 +10,11 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
+<ion-content
+  [fullscreen]="true"
+  [scrollY]="editingCost != null ? 'false':'true'"
+  class="relative {{editingCost != null ? 'pointer-events-none' : ''}}"
+>
   <div class="mx-auto flex justify-between items-center mt-2">
     <ion-button fill="clear">
       <ion-icon name="chevron-back-outline"></ion-icon>
@@ -35,7 +43,7 @@
     <div class="flex justify-between items-center w-full mt-20">
       <ion-title class="text-xl font-semibold">Kiadások</ion-title>
       <ion-fab horizontal="end">
-        <ion-fab-button size="small" color="primary">
+        <ion-fab-button size="small" color="primary" (click)="newCost()">
           <ion-icon name="add"></ion-icon>
         </ion-fab-button>
       </ion-fab>
@@ -50,7 +58,7 @@
           </div>
 
           <div class="flex justify-evenly w-full mt-2">
-            <ion-button color="white">
+            <ion-button color="white" (click)="deleteCost(cost)">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="32"
@@ -64,7 +72,7 @@
               </svg>
             </ion-button>
 
-            <ion-button color="white">
+            <ion-button color="white" (click)="modifyCost(cost)">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="32"
@@ -83,4 +91,12 @@
       }
     </ion-list>
   </div>
+
+  @if (editingCost !== null) {
+  <app-cost-modal
+    [cost]="editingCost"
+    (canceled)="editingCost = null"
+    (saved)="saveCost($event)"
+  ></app-cost-modal>
+  }
 </ion-content>

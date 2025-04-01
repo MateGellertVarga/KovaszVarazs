@@ -22,6 +22,8 @@ import {
 import { DataService } from 'src/app/services/data.service';
 import { OrderModel } from 'src/models/orderModel';
 import { OrderScheduleModel } from 'src/models/orderScheduleModel';
+import { OrderModalComponent } from '../../modals/order-modal/order-modal.component';
+import { ModalNavbarService } from 'src/app/services/modal-navbar.service';
 
 @Component({
   selector: 'orders',
@@ -45,11 +47,15 @@ import { OrderScheduleModel } from 'src/models/orderScheduleModel';
     IonContent,
     IonIcon,
     DatePipe,
+    OrderModalComponent,
   ],
   providers: [DatePipe],
 })
 export default class Orders implements OnInit {
-  constructor(private dataService: DataService) {
+  constructor(
+    private dataService: DataService,
+    private modalNavbarService: ModalNavbarService
+  ) {
     registerLocaleData(localeHu);
   }
 
@@ -133,6 +139,10 @@ export default class Orders implements OnInit {
     },
   ];
 
+  editingOrder: OrderModel | null = null;
+  orderSummary: { productName: string; totalQuantity: number }[] = [];
+  totalIncome: number = 0;
+
   ngOnInit() {
     // this.dataService.getOrderSchedules().subscribe(orderSchedules => {
     //   this.orderSchedules = orderSchedules;
@@ -146,18 +156,52 @@ export default class Orders implements OnInit {
   nextOrderSchedule(id: number) {}
   previousOrderSchedule(id: number) {}
 
-  modifyOrder(id: number) {
-    this.orders.forEach((order) => {
-      if (order.id === id) {
-        //modal
-      }
-    });
+  newOrder() {
+    this.editingOrder = {
+      id: 0,
+      customerName: '',
+      phoneNumber: '',
+      note: '',
+      status: 'pending',
+      isPaying: true,
+      totalPrice: 0,
+      orderScheduleId: 1,
+      orderScheduleDate: '',
+      orderItems: [],
+    };
+    this.modalNavbarService.setEditingOrder(true);
   }
-  deleteOrder(id: number) {
-    this.orders.forEach((order) => {
-      if (order.id === id) {
-        //alert confirm
+
+  modifyOrder(order: OrderModel) {
+    this.editingOrder = { ...order };
+    this.modalNavbarService.setEditingOrder(true);
+  }
+
+  saveOrder(order: OrderModel) {
+    if (this.editingOrder) {
+      const index = this.orders.findIndex(
+        (o) => o.id === this.editingOrder!.id
+      );
+      if (index !== -1) {
+        this.orders[index] = order;
+      } else {
+        this.orders.push(order);
       }
+      this.editingOrder = null;
+      //this.calculateSummary();
+    }
+  }
+
+  deleteOrder(order: OrderModel) {
+    // TODO: confirm window
+    this.dataService.deleteOrder(order.id).subscribe({
+      next: (result: any) => {
+        const index = this.orders.findIndex((o) => o.id == order.id);
+        this.orders.splice(index, 1);
+      },
+      error: (err: any) => {
+        console.log(err);
+      },
     });
   }
 
@@ -174,10 +218,8 @@ export default class Orders implements OnInit {
     });
   }
 
-  orderSummary: { productName: string; totalQuantity: number }[] = [];
-  totalIncome: number = 0;
-
   calculateSummary() {
+    this.totalIncome = 0;
     const productMap = new Map<string, { totalQuantity: number }>();
 
     for (const order of this.orders) {
