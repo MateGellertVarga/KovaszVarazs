@@ -1,10 +1,10 @@
 export interface UserModel {
-  id: number;
+  id?: number;
   name: string;
   email: string;
-  phoneNumber: string;
-  password: string;
+  phone_number: string;
+  password?: string;
   role: string;
-  accessToken: string;
-  refreshToken: string;
+  access_token?: string;
+  refresh_token?: string;
 }

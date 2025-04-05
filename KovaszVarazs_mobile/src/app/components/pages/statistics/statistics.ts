@@ -50,14 +50,14 @@ export class Statistics implements OnInit {
     month: new Date('2025-03-01'),
     sales: [
       {
-        productId: 1,
-        productName: 'Kenyér',
+        product_id: 1,
+        product_name: 'Kenyér',
         quantity: 2,
         income: 10,
       },
       {
-        productId: 2,
-        productName: 'Kifli',
+        product_id: 2,
+        product_name: 'Kifli',
         quantity: 1,
         income: 0.5,
       },

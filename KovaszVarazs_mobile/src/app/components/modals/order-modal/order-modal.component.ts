@@ -22,7 +22,7 @@ export class OrderModalComponent implements OnInit {
     private modalnavbarService: ModalNavbarService
   ) {}
 
-  productQuantities: { [productName: string]: number } = {};
+  productQuantities: { [product_name: string]: number } = {};
   errorMessage: string = '';
 
   ngOnInit() {
@@ -30,43 +30,43 @@ export class OrderModalComponent implements OnInit {
   }
 
   initProductQuantities() {
-    if (this.order && this.order.orderItems.length > 0) {
-      this.order.orderItems.forEach((item) => {
-        this.productQuantities[item.productName] = item.quantity;
+    if (this.order && this.order.order_items.length > 0) {
+      this.order.order_items.forEach((item) => {
+        this.productQuantities[item.product_name] = item.quantity;
       });
       this.orderSchedule?.products.forEach((product) => {
-        if (!(product.productName in this.productQuantities)) {
-          this.productQuantities[product.productName] = 0;
+        if (!(product.product_name in this.productQuantities)) {
+          this.productQuantities[product.product_name] = 0;
         }
       });
     } else {
       this.orderSchedule?.products.forEach((product) => {
-        this.productQuantities[product.productName] = 0;
+        this.productQuantities[product.product_name] = 0;
       });
     }
   }
 
-  increaseQuantity(productName: string) {
-    if (this.productQuantities[productName] !== undefined) {
-      this.productQuantities[productName]++;
+  increaseQuantity(product_name: string) {
+    if (this.productQuantities[product_name] !== undefined) {
+      this.productQuantities[product_name]++;
     } else {
-      this.productQuantities[productName] = 1;
+      this.productQuantities[product_name] = 1;
     }
   }
 
-  decreaseQuantity(productName: string) {
+  decreaseQuantity(product_name: string) {
     if (
-      this.productQuantities[productName] !== undefined &&
-      this.productQuantities[productName] > 0
+      this.productQuantities[product_name] !== undefined &&
+      this.productQuantities[product_name] > 0
     ) {
-      this.productQuantities[productName]--;
+      this.productQuantities[product_name]--;
     }
   }
 
-  onQuantityChange(productName: string, event: Event) {
+  onQuantityChange(product_name: string, event: Event) {
     const input = event.target as HTMLInputElement;
     const newQuantity = parseInt(input.value, 10);
-    this.productQuantities[productName] = isNaN(newQuantity) ? 0 : newQuantity;
+    this.productQuantities[product_name] = isNaN(newQuantity) ? 0 : newQuantity;
   }
 
   cancel() {
@@ -90,16 +90,16 @@ export class OrderModalComponent implements OnInit {
 
   checkRequiredFields(): boolean {
     this.errorMessage = '';
-    if (!this.order?.customerName) {
+    if (!this.order?.customer_name) {
       this.errorMessage += 'Név kötelező!\n';
     }
-    if (this.order?.isPaying == null) {
+    if (this.order?.is_paying == null) {
       this.errorMessage += 'Fizet-e kötelező!\n';
     }
-    if (!this.order?.orderScheduleId) {
+    if (!this.order?.order_schedule_id) {
       this.errorMessage += 'Nap kötelező!\n';
     }
-    if (!this.order?.orderItems || this.order?.orderItems.length === 0) {
+    if (!this.order?.order_items || this.order?.order_items.length === 0) {
       this.errorMessage += 'Legalább egy termék kötelező!\n';
     }
     return !this.errorMessage;

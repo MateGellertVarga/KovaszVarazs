@@ -59,53 +59,58 @@ export class OrderSchedules implements OnInit {
     registerLocaleData(localeHu);
   }
 
-  orderSchedules: OrderScheduleModel[] = [
-    {
-      id: 1,
-      availableDate: new Date('2025-03-29'),
-      products: [
-        {
-          id: 1,
-          productName: 'Kenyér',
-          maxQuantity: 10,
-          remainingQuantity: 10,
-        },
-        {
-          id: 2,
-          productName: 'Kifli',
-          maxQuantity: 10,
-          remainingQuantity: 10,
-        },
-      ],
-    },
-    {
-      id: 2,
-      availableDate: new Date('2025-03-30'),
-      products: [
-        {
-          id: 1,
-          productName: 'Kenyér',
-          maxQuantity: 10,
-          remainingQuantity: 10,
-        },
-        {
-          id: 2,
-          productName: 'Kifli',
-          maxQuantity: 10,
-          remainingQuantity: 10,
-        },
-      ],
-    },
-  ];
+  orderSchedules: OrderScheduleModel[] = //[];
+    [
+      {
+        id: 1,
+        available_date: new Date('2025-03-29'),
+        products: [
+          {
+            id: 1,
+            product_name: 'Kenyér',
+            max_quantity: 10,
+            remaining_quantity: 10,
+          },
+          {
+            id: 2,
+            product_name: 'Kifli',
+            max_quantity: 10,
+            remaining_quantity: 10,
+          },
+        ],
+      },
+      {
+        id: 2,
+        available_date: new Date('2025-03-30'),
+        products: [
+          {
+            id: 1,
+            product_name: 'Kenyér',
+            max_quantity: 10,
+            remaining_quantity: 10,
+          },
+          {
+            id: 2,
+            product_name: 'Kifli',
+            max_quantity: 10,
+            remaining_quantity: 10,
+          },
+        ],
+      },
+    ];
 
   editingOrderSchedule: OrderScheduleModel | null = null;
 
-  ngOnInit() {}
+  ngOnInit() {
+    // this.dataService.getOrderSchedules().subscribe((data) => {
+    //   this.orderSchedules = data;
+    // });
+  }
 
   newOrderSchedule() {
     this.editingOrderSchedule = {
       id: 0,
-      availableDate: new Date(),
+      available_date: new Date(),
       products: [],
     };
     this.modalNavbarService.setEditingOrderSchedule(true);

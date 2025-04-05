@@ -24,6 +24,7 @@ import { OrderModel } from 'src/models/orderModel';
 import { OrderScheduleModel } from 'src/models/orderScheduleModel';
 import { OrderModalComponent } from '../../modals/order-modal/order-modal.component';
 import { ModalNavbarService } from 'src/app/services/modal-navbar.service';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'orders',
@@ -54,103 +55,111 @@ import { ModalNavbarService } from 'src/app/services/modal-navbar.service';
 export default class Orders implements OnInit {
   constructor(
     private dataService: DataService,
-    private modalNavbarService: ModalNavbarService
+    private modalNavbarService: ModalNavbarService,
+    private authService: AuthService
   ) {
     registerLocaleData(localeHu);
   }
 
-  orderSchedules: OrderScheduleModel[] = [
-    {
-      id: 1,
-      availableDate: new Date('2025-03-29'),
-      products: [
-        {
-          id: 1,
-          productName: 'Kenyér',
-          maxQuantity: 10,
-          remainingQuantity: 10,
-        },
-        {
-          id: 2,
-          productName: 'Kifli',
-          maxQuantity: 10,
-          remainingQuantity: 10,
-        },
-      ],
-    },
-    {
-      id: 2,
-      availableDate: new Date('2025-03-30'),
-      products: [
-        {
-          id: 1,
-          productName: 'Kenyér',
-          maxQuantity: 10,
-          remainingQuantity: 10,
-        },
-        {
-          id: 2,
-          productName: 'Kifli',
-          maxQuantity: 10,
-          remainingQuantity: 10,
-        },
-      ],
-    },
-  ];
-  orders: OrderModel[] = [
-    {
-      id: 2,
-      customerName: 'Kis János',
-      phoneNumber: '0905234546',
-      note: 'Subidubi',
-      status: 'pending',
-      isPaying: true,
-      totalPrice: 20,
-      orderScheduleId: 1,
-      orderScheduleDate: '2025-03-29',
-      orderItems: [
-        {
-          productId: 1,
-          productName: 'Kenyér',
-          quantity: 2,
-        },
-        {
-          productId: 2,
-          productName: 'Kifli',
-          quantity: 1,
-        },
-      ],
-    },
-    {
-      id: 1,
-      customerName: 'Nagy Pista',
-      status: 'pending',
-      isPaying: true,
-      totalPrice: 10,
-      orderScheduleId: 1,
-      orderScheduleDate: '2025-03-29',
-      orderItems: [
-        {
-          productId: 1,
-          productName: 'Kenyér',
-          quantity: 2,
-        },
-      ],
-    },
-  ];
+  orderSchedules: OrderScheduleModel[] = //[];
+    [
+      {
+        id: 1,
+        available_date: new Date('2025-03-29'),
+        products: [
+          {
+            id: 1,
+            product_name: 'Kenyér',
+            max_quantity: 10,
+            remaining_quantity: 10,
+          },
+          {
+            id: 2,
+            product_name: 'Kifli',
+            max_quantity: 10,
+            remaining_quantity: 10,
+          },
+        ],
+      },
+      {
+        id: 2,
+        available_date: new Date('2025-03-30'),
+        products: [
+          {
+            id: 1,
+            product_name: 'Kenyér',
+            max_quantity: 10,
+            remaining_quantity: 10,
+          },
+          {
+            id: 2,
+            product_name: 'Kifli',
+            max_quantity: 10,
+            remaining_quantity: 10,
+          },
+        ],
+      },
+    ];
+  orders: OrderModel[] = //[];
+    [
+      {
+        id: 2,
+        customer_name: 'Kis János',
+        phone_number: '0905234546',
+        note: 'Subidubi',
+        status: 'pending',
+        is_paying: true,
+        total_price: 20,
+        order_schedule_id: 1,
+        order_schedule_date: '2025-03-29',
+        order_items: [
+          {
+            product_id: 1,
+            product_name: 'Kenyér',
+            quantity: 2,
+          },
+          {
+            product_id: 2,
+            product_name: 'Kifli',
+            quantity: 1,
+          },
+        ],
+      },
+      {
+        id: 1,
+        customer_name: 'Nagy Pista',
+        status: 'pending',
+        is_paying: true,
+        total_price: 10,
+        order_schedule_id: 1,
+        order_schedule_date: '2025-03-29',
+        order_items: [
+          {
+            product_id: 1,
+            product_name: 'Kenyér',
+            quantity: 2,
+          },
+        ],
+      },
+    ];
 
   editingOrder: OrderModel | null = null;
-  orderSummary: { productName: string; totalQuantity: number }[] = [];
+  orderSummary: { product_name: string; totalQuantity: number }[] = [];
   totalIncome: number = 0;
 
   ngOnInit() {
-    // this.dataService.getOrderSchedules().subscribe(orderSchedules => {
+    // this.dataService.getOrderSchedules().subscribe((orderSchedules) => {
     //   this.orderSchedules = orderSchedules;
     // });
-    // this.dataService.getOrders().subscribe(orders => {
-    //   this.orders = orders;
+    // this.dataService.getOrders().subscribe({
+    //   next: (orders) => {
+    //     this.orders = orders;
+    //     this.calculateSummary();
+    //   },
+    //   error: (err) => {
+    //     console.error(err);
+    //   },
     // });
-    this.calculateSummary();
   }
 
   nextOrderSchedule(id: number) {}
@@ -159,15 +168,15 @@ export default class Orders implements OnInit {
   newOrder() {
     this.editingOrder = {
       id: 0,
-      customerName: '',
-      phoneNumber: '',
+      customer_name: '',
+      phone_number: '',
       note: '',
       status: 'pending',
-      isPaying: true,
-      totalPrice: 0,
-      orderScheduleId: 1,
-      orderScheduleDate: '',
-      orderItems: [],
+      is_paying: true,
+      total_price: 0,
+      order_schedule_id: 1,
+      order_schedule_date: '',
+      order_items: [],
     };
     this.modalNavbarService.setEditingOrder(true);
   }
@@ -223,23 +232,23 @@ export default class Orders implements OnInit {
     const productMap = new Map<string, { totalQuantity: number }>();
 
     for (const order of this.orders) {
-      for (const item of order.orderItems) {
-        if (!productMap.has(item.productName)) {
-          productMap.set(item.productName, { totalQuantity: 0 });
+      for (const item of order.order_items) {
+        if (!productMap.has(item.product_name)) {
+          productMap.set(item.product_name, { totalQuantity: 0 });
         }
-        const product = productMap.get(item.productName);
+        const product = productMap.get(item.product_name);
         product!.totalQuantity += item.quantity;
       }
     }
 
-    this.orderSummary = Array.from(productMap, ([productName, data]) => ({
-      productName,
+    this.orderSummary = Array.from(productMap, ([product_name, data]) => ({
+      product_name,
       totalQuantity: data.totalQuantity,
     }));
 
     this.orders.forEach((order) => {
       if (order.status === 'completed') {
-        this.totalIncome += order.totalPrice;
+        this.totalIncome += order.total_price;
       }
     });
   }

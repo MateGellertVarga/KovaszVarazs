@@ -1,9 +1,10 @@
 <ion-tabs>
+  @if (showNavbar){
   <ion-tab-bar
     slot="bottom"
     class="{{isModalOpen ? 'pointer-events-none opacity-50' : ''}}"
   >
-    <ion-tab-button tab="orders" href="./tabs.routes.ts/tabs/orders">
+    <ion-tab-button tab="orders" href="/tabs/orders">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="48"
@@ -19,10 +20,7 @@
       <ion-label>Rendelések</ion-label>
     </ion-tab-button>
 
-    <ion-tab-button
-      tab="orderSchedules"
-      href="./tabs.routes.ts/tabs/orderSchedules"
-    >
+    <ion-tab-button tab="orderSchedules" href="/tabs/orderSchedules">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="48"
@@ -38,7 +36,7 @@
       <ion-label>Sütések</ion-label>
     </ion-tab-button>
 
-    <ion-tab-button tab="products" href="./tabs.routes.ts/tabs/products">
+    <ion-tab-button tab="products" href="/tabs/products">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="48"
@@ -58,7 +56,7 @@
       </svg>
       <ion-label>Termékek</ion-label>
     </ion-tab-button>
-    <ion-tab-button tab="statistics" href="./tabs.routes.ts/tabs/statistics">
+    <ion-tab-button tab="statistics" href="/tabs/statistics">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="48"
@@ -74,4 +72,5 @@
       <ion-label>Statisztika</ion-label>
     </ion-tab-button>
   </ion-tab-bar>
+  }
 </ion-tabs>

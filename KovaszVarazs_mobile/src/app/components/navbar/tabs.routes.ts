@@ -28,6 +28,18 @@ export const routes: Routes = [
         loadComponent: () =>
           import('../pages/statistics/statistics').then((m) => m.Statistics),
       },
+      {
+        path: 'login',
+        loadComponent: () =>
+          import('../pages/login/login').then((m) => m.Login),
+      },
+      {
+        path: 'registration',
+        loadComponent: () =>
+          import('../pages/registration/registration').then(
+            (m) => m.Registration
+          ),
+      },
     ],
   },
   {

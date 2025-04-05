@@ -15,10 +15,10 @@
         <label class="block font-medium text-gray-700">Név</label>
         <input
           type="date"
-          name="availableDate"
+          name="available_date"
           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-          [ngModel]="orderSchedule.availableDate | date : 'yyyy-MM-dd'"
-          (ngModelChange)="onDateChange(orderSchedule.availableDate, $event)"
+          [ngModel]="orderSchedule.available_date | date : 'yyyy-MM-dd'"
+          (ngModelChange)="onDateChange(orderSchedule.available_date, $event)"
           required
         />
       </div>

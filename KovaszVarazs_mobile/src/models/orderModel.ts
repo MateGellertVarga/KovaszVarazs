@@ -1,16 +1,14 @@
-import { OrderItemModel } from "./orderItemModel";
+import { OrderItemModel } from './orderItemModel';
 
 export interface OrderModel {
   id: number;
-  customerName?: string;
-  phoneNumber?: string;
+  customer_name?: string;
+  phone_number?: string;
   note?: string;
   status: string;
-  isPaying: boolean;
-  totalPrice: number;
-  orderScheduleId: number;
-  orderScheduleDate: string;
-  orderItems: OrderItemModel[];
+  is_paying: boolean;
+  total_price: number;
+  order_schedule_id: number;
+  order_schedule_date: string;
+  order_items: OrderItemModel[];
 }
-
-

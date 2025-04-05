@@ -26,7 +26,7 @@
       <ion-icon name="chevron-back-outline"></ion-icon>
     </ion-button>
     <h2 class="text-xl font-semibold">
-      {{orderSchedules[0].availableDate | date: 'yyyy.MM.dd EEEE' : undefined :
+      {{orderSchedules[0].available_date | date: 'yyyy.MM.dd EEEE' : undefined :
       'hu' }}
     </h2>
     <ion-button fill="clear">
@@ -43,25 +43,25 @@
         <ion-card-header class="flex flex-row justify-between items-center">
           <div class="flex flex-col items-start">
             <ion-card-title class="font-bold mb-1"
-              >{{order.customerName}}</ion-card-title
+              >{{order.customer_name}}</ion-card-title
             >
-            @if (order.phoneNumber) {
-            <ion-card-subtitle>{{order.phoneNumber}}</ion-card-subtitle>
+            @if (order.phone_number) {
+            <ion-card-subtitle>{{order.phone_number}}</ion-card-subtitle>
             } @if (order.note) {
-            <ion-card-subtitle>Megjegyzés: {{order.note}}</ion-card-subtitle>
+            <ion-card-subtitle>{{order.note}}</ion-card-subtitle>
             }
           </div>
-          <h1 class="font-bold text-2xl text-black">{{order.totalPrice}} €</h1>
+          <h1 class="font-bold text-2xl text-black">{{order.total_price}} €</h1>
         </ion-card-header>
 
         <ion-card-content>
           <div class="space-y-2">
-            @for (product of order.orderItems; track $index) {
+            @for (product of order.order_items; track $index) {
             <div
               class="flex justify-between items-center w-full p-2 rounded-lg shadow-sm
       {{order.status == 'in progress' ? 'bg-yellow-100' : order.status == 'completed' ? 'bg-green-200' : 'bg-white'}}"
             >
-              <h3 class="text-black">{{product.productName}}</h3>
+              <h3 class="text-black">{{product.product_name}}</h3>
               <h3 class="text-black">{{product.quantity}} db</h3>
             </div>
             }
@@ -181,7 +181,7 @@
     @for (item of orderSummary; track $index) {
     <ion-item>
       <div class="flex justify-between items-center w-full">
-        <h3>{{ item.productName }}</h3>
+        <h3>{{ item.product_name }}</h3>
         <h3>{{ item.totalQuantity }} db</h3>
       </div>
     </ion-item>

@@ -1,14 +1,12 @@
 export interface OrderScheduleModel {
   id: number;
-  availableDate: Date;
+  available_date: Date;
   products: Product[];
 }
 
 export interface Product {
   id: number;
-  productName: string;
-  maxQuantity: number;
-  remainingQuantity: number;
+  product_name: string;
+  max_quantity: number;
+  remaining_quantity: number;
 }
-
-

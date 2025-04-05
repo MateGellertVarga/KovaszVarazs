@@ -54,7 +54,7 @@ export class ProductModalComponent implements OnInit {
     if (this.product && this.product.price <= 0) {
       this.errorMessage += 'Egységár nagyobb 0!\n';
     }
-    if (!this.product?.imageUrl) {
+    if (!this.product?.image_url) {
       this.errorMessage += 'Kép kötelező!';
     }
     return !this.errorMessage;

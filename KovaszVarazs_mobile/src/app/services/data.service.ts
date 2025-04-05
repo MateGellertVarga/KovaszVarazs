@@ -5,57 +5,33 @@ import { OrderModel } from 'src/models/orderModel';
 import { OrderScheduleModel } from 'src/models/orderScheduleModel';
 import { ProductModel } from 'src/models/productModel';
 import { CostModel, StatisticsModel } from 'src/models/statisticsModel';
-import { UserModel } from 'src/models/userModel';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class DataService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private authService: AuthService) {}
   apiUrl: string = 'http://127.0.0.1:8000/api';
 
-  admin: UserModel = {
-      id: 1,
-      name: 'Admin',
-      email: 'admin@admin.com',
-      phoneNumber: '111222333',
-      password: 'admin',
-      role: 'admin',
-      accessToken: '11|fWPupeOOuefivh94OJ0vf55O8shn0keQX0xpaUyL4f463d29',
-      refreshToken: '12|s16vUrm2jacPD1tRPzgyD2uSuRDVsJDZdcKyuwuCc170ec73',
-  };
-  headers = new HttpHeaders({
-    Authorization: `Bearer ${this.admin.accessToken}`,
-  })
-
   getOrders(): Observable<OrderModel[]> {
-    return this.http.get<OrderModel[]>(`${this.apiUrl}/orders`, {
-      headers: this.headers,
-    });
+    return this.http.get<OrderModel[]>(`${this.apiUrl}/orders`);
   }
 
   getOrder(id: number): Observable<OrderModel> {
-    return this.http.get<OrderModel>(`${this.apiUrl}/orders/${id}`, {
-      headers: this.headers,
-    });
+    return this.http.get<OrderModel>(`${this.apiUrl}/orders/${id}`);
   }
 
   addOrder(order: OrderModel): Observable<OrderModel> {
-    return this.http.post<OrderModel>(`${this.apiUrl}/orders`, order, {
-      headers: this.headers,
-    });
+    return this.http.post<OrderModel>(`${this.apiUrl}/orders`, order);
   }
 
   updateOrder(id: number, order: OrderModel): Observable<OrderModel> {
-    return this.http.put<OrderModel>(`${this.apiUrl}/orders/${id}`, order, {
-      headers: this.headers,
-    });
+    return this.http.put<OrderModel>(`${this.apiUrl}/orders/${id}`, order);
   }
 
   deleteOrder(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/orders/${id}`, {
-      headers: this.headers,
-    });
+    return this.http.delete<void>(`${this.apiUrl}/orders/${id}`);
   }
 
   getOrderSchedules(): Observable<OrderScheduleModel[]> {
@@ -64,10 +40,7 @@ export class DataService {
 
   getOrderSchedule(id: number): Observable<OrderScheduleModel> {
     return this.http.get<OrderScheduleModel>(
-      `${this.apiUrl}/orderSchedules/${id}`,
-      {
-        headers: this.headers,
-      }
+      `${this.apiUrl}/orderSchedules/${id}`
     );
   }
 
@@ -76,10 +49,7 @@ export class DataService {
   ): Observable<OrderScheduleModel> {
     return this.http.post<OrderScheduleModel>(
       `${this.apiUrl}/orderSchedules`,
-      orderSchedule,
-      {
-        headers: this.headers,
-      }
+      orderSchedule
     );
   }
 
@@ -89,17 +59,12 @@ export class DataService {
   ): Observable<OrderScheduleModel> {
     return this.http.put<OrderScheduleModel>(
       `${this.apiUrl}/orderSchedules/${id}`,
-      orderSchedule,
-      {
-        headers: this.headers,
-      }
+      orderSchedule
     );
   }
 
   deleteOrderSchedule(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/orderSchedules/${id}`, {
-      headers: this.headers,
-    });
+    return this.http.delete<void>(`${this.apiUrl}/orderSchedules/${id}`);
   }
 
   getProducts(): Observable<ProductModel[]> {
@@ -111,51 +76,35 @@ export class DataService {
   }
 
   addProduct(product: ProductModel): Observable<ProductModel> {
-    return this.http.post<ProductModel>(`${this.apiUrl}/products`, product, {
-      headers: this.headers,
-    });
+    return this.http.post<ProductModel>(`${this.apiUrl}/products`, product);
   }
 
   updateProduct(id: number, product: ProductModel): Observable<ProductModel> {
     return this.http.put<ProductModel>(
       `${this.apiUrl}/products/${id}`,
-      product,
-      {
-        headers: this.headers,
-      }
+      product
     );
   }
 
   deleteProduct(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/products/${id}`, {
-      headers: this.headers,
-    });
+    return this.http.delete<void>(`${this.apiUrl}/products/${id}`);
   }
 
   getStatistics(month: Date): Observable<StatisticsModel> {
     return this.http.get<StatisticsModel>(
-      `${this.apiUrl}/statistics?month=${month}`,
-      {
-        headers: this.headers,
-      }
+      `${this.apiUrl}/statistics?month=${month}`
     );
   }
 
   addCost(cost: CostModel): Observable<CostModel> {
-    return this.http.post<CostModel>(`${this.apiUrl}/costs`, cost, {
-      headers: this.headers,
-    });
+    return this.http.post<CostModel>(`${this.apiUrl}/costs`, cost);
   }
 
   updateCost(id: number, cost: CostModel): Observable<CostModel> {
-    return this.http.put<CostModel>(`${this.apiUrl}/costs/${id}`, cost, {
-      headers: this.headers,
-    });
+    return this.http.put<CostModel>(`${this.apiUrl}/costs/${id}`, cost);
   }
 
   deleteCost(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/costs/${id}`, {
-      headers: this.headers,
-    });
+    return this.http.delete<void>(`${this.apiUrl}/costs/${id}`);
   }
 }

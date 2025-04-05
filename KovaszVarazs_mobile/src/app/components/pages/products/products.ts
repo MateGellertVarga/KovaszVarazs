@@ -51,19 +51,19 @@ export class Products implements OnInit {
       id: 1,
       name: 'Kenyér',
       price: 5,
-      imageUrl: 'https://ionicframework.com/docs/img/demos/card-media.png',
+      image_url: 'https://ionicframework.com/docs/img/demos/card-media.png',
     },
     {
       id: 2,
       name: 'Kifli',
       price: 0.5,
-      imageUrl: 'https://ionicframework.com/docs/img/demos/card-media.png',
+      image_url: 'https://ionicframework.com/docs/img/demos/card-media.png',
     },
     {
       id: 3,
       name: 'Kalács',
       price: 10,
-      imageUrl: 'https://ionicframework.com/docs/img/demos/card-media.png',
+      image_url: 'https://ionicframework.com/docs/img/demos/card-media.png',
     },
   ];
 
@@ -85,7 +85,7 @@ export class Products implements OnInit {
       id: 0,
       name: '',
       price: 0,
-      imageUrl: '',
+      image_url: '',
     };
     this.modalNavbarService.setEditingProduct(true);
   }

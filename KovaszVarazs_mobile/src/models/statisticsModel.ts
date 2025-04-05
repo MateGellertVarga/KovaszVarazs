@@ -5,8 +5,8 @@ export interface StatisticsModel {
 }
 
 export interface SaleModel {
-  productId: number;
-  productName: string;
+  product_id: number;
+  product_name: string;
   quantity: number;
   income: number;
 }
@@ -17,4 +17,3 @@ export interface CostModel {
   name: string;
   amount: number;
 }
-

@@ -28,22 +28,22 @@ export class OrderScheduleModalComponent implements OnInit {
       id: 1,
       name: 'Kenyér',
       price: 5,
-      imageUrl: 'https://ionicframework.com/docs/img/demos/card-media.png',
+      image_url: 'https://ionicframework.com/docs/img/demos/card-media.png',
     },
     {
       id: 2,
       name: 'Kifli',
       price: 0.5,
-      imageUrl: 'https://ionicframework.com/docs/img/demos/card-media.png',
+      image_url: 'https://ionicframework.com/docs/img/demos/card-media.png',
     },
     {
       id: 3,
       name: 'Kalács',
       price: 10,
-      imageUrl: 'https://ionicframework.com/docs/img/demos/card-media.png',
+      image_url: 'https://ionicframework.com/docs/img/demos/card-media.png',
     },
   ];
-  productMaxQuantities: { [productName: string]: number } = {};
+  productMaxQuantities: { [product_name: string]: number } = {};
   errorMessage: string = '';
 
   ngOnInit() {
@@ -60,13 +60,13 @@ export class OrderScheduleModalComponent implements OnInit {
 
   onDateChange(date: Date, event: Event) {
     const input = event.target as HTMLInputElement;
-    this.orderSchedule!.availableDate = new Date(date);
+    this.orderSchedule!.available_date = new Date(date);
   }
 
   initProductMaxQuantities() {
     if (this.orderSchedule && this.orderSchedule.products.length > 0) {
       this.orderSchedule.products.forEach((product) => {
-        this.productMaxQuantities[product.productName] = product.maxQuantity;
+        this.productMaxQuantities[product.product_name] = product.max_quantity;
       });
 
       this.products.forEach((product) => {
@@ -81,10 +81,10 @@ export class OrderScheduleModalComponent implements OnInit {
     }
   }
 
-  onQuantityChange(productName: string, event: Event) {
+  onQuantityChange(product_name: string, event: Event) {
     const input = event.target as HTMLInputElement;
     const newQuantity = parseInt(input.value, 10);
-    this.productMaxQuantities[productName] = isNaN(newQuantity)
+    this.productMaxQuantities[product_name] = isNaN(newQuantity)
       ? 0
       : newQuantity;
   }
@@ -110,7 +110,7 @@ export class OrderScheduleModalComponent implements OnInit {
 
   checkRequiredFields(): boolean {
     this.errorMessage = '';
-    if (!this.orderSchedule?.availableDate) {
+    if (!this.orderSchedule?.available_date) {
       this.errorMessage += 'Dátum kötelező!\n';
     }
     if (

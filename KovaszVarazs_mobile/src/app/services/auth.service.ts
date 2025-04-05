@@ -1,33 +1,81 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { UserModel } from 'src/models/userModel';
+import { Capacitor } from '@capacitor/core';
+import { SecureStorage } from '@aparajita/capacitor-secure-storage';
+import { map, Observable } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
-
-  constructor(private http: HttpClient) { }
-  apiUrl:string = 'http://localhost:8000/api';
-
-  headers = {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${localStorage.getItem('token')}`
+  constructor(private http: HttpClient) {
+    this.loadUserData();
   }
+  apiUrl: string = 'http://localhost:8000/api';
 
-  login(email: string, password: string) {
-    return this.http.post(`${this.apiUrl}/login`, { email, password });
+  public loggedInUser: UserModel | null = null;
+
+  login(email: string, password: string): Observable<boolean> {
+    return this.http
+      .post<UserModel>(`${this.apiUrl}/login`, { email, password })
+      .pipe(
+        map((result: UserModel) => {
+          this.loggedInUser = result;
+          this.storeUserData(result);
+          return true;
+        })
+      );
   }
 
   logout() {
-    return this.http.post(`${this.apiUrl}/logout`, {});
+    this.removeUserData();
+    if (this.loggedInUser) {
+      this.http.post(`${this.apiUrl}/logout`, {}).subscribe();
+      this.loggedInUser = null;
+    }
   }
 
-  register(user:UserModel) {
+  register(user: UserModel) {
     return this.http.post(`${this.apiUrl}/register`, user);
   }
 
-  refreshToken() {
+  refresh_token() {
     return this.http.post(`${this.apiUrl}/refresh`, {});
+  }
+
+  async loadUserData(): Promise<void> {
+    this.loggedInUser = await this.getUserData();
+  }
+
+  async storeUserData(user: UserModel) {
+    if (Capacitor.isNativePlatform()) {
+      await SecureStorage.setItem('loggedInUser', JSON.stringify(user));
+    } else {
+      localStorage.setItem('loggedInUser', JSON.stringify(user));
+    }
+  }
+
+  async getUserData(): Promise<any> {
+    if (Capacitor.isNativePlatform()) {
+      try {
+        const result = await SecureStorage.getItem('loggedInUser');
+        return result ? JSON.parse(result) : null;
+      } catch (error) {
+        console.error('SecureStorage error:', error);
+        return null;
+      }
+    } else {
+      const stored = localStorage.getItem('loggedInUser');
+      return stored ? JSON.parse(stored) : null;
+    }
+  }
+
+  async removeUserData() {
+    if (Capacitor.isNativePlatform()) {
+      await SecureStorage.removeItem('loggedInUser');
+    } else {
+      localStorage.removeItem('loggedInUser');
+    }
   }
 }
