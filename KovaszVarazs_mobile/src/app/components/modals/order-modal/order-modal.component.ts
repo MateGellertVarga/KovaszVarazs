@@ -4,12 +4,12 @@ import { DataService } from 'src/app/services/data.service';
 import { ModalNavbarService } from 'src/app/services/modal-navbar.service';
 import { OrderModel } from 'src/models/orderModel';
 import { OrderScheduleModel } from 'src/models/orderScheduleModel';
+import { IonLabel, IonItem, IonButton } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-order-modal',
   templateUrl: './order-modal.component.html',
-  styleUrls: ['./order-modal.component.scss'],
-  imports: [FormsModule],
+  imports: [IonButton, IonItem, IonLabel, FormsModule],
 })
 export class OrderModalComponent implements OnInit {
   @Input() order: OrderModel | null = null;
@@ -21,11 +21,14 @@ export class OrderModalComponent implements OnInit {
     private dataService: DataService,
     private modalnavbarService: ModalNavbarService
   ) {}
-
+  scrollY: number = 0;
+  viewportHeight: number = 0;
   productQuantities: { [product_name: string]: number } = {};
   errorMessage: string = '';
 
   ngOnInit() {
+    this.scrollY = window.scrollY || window.pageYOffset;
+    this.viewportHeight = window.innerHeight;
     this.initProductQuantities();
   }
 
@@ -75,20 +78,45 @@ export class OrderModalComponent implements OnInit {
   }
 
   save() {
+    if (this.order) {
+      this.syncOrderItemsFromQuantities();
+    }
+
     if (this.order && this.checkRequiredFields()) {
-      // this.dataService.addOrder(this.order!).subscribe({
-      //   next: (order: OrderModel) => {
-      //     this.saved.emit(order);
-      //   },
-      //   error: (error: any) => {
-      //     this.errorMessage = error.error?.message ?? error.message;
-      //   },
-      // });
-      this.modalnavbarService.setEditingOrder(false);
+      const saveObservable =
+        this.order.id != 0
+          ? this.dataService.updateOrder(this.order.id, this.order)
+          : this.dataService.addOrder(this.order);
+      saveObservable.subscribe({
+        next: (order: OrderModel) => {
+          this.saved.emit(order);
+          this.modalnavbarService.setEditingOrder(false);
+        },
+        error: (error: any) => {
+          this.errorMessage = error.error?.message ?? error.message;
+        },
+      });
     }
   }
 
+  syncOrderItemsFromQuantities() {
+    this.order!.order_items = Object.entries(this.productQuantities)
+      .filter(([_, quantity]) => quantity > 0)
+      .map(([product_name, quantity]) => {
+        const product = this.orderSchedule?.products.find(
+          (p) => p.product_name === product_name
+        );
+        return {
+          product_id: product!.id,
+          product_name: product!.product_name,
+          quantity: quantity,
+        };
+      });
+  }
+
   checkRequiredFields(): boolean {
+    console.log(this.order);
+
     this.errorMessage = '';
     if (!this.order?.customer_name) {
       this.errorMessage += 'Név kötelező!\n';
@@ -99,9 +127,14 @@ export class OrderModalComponent implements OnInit {
     if (!this.order?.order_schedule_id) {
       this.errorMessage += 'Nap kötelező!\n';
     }
-    if (!this.order?.order_items || this.order?.order_items.length === 0) {
+    if (
+      !this.order?.order_items ||
+      this.order.order_items.length === 0 ||
+      !this.order.order_items.some((item) => item.quantity > 0)
+    ) {
       this.errorMessage += 'Legalább egy termék kötelező!\n';
     }
+
     return !this.errorMessage;
   }
 }

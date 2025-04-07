@@ -22,23 +22,31 @@
   class="relative {{editingOrder != null ? 'pointer-events-none' : ''}}"
 >
   <div class="w-[95%] mx-auto flex justify-between items-center mt-2">
-    <ion-button fill="clear">
+    <ion-button
+      fill="clear"
+      (click)="previousOrderSchedule(currentOrderSchedule!.id)"
+    >
       <ion-icon name="chevron-back-outline"></ion-icon>
     </ion-button>
+    @if (currentOrderSchedule) {
     <h2 class="text-xl font-semibold">
-      {{orderSchedules[0].available_date | date: 'yyyy.MM.dd EEEE' : undefined :
-      'hu' }}
+      {{currentOrderSchedule!.available_date | date: 'yyyy.MM.dd EEEE' :
+      undefined : 'hu' }}
     </h2>
-    <ion-button fill="clear">
+    }
+    <ion-button
+      fill="clear"
+      (click)="nextOrderSchedule(currentOrderSchedule!.id)"
+    >
       <ion-icon name="chevron-forward-outline"></ion-icon>
     </ion-button>
   </div>
-
+  @if (orders.length > 0) {
   <ion-list>
     @for (order of orders; track $index) {
     <ion-item class="w-full flex justify-center">
       <ion-card
-        class="w-[90vw] p-1 {{order.status == 'in progress' ? 'border-4 border-yellow-500 bg-yellow-100' : order.status == 'completed' ? 'border-4 border-green-700 bg-green-200' : ''}}"
+        class="w-[90vw] p-1 {{order.status == 'processing' ? 'border-4 border-yellow-500 bg-yellow-100' : order.status == 'completed' ? 'border-4 border-green-700 bg-green-200' : ''}}"
       >
         <ion-card-header class="flex flex-row justify-between items-center">
           <div class="flex flex-col items-start">
@@ -59,7 +67,7 @@
             @for (product of order.order_items; track $index) {
             <div
               class="flex justify-between items-center w-full p-2 rounded-lg shadow-sm
-      {{order.status == 'in progress' ? 'bg-yellow-100' : order.status == 'completed' ? 'bg-green-200' : 'bg-white'}}"
+      {{order.status == 'processing' ? 'bg-yellow-100' : order.status == 'completed' ? 'bg-green-200' : 'bg-white'}}"
             >
               <h3 class="text-black">{{product.product_name}}</h3>
               <h3 class="text-black">{{product.quantity}} db</h3>
@@ -110,7 +118,7 @@
                 />
               </svg>
             </ion-button>
-            } @else if (order.status === 'in progress') {
+            } @else if (order.status === 'processing') {
             <ion-button color="white" (click)="deleteOrder(order)">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -171,6 +179,7 @@
     </ion-item>
     }
   </ion-list>
+  }
 
   <h1
     class="text-center w-full text-2xl font-bold mt-5 border-t-2 border-black pt-2"
@@ -197,7 +206,7 @@
   @if (editingOrder !== null) {
   <app-order-modal
     [order]="editingOrder"
-    [orderSchedule]="orderSchedules[0]"
+    [orderSchedule]="currentOrderSchedule"
     (canceled)="editingOrder = null"
     (saved)="saveOrder($event)"
   ></app-order-modal>

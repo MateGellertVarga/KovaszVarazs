@@ -18,8 +18,9 @@ import {
   withInterceptors,
 } from '@angular/common/http';
 import { authInterceptor } from './app/services/auth.interceptor';
-import { provideZoneChangeDetection } from '@angular/core';
+import { APP_INITIALIZER, provideZoneChangeDetection } from '@angular/core';
 import { startup } from './app/services/startup.service';
+import { AuthService } from './app/services/auth.service';
 
 bootstrapApplication(AppComponent, {
   providers: [
@@ -28,6 +29,11 @@ bootstrapApplication(AppComponent, {
     provideRouter(routes, withPreloading(PreloadAllModules)),
     provideHttpClient(withFetch(), withInterceptors([authInterceptor])),
     provideZoneChangeDetection(),
-    { provide: 'app-staptup', useFactory: startup, multi: true },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: startup,
+      deps: [AuthService],
+      multi: true,
+    },
   ],
 });

@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { DatePipe, registerLocaleData } from '@angular/common';
 import localeHU from '@angular/common/locales/hu';
 import {
+  AlertController,
   IonHeader,
   IonTitle,
   IonToolbar,
@@ -21,7 +22,6 @@ import { ModalNavbarService } from 'src/app/services/modal-navbar.service';
 @Component({
   selector: 'statistics',
   templateUrl: './statistics.html',
-  styleUrls: ['./statistics.scss'],
   imports: [
     IonFabButton,
     IonFab,
@@ -38,51 +38,53 @@ import { ModalNavbarService } from 'src/app/services/modal-navbar.service';
   ],
   providers: [DatePipe],
 })
-export class Statistics implements OnInit {
+export class Statistics {
   constructor(
     private dataService: DataService,
-    private modalNavbarService: ModalNavbarService
+    private modalNavbarService: ModalNavbarService,
+    private alertController: AlertController
   ) {
     registerLocaleData(localeHU);
   }
 
-  statistics: StatisticsModel = {
-    month: new Date('2025-03-01'),
-    sales: [
-      {
-        product_id: 1,
-        product_name: 'Kenyér',
-        quantity: 2,
-        income: 10,
-      },
-      {
-        product_id: 2,
-        product_name: 'Kifli',
-        quantity: 1,
-        income: 0.5,
-      },
-    ],
-    costs: [
-      {
-        id: 1,
-        month: new Date('2025-03-01'),
-        name: 'Liszt',
-        amount: 100,
-      },
-    ],
-  };
+  statistics: StatisticsModel = { month: new Date(), sales: [], costs: [] };
+  // {
+  //   month: new Date('2025-03-01'),
+  //   sales: [
+  //     {
+  //       product_id: 1,
+  //       product_name: 'Kenyér',
+  //       quantity: 2,
+  //       income: 10,
+  //     },
+  //     {
+  //       product_id: 2,
+  //       product_name: 'Kifli',
+  //       quantity: 1,
+  //       income: 0.5,
+  //     },
+  //   ],
+  //   costs: [
+  //     {
+  //       id: 1,
+  //       month: new Date('2025-03-01'),
+  //       name: 'Liszt',
+  //       amount: 100,
+  //     },
+  //   ],
+  // };
 
   editingCost: CostModel | null = null;
 
-  ngOnInit() {
-    // this.dataService.getStatistics().subscribe({
-    //   next: (result: StatisticsModel[]) => {
-    //     this.statistics = result;
-    //   },
-    //   error: (err) => {
-    //     console.log(err);
-    //   },
-    // });
+  ionViewWillEnter() {
+    this.dataService.getStatistics('2025-03').subscribe({
+      next: (result: StatisticsModel) => {
+        this.statistics = result;
+      },
+      error: (err) => {
+        console.log(err);
+      },
+    });
   }
 
   newCost() {
@@ -102,27 +104,47 @@ export class Statistics implements OnInit {
 
   saveCost(cost: CostModel) {
     if (this.editingCost) {
-      const index = this.statistics.costs.findIndex(
+      const index = this.statistics!.costs.findIndex(
         (c) => c.id === this.editingCost!.id
       );
       if (index !== -1) {
-        this.statistics.costs[index] = cost;
+        this.statistics!.costs[index] = cost;
       } else {
-        this.statistics.costs.push(cost);
+        this.statistics!.costs.push(cost);
       }
       this.modalNavbarService.setEditingCost(false);
     }
   }
 
-  deleteCost(cost: CostModel) {
-    this.dataService.deleteCost(cost.id).subscribe({
-      next: (result: any) => {
-        const index = this.statistics.costs.findIndex((c) => c.id === cost.id);
-        this.statistics.costs.splice(index, 1);
-      },
-      error: (err) => {
-        console.log(err);
-      },
+  async deleteCost(cost: CostModel) {
+    const alert = await this.alertController.create({
+      header: 'Törlés',
+      message: `Biztosan törölni szeretnéd a költséget?`,
+      buttons: [
+        {
+          text: 'Mégse',
+          role: 'cancel',
+        },
+        {
+          text: 'Törlés',
+          role: 'destructive',
+          handler: () => {
+            this.dataService.deleteCost(cost.id).subscribe({
+              next: () => {
+                const index = this.statistics!.costs.findIndex(
+                  (c) => c.id === cost.id
+                );
+                if (index !== -1) this.statistics!.costs.splice(index, 1);
+              },
+              error: (err) => {
+                console.error('Error deleting cost:', err);
+              },
+            });
+          },
+        },
+      ],
     });
+
+    await alert.present();
   }
 }

@@ -9,7 +9,6 @@ import { ProductModel } from 'src/models/productModel';
 @Component({
   selector: 'app-order-schedule-modal',
   templateUrl: './order-schedule-modal.component.html',
-  styleUrls: ['./order-schedule-modal.component.scss'],
   imports: [FormsModule, DatePipe],
   providers: [DatePipe],
 })
@@ -23,38 +22,23 @@ export class OrderScheduleModalComponent implements OnInit {
     private modalnavbarService: ModalNavbarService
   ) {}
 
-  products: ProductModel[] = [
-    {
-      id: 1,
-      name: 'Kenyér',
-      price: 5,
-      image_url: 'https://ionicframework.com/docs/img/demos/card-media.png',
-    },
-    {
-      id: 2,
-      name: 'Kifli',
-      price: 0.5,
-      image_url: 'https://ionicframework.com/docs/img/demos/card-media.png',
-    },
-    {
-      id: 3,
-      name: 'Kalács',
-      price: 10,
-      image_url: 'https://ionicframework.com/docs/img/demos/card-media.png',
-    },
-  ];
+  scrollY: number = 0;
+  viewportHeight: number = 0;
+  products: ProductModel[] = [];
   productMaxQuantities: { [product_name: string]: number } = {};
   errorMessage: string = '';
 
   ngOnInit() {
-    // this.dataService.getProducts().subscribe({
-    //   next: (result: ProductModel[]) => {
-    //     this.products = result;
-    //   },
-    //   error: (err) => {
-    //     console.log(err);
-    //   },
-    // });
+    this.dataService.getProducts().subscribe({
+      next: (result: ProductModel[]) => {
+        this.products = result;
+      },
+      error: (err) => {
+        console.log(err);
+      },
+    });
+    this.scrollY = window.scrollY || window.pageYOffset;
+    this.viewportHeight = window.innerHeight;
     this.initProductMaxQuantities();
   }
 

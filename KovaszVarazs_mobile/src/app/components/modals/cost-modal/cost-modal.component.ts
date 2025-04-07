@@ -7,7 +7,6 @@ import { CostModel } from 'src/models/statisticsModel';
 @Component({
   selector: 'app-cost-modal',
   templateUrl: './cost-modal.component.html',
-  styleUrls: ['./cost-modal.component.scss'],
   imports: [FormsModule],
 })
 export class CostModalComponent implements OnInit {
@@ -20,9 +19,14 @@ export class CostModalComponent implements OnInit {
     private modalnavbarService: ModalNavbarService
   ) {}
 
+  scrollY: number = 0;
+  viewportHeight: number = 0;
   errorMessage: string = '';
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.scrollY = window.scrollY || window.pageYOffset;
+    this.viewportHeight = window.innerHeight;
+  }
 
   cancel() {
     this.modalnavbarService.setEditingCost(false);

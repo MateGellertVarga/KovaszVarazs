@@ -25,6 +25,7 @@
   [scrollY]="editingOrderSchedule != null ? 'false':'true'"
   class="relative {{editingOrderSchedule != null ? 'pointer-events-none' : ''}}"
 >
+  @if (orderSchedules.length > 0) {
   <ion-list>
     @for (orderSchedule of orderSchedules; track $index) {
     <ion-item class="w-full flex justify-between">
@@ -34,6 +35,9 @@
             >{{ orderSchedule.available_date | date: 'yyyy.MM.dd EEEE' :
             undefined : 'hu' }}</ion-card-title
           >
+          @if (orderSchedule.note) {
+          <ion-card-subtitle>{{ orderSchedule.note }}</ion-card-subtitle>
+          }
         </ion-card-header>
 
         <ion-card-content>
@@ -100,8 +104,7 @@
     </ion-item>
     }
   </ion-list>
-
-  @if (editingOrderSchedule != null) {
+  } @if (editingOrderSchedule != null) {
   <app-order-schedule-modal
     [orderSchedule]="editingOrderSchedule"
     (canceled)="editingOrderSchedule=null"

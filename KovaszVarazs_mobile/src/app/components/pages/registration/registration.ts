@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -14,7 +14,6 @@ import { UserModel } from 'src/models/userModel';
 @Component({
   selector: 'app-registration',
   templateUrl: './registration.html',
-  styleUrls: ['./registration.scss'],
   standalone: true,
   imports: [
     IonContent,
@@ -26,7 +25,7 @@ import { UserModel } from 'src/models/userModel';
     RouterModule,
   ],
 })
-export class Registration implements OnInit {
+export class Registration {
   constructor(private authservice: AuthService, private router: Router) {}
 
   newUser: UserModel = {
@@ -38,8 +37,6 @@ export class Registration implements OnInit {
   };
   passwordAgain: string = '';
   errorMessage: string = '';
-
-  ngOnInit() {}
 
   register() {
     if (this.validation()) {

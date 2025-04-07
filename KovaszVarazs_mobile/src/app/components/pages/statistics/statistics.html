@@ -15,12 +15,14 @@
   [scrollY]="editingCost != null ? 'false':'true'"
   class="relative {{editingCost != null ? 'pointer-events-none' : ''}}"
 >
+  @if (statistics) {
   <div class="mx-auto flex justify-between items-center mt-2">
     <ion-button fill="clear">
       <ion-icon name="chevron-back-outline"></ion-icon>
     </ion-button>
     <h2 class="text-xl font-semibold">
-      {{statistics.month | date: 'yyyy MMMM' : undefined : 'hu' }}
+      {{statistics.month | date: 'yyyy MMMM' : undefined : 'hu' }} nincs
+      backenden még!!
     </h2>
     <ion-button fill="clear">
       <ion-icon name="chevron-forward-outline"></ion-icon>
@@ -91,8 +93,7 @@
       }
     </ion-list>
   </div>
-
-  @if (editingCost !== null) {
+  } @if (editingCost !== null) {
   <app-cost-modal
     [cost]="editingCost"
     (canceled)="editingCost = null"

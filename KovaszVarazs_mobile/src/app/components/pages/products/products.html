@@ -21,7 +21,7 @@
   [scrollY]="editingProduct != null ? 'false':'true'"
   class="relative {{editingProduct != null ? 'pointer-events-none' : ''}}"
 >
-  @for (product of products; track $index) {
+  @if (products.length> 0) { @for (product of products; track $index) {
   <ion-card class="w-3/4 mx-auto mb-4">
     <img [src]="product.image_url" />
     <ion-card-header>
@@ -68,5 +68,5 @@
     (canceled)="editingProduct = null"
     (saved)="saveProduct($event)"
   ></app-product-modal>
-  }
+  } }
 </ion-content>

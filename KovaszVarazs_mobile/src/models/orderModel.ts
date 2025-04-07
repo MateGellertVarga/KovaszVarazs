@@ -9,6 +9,6 @@ export interface OrderModel {
   is_paying: boolean;
   total_price: number;
   order_schedule_id: number;
-  order_schedule_date: string;
+  order_schedule_date: Date;
   order_items: OrderItemModel[];
 }

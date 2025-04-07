@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { OrderModel } from 'src/models/orderModel';
 import { OrderScheduleModel } from 'src/models/orderScheduleModel';
 import { ProductModel } from 'src/models/productModel';
@@ -15,11 +15,23 @@ export class DataService {
   apiUrl: string = 'http://127.0.0.1:8000/api';
 
   getOrders(): Observable<OrderModel[]> {
-    return this.http.get<OrderModel[]>(`${this.apiUrl}/orders`);
+    return this.http.get<OrderModel[]>(`${this.apiUrl}/orders`).pipe(
+      map((orders) =>
+        orders.map((order) => ({
+          ...order,
+          order_schedule_date: new Date(order.order_schedule_date),
+        }))
+      )
+    );
   }
 
   getOrder(id: number): Observable<OrderModel> {
-    return this.http.get<OrderModel>(`${this.apiUrl}/orders/${id}`);
+    return this.http.get<OrderModel>(`${this.apiUrl}/orders/${id}`).pipe(
+      map((order) => ({
+        ...order,
+        order_schedule_date: new Date(order.order_schedule_date),
+      }))
+    );
   }
 
   addOrder(order: OrderModel): Observable<OrderModel> {
@@ -35,13 +47,27 @@ export class DataService {
   }
 
   getOrderSchedules(): Observable<OrderScheduleModel[]> {
-    return this.http.get<OrderScheduleModel[]>(`${this.apiUrl}/orderSchedules`);
+    return this.http
+      .get<OrderScheduleModel[]>(`${this.apiUrl}/orderSchedules`)
+      .pipe(
+        map((schedules) =>
+          schedules.map((schedule) => ({
+            ...schedule,
+            available_date: new Date(schedule.available_date),
+          }))
+        )
+      );
   }
 
   getOrderSchedule(id: number): Observable<OrderScheduleModel> {
-    return this.http.get<OrderScheduleModel>(
-      `${this.apiUrl}/orderSchedules/${id}`
-    );
+    return this.http
+      .get<OrderScheduleModel>(`${this.apiUrl}/orderSchedules/${id}`)
+      .pipe(
+        map((schedule) => ({
+          ...schedule,
+          available_date: new Date(schedule.available_date),
+        }))
+      );
   }
 
   addOrderSchedule(
@@ -90,10 +116,17 @@ export class DataService {
     return this.http.delete<void>(`${this.apiUrl}/products/${id}`);
   }
 
-  getStatistics(month: Date): Observable<StatisticsModel> {
-    return this.http.get<StatisticsModel>(
-      `${this.apiUrl}/statistics?month=${month}`
-    );
+  getStatistics(month: string): Observable<StatisticsModel> {
+    return this.http
+      .get<StatisticsModel>(
+        `${this.apiUrl}/statistics?month=${month.replace("'", '')}`
+      )
+      .pipe(
+        map((statistics) => ({
+          ...statistics,
+          month: new Date(statistics.month),
+        }))
+      );
   }
 
   addCost(cost: CostModel): Observable<CostModel> {

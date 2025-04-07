@@ -14,14 +14,7 @@ import { ModalNavbarService } from 'src/app/services/modal-navbar.service';
   selector: 'app-navbar',
   templateUrl: 'navbar.html',
   styleUrls: ['navbar.scss'],
-  imports: [
-    IonRouterOutlet,
-    IonTabs,
-    IonTabBar,
-    IonTabButton,
-    IonIcon,
-    IonLabel,
-  ],
+  imports: [IonTabs, IonTabBar, IonTabButton, IonLabel],
 })
 export class Navbar {
   public environmentInjector = inject(EnvironmentInjector);

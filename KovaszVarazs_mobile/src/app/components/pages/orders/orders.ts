@@ -1,14 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { DatePipe, registerLocaleData } from '@angular/common';
 import localeHu from '@angular/common/locales/hu';
 import {
+  AlertController,
   IonHeader,
   IonToolbar,
   IonTitle,
   IonContent,
   IonList,
   IonItem,
-  IonLabel,
   IonButton,
   IonIcon,
   IonCard,
@@ -24,12 +24,10 @@ import { OrderModel } from 'src/models/orderModel';
 import { OrderScheduleModel } from 'src/models/orderScheduleModel';
 import { OrderModalComponent } from '../../modals/order-modal/order-modal.component';
 import { ModalNavbarService } from 'src/app/services/modal-navbar.service';
-import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'orders',
   templateUrl: 'orders.html',
-  styleUrls: ['orders.scss'],
   imports: [
     IonFabButton,
     IonFab,
@@ -39,7 +37,6 @@ import { AuthService } from 'src/app/services/auth.service';
     IonCardContent,
     IonCard,
     IonButton,
-    IonLabel,
     IonItem,
     IonList,
     IonHeader,
@@ -52,118 +49,70 @@ import { AuthService } from 'src/app/services/auth.service';
   ],
   providers: [DatePipe],
 })
-export default class Orders implements OnInit {
+export default class Orders {
   constructor(
     private dataService: DataService,
     private modalNavbarService: ModalNavbarService,
-    private authService: AuthService
+    private alertController: AlertController
   ) {
     registerLocaleData(localeHu);
   }
 
-  orderSchedules: OrderScheduleModel[] = //[];
-    [
-      {
-        id: 1,
-        available_date: new Date('2025-03-29'),
-        products: [
-          {
-            id: 1,
-            product_name: 'Kenyér',
-            max_quantity: 10,
-            remaining_quantity: 10,
-          },
-          {
-            id: 2,
-            product_name: 'Kifli',
-            max_quantity: 10,
-            remaining_quantity: 10,
-          },
-        ],
-      },
-      {
-        id: 2,
-        available_date: new Date('2025-03-30'),
-        products: [
-          {
-            id: 1,
-            product_name: 'Kenyér',
-            max_quantity: 10,
-            remaining_quantity: 10,
-          },
-          {
-            id: 2,
-            product_name: 'Kifli',
-            max_quantity: 10,
-            remaining_quantity: 10,
-          },
-        ],
-      },
-    ];
-  orders: OrderModel[] = //[];
-    [
-      {
-        id: 2,
-        customer_name: 'Kis János',
-        phone_number: '0905234546',
-        note: 'Subidubi',
-        status: 'pending',
-        is_paying: true,
-        total_price: 20,
-        order_schedule_id: 1,
-        order_schedule_date: '2025-03-29',
-        order_items: [
-          {
-            product_id: 1,
-            product_name: 'Kenyér',
-            quantity: 2,
-          },
-          {
-            product_id: 2,
-            product_name: 'Kifli',
-            quantity: 1,
-          },
-        ],
-      },
-      {
-        id: 1,
-        customer_name: 'Nagy Pista',
-        status: 'pending',
-        is_paying: true,
-        total_price: 10,
-        order_schedule_id: 1,
-        order_schedule_date: '2025-03-29',
-        order_items: [
-          {
-            product_id: 1,
-            product_name: 'Kenyér',
-            quantity: 2,
-          },
-        ],
-      },
-    ];
+  orderSchedules: OrderScheduleModel[] = [];
+  orders: OrderModel[] = [];
 
+  currentOrderSchedule: OrderScheduleModel | null = null;
   editingOrder: OrderModel | null = null;
   orderSummary: { product_name: string; totalQuantity: number }[] = [];
   totalIncome: number = 0;
 
-  ngOnInit() {
-    // this.dataService.getOrderSchedules().subscribe((orderSchedules) => {
-    //   this.orderSchedules = orderSchedules;
-    // });
-    // this.dataService.getOrders().subscribe({
-    //   next: (orders) => {
-    //     this.orders = orders;
-    //     this.calculateSummary();
-    //   },
-    //   error: (err) => {
-    //     console.error(err);
-    //   },
-    // });
+  ionViewWillEnter() {
+    this.dataService.getOrderSchedules().subscribe((orderSchedules) => {
+      this.orderSchedules = orderSchedules;
+      this.currentOrderSchedule =
+        this.orderSchedules.find(
+          (s) => s.available_date.getTime() >= new Date().getTime()
+        ) ?? null;
+    });
+
+    this.dataService.getOrders().subscribe({
+      next: (orders) => {
+        this.orders = orders;
+        this.sortOrders();
+        this.calculateSummary();
+      },
+      error: (err) => {
+        console.error(err);
+      },
+    });
   }
 
-  nextOrderSchedule(id: number) {}
-  previousOrderSchedule(id: number) {}
+  sortOrders() {
+    const status: Record<'pending' | 'processing' | 'completed', number> = {
+      pending: 0,
+      processing: 1,
+      completed: 2,
+    };
+
+    this.orders.sort((a, b) => {
+      const statusDiff =
+        status[a.status as keyof typeof status] -
+        status[b.status as keyof typeof status];
+      return statusDiff !== 0
+        ? statusDiff
+        : a.customer_name!.localeCompare(b.customer_name!);
+    });
+  }
+
+  nextOrderSchedule(id: number) {
+    this.currentOrderSchedule =
+      this.orderSchedules.find((s) => s.id === id + 1) ?? null;
+  }
+
+  previousOrderSchedule(id: number) {
+    this.currentOrderSchedule =
+      this.orderSchedules.find((s) => s.id === id - 1) ?? null;
+  }
 
   newOrder() {
     this.editingOrder = {
@@ -174,8 +123,8 @@ export default class Orders implements OnInit {
       status: 'pending',
       is_paying: true,
       total_price: 0,
-      order_schedule_id: 1,
-      order_schedule_date: '',
+      order_schedule_id: this.currentOrderSchedule!.id,
+      order_schedule_date: new Date(),
       order_items: [],
     };
     this.modalNavbarService.setEditingOrder(true);
@@ -197,33 +146,60 @@ export default class Orders implements OnInit {
         this.orders.push(order);
       }
       this.editingOrder = null;
-      //this.calculateSummary();
+      this.sortOrders();
+      this.calculateSummary();
     }
   }
 
-  deleteOrder(order: OrderModel) {
-    // TODO: confirm window
-    this.dataService.deleteOrder(order.id).subscribe({
-      next: (result: any) => {
-        const index = this.orders.findIndex((o) => o.id == order.id);
-        this.orders.splice(index, 1);
-      },
-      error: (err: any) => {
-        console.log(err);
-      },
+  async deleteOrder(order: OrderModel) {
+    const alert = await this.alertController.create({
+      header: 'Törlés',
+      message: 'Biztosan törölni szeretnéd a rendelést?',
+      buttons: [
+        {
+          text: 'Mégse',
+          role: 'cancel',
+        },
+        {
+          text: 'Törlés',
+          role: 'destructive',
+          handler: () => {
+            this.dataService.deleteOrder(order.id).subscribe({
+              next: () => {
+                const index = this.orders.findIndex((o) => o.id === order.id);
+                if (index !== -1) this.orders.splice(index, 1);
+                this.calculateSummary();
+              },
+              error: (err) => {
+                console.error('Törlés sikertelen:', err);
+              },
+            });
+          },
+        },
+      ],
     });
+
+    await alert.present();
   }
 
   changeOrderStatus(id: number) {
-    this.orders.forEach((order) => {
-      if (order.id === id) {
-        if (order.status === 'pending') {
-          order.status = 'in progress';
-        } else if (order.status === 'in progress') {
-          order.status = 'completed';
-          this.calculateSummary();
-        }
-      }
+    const order = this.orders.find((o) => o.id === id);
+    if (!order) return;
+
+    if (order.status === 'pending') {
+      order.status = 'processing';
+    } else if (order.status === 'processing') {
+      order.status = 'completed';
+    }
+
+    this.dataService.updateOrder(order.id, order).subscribe({
+      next: () => {
+        this.sortOrders();
+        this.calculateSummary();
+      },
+      error: (err) => {
+        console.error('Hiba a státusz frissítésekor:', err);
+      },
     });
   }
 

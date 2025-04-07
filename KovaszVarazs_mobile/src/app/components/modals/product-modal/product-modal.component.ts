@@ -7,7 +7,6 @@ import { ProductModel } from 'src/models/productModel';
 @Component({
   selector: 'app-product-modal',
   templateUrl: './product-modal.component.html',
-  styleUrls: ['./product-modal.component.scss'],
   imports: [FormsModule],
 })
 export class ProductModalComponent implements OnInit {
@@ -20,9 +19,14 @@ export class ProductModalComponent implements OnInit {
     private modalnavbarService: ModalNavbarService
   ) {}
 
+  scrollY: number = 0;
+  viewportHeight: number = 0;
   errorMessage: string = '';
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.viewportHeight = window.innerHeight;
+    this.scrollY = window.scrollY || window.pageYOffset;
+  }
 
   cancel() {
     this.modalnavbarService.setEditingProduct(false);

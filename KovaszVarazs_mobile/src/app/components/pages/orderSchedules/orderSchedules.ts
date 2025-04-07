@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { DatePipe, registerLocaleData } from '@angular/common';
 import localeHu from '@angular/common/locales/hu';
 import {
+  AlertController,
   IonHeader,
   IonToolbar,
   IonTitle,
@@ -27,16 +28,14 @@ import { OrderScheduleModalComponent } from '../../modals/order-schedule-modal/o
 @Component({
   selector: 'orderSchedules',
   templateUrl: 'orderSchedules.html',
-  styleUrls: ['orderSchedules.scss'],
   providers: [DatePipe],
   imports: [
     IonCardContent,
     IonCardTitle,
+    IonCardSubtitle,
     IonCard,
     IonCardHeader,
-    IonCardSubtitle,
     IonList,
-    IonLabel,
     IonItem,
     IonButton,
     IonIcon,
@@ -50,67 +49,31 @@ import { OrderScheduleModalComponent } from '../../modals/order-schedule-modal/o
     OrderScheduleModalComponent,
   ],
 })
-export class OrderSchedules implements OnInit {
+export class OrderSchedules {
   constructor(
     private dataService: DataService,
     private datePipe: DatePipe,
-    private modalNavbarService: ModalNavbarService
+    private modalNavbarService: ModalNavbarService,
+    private alertController: AlertController
   ) {
     registerLocaleData(localeHu);
   }
 
-  orderSchedules: OrderScheduleModel[] = //[];
-    [
-      {
-        id: 1,
-        available_date: new Date('2025-03-29'),
-        products: [
-          {
-            id: 1,
-            product_name: 'Kenyér',
-            max_quantity: 10,
-            remaining_quantity: 10,
-          },
-          {
-            id: 2,
-            product_name: 'Kifli',
-            max_quantity: 10,
-            remaining_quantity: 10,
-          },
-        ],
-      },
-      {
-        id: 2,
-        available_date: new Date('2025-03-30'),
-        products: [
-          {
-            id: 1,
-            product_name: 'Kenyér',
-            max_quantity: 10,
-            remaining_quantity: 10,
-          },
-          {
-            id: 2,
-            product_name: 'Kifli',
-            max_quantity: 10,
-            remaining_quantity: 10,
-          },
-        ],
-      },
-    ];
+  orderSchedules: OrderScheduleModel[] = [];
 
   editingOrderSchedule: OrderScheduleModel | null = null;
 
-  ngOnInit() {
-    // this.dataService.getOrderSchedules().subscribe((data) => {
-    //   this.orderSchedules = data;
-    // });
+  ionViewWillEnter() {
+    this.dataService.getOrderSchedules().subscribe((data) => {
+      this.orderSchedules = data;
+    });
   }
 
   newOrderSchedule() {
     this.editingOrderSchedule = {
       id: 0,
       available_date: new Date(),
+      note: '',
       products: [],
     };
     this.modalNavbarService.setEditingOrderSchedule(true);
@@ -135,18 +98,35 @@ export class OrderSchedules implements OnInit {
     }
   }
 
-  deleteOrderSchedule(orderSchedule: OrderScheduleModel) {
-    // TODO: confirm window
-    this.dataService.deleteOrderSchedule(orderSchedule.id).subscribe({
-      next: (result: any) => {
-        const index = this.orderSchedules.findIndex(
-          (os) => os.id === orderSchedule.id
-        );
-        this.orderSchedules.splice(index, 1);
-      },
-      error: (error: any) => {
-        console.error('Error deleting order schedule:', error);
-      },
+  async deleteOrderSchedule(orderSchedule: OrderScheduleModel) {
+    const alert = await this.alertController.create({
+      header: 'Törlés',
+      message: 'Biztosan törölni szeretnéd ezt a sütési napot?',
+      buttons: [
+        {
+          text: 'Mégse',
+          role: 'cancel',
+        },
+        {
+          text: 'Törlés',
+          role: 'destructive',
+          handler: () => {
+            this.dataService.deleteOrderSchedule(orderSchedule.id).subscribe({
+              next: () => {
+                const index = this.orderSchedules.findIndex(
+                  (os) => os.id === orderSchedule.id
+                );
+                if (index !== -1) this.orderSchedules.splice(index, 1);
+              },
+              error: (error) => {
+                console.error('Error deleting order schedule:', error);
+              },
+            });
+          },
+        },
+      ],
     });
+
+    await alert.present();
   }
 }

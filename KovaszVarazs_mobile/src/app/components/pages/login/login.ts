@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -14,7 +14,6 @@ import { UserModel } from 'src/models/userModel';
 @Component({
   selector: 'app-login',
   templateUrl: './login.html',
-  styleUrls: ['./login.scss'],
   standalone: true,
   imports: [
     IonContent,
@@ -26,14 +25,12 @@ import { UserModel } from 'src/models/userModel';
     RouterModule,
   ],
 })
-export class Login implements OnInit {
+export class Login {
   constructor(private authService: AuthService, private router: Router) {}
 
   email: string = 'admin@admin.com';
   password: string = 'admin';
   errorMessage: string = '';
-
-  ngOnInit() {}
 
   login(email: string, password: string) {
     this.errorMessage = '';
