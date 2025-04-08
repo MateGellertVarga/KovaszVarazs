@@ -11,7 +11,7 @@ import { inject } from '@angular/core';
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   var authService = inject(AuthService);
 
-  const token = authService.loggedInUser!.access_token;
+  const token = authService.loggedInUser!.token;
 
   if (token != null && token != '' && token != undefined) {
     const clonedReq = req.clone({

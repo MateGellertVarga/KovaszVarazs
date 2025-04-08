@@ -40,9 +40,9 @@ export class AuthService {
     return this.http.post(`${this.apiUrl}/register`, user);
   }
 
-  refresh_token() {
-    return this.http.post(`${this.apiUrl}/refresh`, {});
-  }
+  // refresh_token() {
+  //   return this.http.post(`${this.apiUrl}/refresh`, {});
+  // }
 
   async loadUserData(): Promise<void> {
     this.loggedInUser = await this.getUserData();

@@ -5,6 +5,6 @@ export interface UserModel {
   phone_number: string;
   password?: string;
   role: string;
-  access_token?: string;
-  refresh_token?: string;
+  token?: string;
+  //refresh_token?: string;
 }

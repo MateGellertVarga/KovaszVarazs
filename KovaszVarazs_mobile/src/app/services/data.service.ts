@@ -25,6 +25,19 @@ export class DataService {
     );
   }
 
+  getOrdersByOrderScheduleId(scheduleId: number): Observable<OrderModel[]> {
+    return this.http
+      .get<OrderModel[]>(`${this.apiUrl}/orders/${scheduleId}`)
+      .pipe(
+        map((orders) =>
+          orders.map((order) => ({
+            ...order,
+            order_schedule_date: new Date(order.order_schedule_date),
+          }))
+        )
+      );
+  }
+
   getOrder(id: number): Observable<OrderModel> {
     return this.http.get<OrderModel>(`${this.apiUrl}/orders/${id}`).pipe(
       map((order) => ({

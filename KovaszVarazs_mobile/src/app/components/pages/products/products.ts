@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import {
   AlertController,
   IonHeader,
@@ -43,31 +43,11 @@ export class Products {
   constructor(
     private dataService: DataService,
     private modalNavbarService: ModalNavbarService,
-    private alertController: AlertController
+    private alertController: AlertController,
+    private changeDetectorRef: ChangeDetectorRef
   ) {}
 
   products: ProductModel[] = [];
-  //[
-  //   {
-  //     id: 1,
-  //     name: 'Kenyér',
-  //     price: 5,
-  //     image_url: 'https://ionicframework.com/docs/img/demos/card-media.png',
-  //   },
-  //   {
-  //     id: 2,
-  //     name: 'Kifli',
-  //     price: 0.5,
-  //     image_url: 'https://ionicframework.com/docs/img/demos/card-media.png',
-  //   },
-  //   {
-  //     id: 3,
-  //     name: 'Kalács',
-  //     price: 10,
-  //     image_url: 'https://ionicframework.com/docs/img/demos/card-media.png',
-  //   },
-  // ];
-
   editingProduct: ProductModel | null = null;
 
   ionViewWillEnter() {
@@ -128,7 +108,10 @@ export class Products {
                 const index = this.products.findIndex(
                   (p) => p.id === product.id
                 );
-                if (index !== -1) this.products.splice(index, 1);
+                if (index !== -1) {
+                  this.products.splice(index, 1);
+                  this.changeDetectorRef.detectChanges();
+                }
               },
               error: (err) => {
                 console.error('Error deleting product:', err);

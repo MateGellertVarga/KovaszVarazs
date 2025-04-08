@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { DatePipe, registerLocaleData } from '@angular/common';
 import localeHu from '@angular/common/locales/hu';
 import {
@@ -54,7 +54,8 @@ export class OrderSchedules {
     private dataService: DataService,
     private datePipe: DatePipe,
     private modalNavbarService: ModalNavbarService,
-    private alertController: AlertController
+    private alertController: AlertController,
+    private changeDetectorRef: ChangeDetectorRef
   ) {
     registerLocaleData(localeHu);
   }
@@ -116,7 +117,10 @@ export class OrderSchedules {
                 const index = this.orderSchedules.findIndex(
                   (os) => os.id === orderSchedule.id
                 );
-                if (index !== -1) this.orderSchedules.splice(index, 1);
+                if (index !== -1) {
+                  this.orderSchedules.splice(index, 1);
+                  this.changeDetectorRef.detectChanges();
+                }
               },
               error: (error) => {
                 console.error('Error deleting order schedule:', error);

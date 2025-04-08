@@ -42,9 +42,8 @@ export class OrderScheduleModalComponent implements OnInit {
     this.initProductMaxQuantities();
   }
 
-  onDateChange(date: Date, event: Event) {
-    const input = event.target as HTMLInputElement;
-    this.orderSchedule!.available_date = new Date(date);
+  onDateChange(newValue: string) {
+    this.orderSchedule!.available_date = new Date(newValue);
   }
 
   initProductMaxQuantities() {
@@ -79,17 +78,47 @@ export class OrderScheduleModalComponent implements OnInit {
   }
 
   save() {
-    if (this.orderSchedule && this.checkRequiredFields()) {
-      // this.dataService.addOrderSchedule(this.orderSchedule).subscribe({
-      //   next: (orderSchedule: OrderScheduleModel) => {
-      //     this.saved.emit(orderSchedule);
-      //   },
-      //   error: (error: any) => {
-      //     this.errorMessage = error.error?.message ?? error.message;
-      //   },
-      // });
-      this.modalnavbarService.setEditingOrderSchedule(false);
+    if (this.orderSchedule) {
+      this.syncProductsFromQuantities();
     }
+
+    if (this.orderSchedule && this.checkRequiredFields()) {
+      const saveObservable =
+        this.orderSchedule.id !== 0
+          ? this.dataService.updateOrderSchedule(
+              this.orderSchedule.id,
+              this.orderSchedule
+            )
+          : this.dataService.addOrderSchedule(this.orderSchedule);
+
+      saveObservable.subscribe({
+        next: (orderSchedule: OrderScheduleModel) => {
+          this.saved.emit(orderSchedule);
+          this.modalnavbarService.setEditingOrderSchedule(false);
+        },
+        error: (error: any) => {
+          console.log(error.error.message);
+
+          this.errorMessage = error.error?.message ?? error.message;
+        },
+      });
+    }
+  }
+
+  syncProductsFromQuantities() {
+    this.orderSchedule!.products = Object.entries(this.productMaxQuantities)
+      .filter(([_, quantity]) => quantity > 0)
+      .map(([product_name, quantity]) => {
+        const existingProduct = this.products.find(
+          (p) => p.name === product_name
+        );
+        return {
+          id: existingProduct!.id,
+          product_name: existingProduct!.name,
+          max_quantity: quantity,
+          remaining_quantity: quantity,
+        };
+      });
   }
 
   checkRequiredFields(): boolean {
@@ -99,9 +128,10 @@ export class OrderScheduleModalComponent implements OnInit {
     }
     if (
       !this.orderSchedule?.products ||
-      this.orderSchedule?.products.length === 0
+      this.orderSchedule?.products.length === 0 ||
+      !this.orderSchedule?.products.some((product) => product.max_quantity > 0)
     ) {
-      this.errorMessage += 'Termékek kötelezőek!';
+      this.errorMessage += 'Legalább egy termék kötelező!';
     }
     return !this.errorMessage;
   }

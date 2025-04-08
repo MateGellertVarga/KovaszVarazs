@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { DatePipe, registerLocaleData } from '@angular/common';
 import localeHu from '@angular/common/locales/hu';
 import {
@@ -53,7 +53,8 @@ export default class Orders {
   constructor(
     private dataService: DataService,
     private modalNavbarService: ModalNavbarService,
-    private alertController: AlertController
+    private alertController: AlertController,
+    private changeDetectorRef: ChangeDetectorRef
   ) {
     registerLocaleData(localeHu);
   }
@@ -73,17 +74,21 @@ export default class Orders {
         this.orderSchedules.find(
           (s) => s.available_date.getTime() >= new Date().getTime()
         ) ?? null;
-    });
 
-    this.dataService.getOrders().subscribe({
-      next: (orders) => {
-        this.orders = orders;
-        this.sortOrders();
-        this.calculateSummary();
-      },
-      error: (err) => {
-        console.error(err);
-      },
+      if (this.currentOrderSchedule) {
+        this.dataService
+          .getOrdersByOrderScheduleId(this.currentOrderSchedule!.id)
+          .subscribe({
+            next: (orders) => {
+              this.orders = orders;
+              this.sortOrders();
+              this.calculateSummary();
+            },
+            error: (err) => {
+              console.error(err);
+            },
+          });
+      }
     });
   }
 
@@ -105,13 +110,43 @@ export default class Orders {
   }
 
   nextOrderSchedule(id: number) {
+    if (id === this.orderSchedules.length) return;
     this.currentOrderSchedule =
       this.orderSchedules.find((s) => s.id === id + 1) ?? null;
+    if (this.currentOrderSchedule) {
+      this.dataService
+        .getOrdersByOrderScheduleId(this.currentOrderSchedule.id)
+        .subscribe({
+          next: (orders) => {
+            this.orders = orders;
+            this.sortOrders();
+            this.calculateSummary();
+          },
+          error: (err) => {
+            console.error(err);
+          },
+        });
+    }
   }
 
   previousOrderSchedule(id: number) {
+    if (id === 1) return;
     this.currentOrderSchedule =
       this.orderSchedules.find((s) => s.id === id - 1) ?? null;
+    if (this.currentOrderSchedule) {
+      this.dataService
+        .getOrdersByOrderScheduleId(this.currentOrderSchedule.id)
+        .subscribe({
+          next: (orders) => {
+            this.orders = orders;
+            this.sortOrders();
+            this.calculateSummary();
+          },
+          error: (err) => {
+            console.error(err);
+          },
+        });
+    }
   }
 
   newOrder() {
@@ -167,8 +202,10 @@ export default class Orders {
             this.dataService.deleteOrder(order.id).subscribe({
               next: () => {
                 const index = this.orders.findIndex((o) => o.id === order.id);
-                if (index !== -1) this.orders.splice(index, 1);
-                this.calculateSummary();
+                if (index !== -1) {
+                  this.orders.splice(index, 1);
+                  this.changeDetectorRef.detectChanges();
+                }
               },
               error: (err) => {
                 console.error('Törlés sikertelen:', err);

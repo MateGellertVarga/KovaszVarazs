@@ -9,7 +9,7 @@ import { IonLabel, IonItem, IonButton } from '@ionic/angular/standalone';
 @Component({
   selector: 'app-order-modal',
   templateUrl: './order-modal.component.html',
-  imports: [IonButton, IonItem, IonLabel, FormsModule],
+  imports: [FormsModule],
 })
 export class OrderModalComponent implements OnInit {
   @Input() order: OrderModel | null = null;

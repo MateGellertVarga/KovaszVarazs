@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { DatePipe, registerLocaleData } from '@angular/common';
 import localeHU from '@angular/common/locales/hu';
 import {
@@ -42,38 +42,13 @@ export class Statistics {
   constructor(
     private dataService: DataService,
     private modalNavbarService: ModalNavbarService,
-    private alertController: AlertController
+    private alertController: AlertController,
+    private changeDetectorRef: ChangeDetectorRef
   ) {
     registerLocaleData(localeHU);
   }
 
   statistics: StatisticsModel = { month: new Date(), sales: [], costs: [] };
-  // {
-  //   month: new Date('2025-03-01'),
-  //   sales: [
-  //     {
-  //       product_id: 1,
-  //       product_name: 'Kenyér',
-  //       quantity: 2,
-  //       income: 10,
-  //     },
-  //     {
-  //       product_id: 2,
-  //       product_name: 'Kifli',
-  //       quantity: 1,
-  //       income: 0.5,
-  //     },
-  //   ],
-  //   costs: [
-  //     {
-  //       id: 1,
-  //       month: new Date('2025-03-01'),
-  //       name: 'Liszt',
-  //       amount: 100,
-  //     },
-  //   ],
-  // };
-
   editingCost: CostModel | null = null;
 
   ionViewWillEnter() {
@@ -134,7 +109,10 @@ export class Statistics {
                 const index = this.statistics!.costs.findIndex(
                   (c) => c.id === cost.id
                 );
-                if (index !== -1) this.statistics!.costs.splice(index, 1);
+                if (index !== -1) {
+                  this.statistics!.costs.splice(index, 1);
+                  this.changeDetectorRef.detectChanges();
+                }
               },
               error: (err) => {
                 console.error('Error deleting cost:', err);
