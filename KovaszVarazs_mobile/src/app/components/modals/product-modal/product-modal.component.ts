@@ -21,6 +21,7 @@ export class ProductModalComponent implements OnInit {
 
   scrollY: number = 0;
   viewportHeight: number = 0;
+  selectedFile: File | null = null;
   errorMessage: string = '';
 
   ngOnInit() {
@@ -33,17 +34,39 @@ export class ProductModalComponent implements OnInit {
     this.canceled.emit();
   }
 
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      this.selectedFile = input.files[0];
+    }
+  }
+
   save() {
     if (this.product && this.checkRequiredFields()) {
-      // this.dataService.addProduct(this.product).subscribe({
-      //   next: (product: ProductModel) => {
-      //     this.saved.emit(product);
-      //   },
-      //   error: (error:any) => {
-      //     this.errorMessage = error.error?.message ?? error.message;
-      //   },
-      // });
-      this.modalnavbarService.setEditingProduct(false);
+      const formData = new FormData();
+      formData.append('name', this.product.name);
+      formData.append('price', this.product.price.toString());
+      if (this.selectedFile) {
+        formData.append('image', this.selectedFile);
+      }
+      if (this.product.id !== 0) {
+        formData.append('_method', 'PUT');
+      }
+
+      const saveObservable =
+        this.product.id != 0
+          ? this.dataService.updateProduct(this.product.id, formData)
+          : this.dataService.addProduct(formData);
+
+      saveObservable.subscribe({
+        next: (product: ProductModel) => {
+          this.saved.emit(product);
+          this.modalnavbarService.setEditingProduct(false);
+        },
+        error: (error: any) => {
+          this.errorMessage = error.error?.message ?? error.message;
+        },
+      });
     }
   }
 
@@ -57,9 +80,6 @@ export class ProductModalComponent implements OnInit {
     }
     if (this.product && this.product.price <= 0) {
       this.errorMessage += 'Egységár nagyobb 0!\n';
-    }
-    if (!this.product?.image_url) {
-      this.errorMessage += 'Kép kötelező!';
     }
     return !this.errorMessage;
   }

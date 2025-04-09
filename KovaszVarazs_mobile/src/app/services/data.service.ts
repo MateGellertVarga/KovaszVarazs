@@ -6,6 +6,7 @@ import { OrderScheduleModel } from 'src/models/orderScheduleModel';
 import { ProductModel } from 'src/models/productModel';
 import { CostModel, StatisticsModel } from 'src/models/statisticsModel';
 import { AuthService } from './auth.service';
+import { p } from '@angular/core/weak_ref.d-Bp6cSy-X';
 
 @Injectable({
   providedIn: 'root',
@@ -114,14 +115,14 @@ export class DataService {
     return this.http.get<ProductModel>(`${this.apiUrl}/products/${id}`);
   }
 
-  addProduct(product: ProductModel): Observable<ProductModel> {
-    return this.http.post<ProductModel>(`${this.apiUrl}/products`, product);
+  addProduct(productData: FormData): Observable<ProductModel> {
+    return this.http.post<ProductModel>(`${this.apiUrl}/products`, productData);
   }
 
-  updateProduct(id: number, product: ProductModel): Observable<ProductModel> {
-    return this.http.put<ProductModel>(
+  updateProduct(id: number, productData: FormData): Observable<ProductModel> {
+    return this.http.post<ProductModel>(
       `${this.apiUrl}/products/${id}`,
-      product
+      productData
     );
   }
 
