@@ -27,7 +27,8 @@ class StoreOrderRequest extends FormRequest
         ];
     }
 
-    public function messages():array {
+    public function messages(): array
+    {
         return [
             'user_id.required'                => 'Felhasználó hiányzik',
             'user_id.exists'                  => 'Felhasználó nem létezik',

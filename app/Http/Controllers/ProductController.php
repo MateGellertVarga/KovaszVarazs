@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
@@ -17,7 +18,7 @@ class ProductController extends Controller
     {
         $authUser = $request->user();
         if (!$authUser || $authUser->role !== 'admin') {
-            return response()->json(['error' => 'Nincs jogod ehhez a művelethez'], 401);
+            return response()->json(['message' => 'Nincs jogod ehhez a művelethez'], 401);
         }
 
         $imagePath = null;
@@ -44,30 +45,55 @@ class ProductController extends Controller
     {
         $authUser = $request->user();
         if (!$authUser || $authUser->role !== 'admin') {
-            return response()->json(['error' => 'Nincs jogod ehhez a művelethez'], 401);
+            return response()->json(['message' => 'Nincs jogod ehhez a művelethez'], 401);
         }
 
         $product = Product::findOrFail($id);
 
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('products', 'public');
-            $product->image_url = asset('storage/' . $imagePath);
+            if ($product->image_url) {
+                $oldPath = str_replace(asset('storage/'), '', $product->image_url);
+                Storage::disk('public')->delete($oldPath);
+            }
+
+            $image = $request->file('image');
+            $filename = uniqid() . '.' . $image->getClientOriginalExtension();
+            $imagePath = $image->storeAs('products', $filename, 'public');
+            $product->image_url = asset('storage/products/' . $filename);
         }
 
-        $product->update($request->except('image'));
+        if ($request->has('name')) {
+            $product->name = $request->name;
+        }
+
+        if ($request->has('price')) {
+            $product->price = $request->price;
+        }
+
+        $product->save();
 
         return response()->json($product);
     }
+
+
 
 
     public function destroy($id)
     {
         $authUser = request()->user();
         if (!$authUser || $authUser->role !== 'admin') {
-            return response()->json(['error' => 'Nincs jogod ehhez a művelethez'], 401);
+            return response()->json(['message' => 'Nincs jogod ehhez a művelethez'], 401);
         }
+
         $product = Product::findOrFail($id);
+
+        if ($product->image_url) {
+            $oldPath = str_replace(asset('storage/'), '', $product->image_url);
+            Storage::disk('public')->delete($oldPath);
+        }
+
         $product->delete();
+
         return response()->noContent();
     }
 }

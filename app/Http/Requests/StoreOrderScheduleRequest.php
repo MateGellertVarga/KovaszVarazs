@@ -15,17 +15,20 @@ class StoreOrderScheduleRequest extends FormRequest
     {
         return [
             'available_date' => 'required|date|unique:order_schedules,available_date',
+            'note' => 'nullable|string',
             'products' => 'required|array',
             'products.*.id' => 'required|exists:products,id',
             'products.*.max_quantity' => 'required|integer|min:1',
         ];
     }
 
-    public function messages():array {
+    public function messages(): array
+    {
         return [
             'available_date.required' => 'Dátum hiányzik',
             'available_date.date'     => 'Dátum formátuma nem megfelelő',
             'available_date.unique'   => 'Ez a dátum már foglalt',
+            'note.string'            => 'Megjegyzés formátuma nem megfelelő',
             'products.required'        => 'Termékek hiányzik',
             'products.array'           => 'Termékek formátuma nem megfelelő',
             'products.*.id.required'   => 'Termék hiányzik',

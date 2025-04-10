@@ -11,14 +11,18 @@ class StatisticsController extends Controller
     {
         $authUser = $request->user();
         if (!$authUser || $authUser->role !== 'admin') {
-            return response()->json(['error' => 'Nincs jogod ehhez a művelethez'], 401);
+            return response()->json(['message' => 'Nincs jogod ehhez a művelethez'], 401);
         }
 
         $month = $request->query('month');
         if (!$month) {
             return response()->json([
-                'error' => 'Month parameter is required in the format YYYY-MM.'
+                'message' => 'Month parameter is required in the format YYYY-MM.'
             ], 400);
+        }
+
+        if (!preg_match('/^\d{4}-\d{2}$/', $month)) {
+            return response()->json(['message' => 'Invalid month format. Use YYYY-MM.'], 400);
         }
 
         $sales = DB::table('order_items')
@@ -33,18 +37,18 @@ class StatisticsController extends Controller
             )
             ->where('orders.status', 'completed')
             ->where('orders.is_paying', true)
-            ->whereRaw("strftime('%Y-%m', order_schedules.available_date) = ?", [$month])
+            ->where('order_schedules.available_date', 'like', "$month%")
             ->groupBy('products.id', 'products.name')
             ->get();
 
         $costs = DB::table('costs')
-            ->select('name', 'amount')
-            ->whereRaw("strftime('%Y-%m', month) = ?", [$month])
+            ->select('id', 'name', 'amount', 'month')
+            ->where('month', 'like', "$month%")
             ->get();
 
         return response()->json([
             'sales' => $sales,
-            'costs' => $costs
+            'costs' => $costs,
         ]);
     }
 }

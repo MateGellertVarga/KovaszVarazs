@@ -11,13 +11,15 @@ class Product extends Model
     /** @use HasFactory<\Database\Factories\ProductFactory> */
     use HasFactory, SoftDeletes;
     public $timestamps = false;
-    protected $fillable = ['name', 'price' , 'image_url'];
+    protected $fillable = ['name', 'price', 'image_url'];
 
-    public function orderItems(){
+    public function orderItems()
+    {
         return $this->hasMany(OrderItem::class);
     }
 
-    public function orders(){
+    public function orders()
+    {
         return $this->belongsToMany(Order::class, 'order_items')->withPivot('quantity');
     }
 }

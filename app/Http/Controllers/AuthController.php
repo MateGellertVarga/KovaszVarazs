@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
-use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Response;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\LoginRequest;
@@ -33,41 +32,45 @@ class AuthController extends Controller
         $user = User::where('email', $request->email)->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
-            return response()->json(['error' => 'Helytelen email cím vagy jelszó'], 400);
+            return response()->json(['message' => 'Helytelen email cím vagy jelszó'], 400);
         }
 
-        $accessToken = $user->createToken('access_token', ['access'], now()->addHour())->plainTextToken;
-        $refreshToken = $user->createToken('refresh_token', ['refresh'])->plainTextToken;
+        //$accessToken = $user->createToken('access_token', ['access'], now()->addHour())->plainTextToken;
+        $refreshToken = $user->createToken('token')->plainTextToken;
 
         return response()->json([
-            'access_token' => $accessToken,
-            'refresh_token' => $refreshToken,
-            'token_type'   => 'Bearer',
-        ]);
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'phone_number' => $user->phone_number,
+            'role' => $user->role,
+            //'access_token' => $accessToken,
+            'token' => $refreshToken
+        ], 200);
     }
 
-    public function refresh(Request $request)
-    {
-        $refreshToken = $request->bearerToken();
+    // public function refresh(Request $request)
+    // {
+    //     $refreshToken = $request->bearerToken();
 
-        if (!$refreshToken) {
-            return response()->json(['error' => 'Hiba! Hiáynzó token'], 401);
-        }
+    //     if (!$refreshToken) {
+    //         return response()->json(['message' => 'Hiba! Hiáynzó token'], 401);
+    //     }
 
-        $token = PersonalAccessToken::findToken($refreshToken);
-        if (!$token || !$token->can('refresh')) {
-            return response()->json(['error' => 'Érvenytelen token'], 401);
-        }
+    //     $token = PersonalAccessToken::findToken($refreshToken);
+    //     if (!$token || !$token->can('refresh')) {
+    //         return response()->json(['message' => 'Érvenytelen token'], 401);
+    //     }
 
-        $user = $token->tokenable;
+    //     $user = $token->tokenable;
 
-        $newAccessToken = $user->createToken('access_token', ['access'], now()->addHour())->plainTextToken;
+    //     $newAccessToken = $user->createToken('access_token', ['access'], now()->addHour())->plainTextToken;
 
-        return response()->json([
-            'access_token' => $newAccessToken,
-            'token_type'   => 'Bearer',
-        ]);
-    }
+    //     return response()->json([
+    //         'access_token' => $newAccessToken,
+    //         'token_type'   => 'Bearer',
+    //     ]);
+    // }
 
 
 
@@ -75,7 +78,7 @@ class AuthController extends Controller
     public function logout(Request $request)
     {
         $user = $request->user();
-        $user->tokens()->where('name', 'refresh_token')->delete();
+        $user->tokens()->where('name', 'token')->delete();
         return response()->json(['message' => 'Sikeres kijelentkezés']);
     }
 }

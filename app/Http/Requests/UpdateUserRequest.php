@@ -21,7 +21,8 @@ class UpdateUserRequest extends FormRequest
         ];
     }
 
-    public function messages():array {
+    public function messages(): array
+    {
         return [
             'name.required' => 'Név hiányzik',
             'name.string'   => 'Név formátuma nem megfelelő',

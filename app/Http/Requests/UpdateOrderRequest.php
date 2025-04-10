@@ -26,7 +26,8 @@ class UpdateOrderRequest extends FormRequest
         ];
     }
 
-    public function messages():array {
+    public function messages(): array
+    {
         return [
             'customer_name.string' => 'Név formátuma nem megfelelő',
             'phone_number.string'  => 'Telefonszám formátuma nem megfelelő',

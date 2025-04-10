@@ -18,7 +18,8 @@ class OrderScheduleResource extends JsonResource
         return [
             'id' => $this->id,
             'available_date' => $this->available_date,
-            'products' => $this->products->map(function($product) {
+            'note' => $this->note,
+            'products' => $this->products->map(function ($product) {
                 return [
                     'id' => $product->id,
                     'product_name' => $product->name,

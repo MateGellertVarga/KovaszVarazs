@@ -44,7 +44,7 @@ class Order extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function getTotalPriceAttribute()
+    public function gettotal_priceAttribute()
     {
         $this->loadMissing('orderItems.product');
 

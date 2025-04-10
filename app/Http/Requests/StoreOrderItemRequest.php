@@ -19,7 +19,8 @@ class StoreOrderItemRequest extends FormRequest
         ];
     }
 
-    public function messages():array {
+    public function messages(): array
+    {
         return [
             'product_id.required' => 'Termék hiányzik',
             'product_id.exists'   => 'Termék nem létezik',

@@ -12,9 +12,12 @@ use App\Http\Controllers\StatisticsController;
 use App\Http\Controllers\UserController;
 
 /* Public endpoints */
-Route::post('register', [AuthController::class, 'register']);
-Route::post('login', [AuthController::class, 'login']);
-Route::post('refresh', [AuthController::class, 'refresh']);
+
+Route::prefix('auth')->group(function () {
+    Route::post('register', [AuthController::class, 'register']);
+    Route::post('login', [AuthController::class, 'login']);
+    Route::post('refresh', [AuthController::class, 'refresh']);
+});
 
 Route::get('products', [ProductController::class, 'index']);
 Route::get('products/{product}', [ProductController::class, 'show']);
@@ -25,13 +28,15 @@ Route::get('orderSchedules/{orderSchedule}', [OrderScheduleController::class, 's
 Route::post('orders', [OrderController::class, 'store']);
 
 /* Authenticated user endpoints */
-Route::middleware('auth:sanctum')->group(function () {
-    Route::post('logout', [AuthController::class, 'logout']);
 
+Route::middleware('auth:sanctum')->prefix('auth')->group(function () {
+    Route::post('logout', [AuthController::class, 'logout']);
     Route::get('user', [UserController::class, 'show']);
     Route::put('user', [UserController::class, 'update']);
-
+});
+Route::middleware('auth:sanctum')->group(function () {
     Route::get('orders', [OrderController::class, 'index']);
+    Route::get('orders/{orderSchedule}', [OrderController::class, 'getOrdersByOrderSchedule']);
     Route::get('orders/{order}', [OrderController::class, 'show']);
     Route::put('orders/{order}', [OrderController::class, 'update']);
     Route::delete('orders/{order}', [OrderController::class, 'destroy']);
@@ -55,5 +60,3 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
 
     Route::get('statistics', [StatisticsController::class, 'monthly']);
 });
-
-

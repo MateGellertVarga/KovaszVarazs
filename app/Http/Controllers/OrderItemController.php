@@ -10,22 +10,22 @@ use App\Models\Product;
 
 class OrderItemController extends Controller
 {
-    public function index($orderId)
+    public function index($order_id)
     {
-        $order = Order::findOrFail($orderId);
+        $order = Order::findOrFail($order_id);
         $authUser = request()->user();
         if ($authUser->role !== 'admin' && $order->user_id !== $authUser->id) {
-            return response()->json(['error' => 'Nincs jogod ehhez a művelethez'], 401);
+            return response()->json(['message' => 'Nincs jogod ehhez a művelethez'], 401);
         }
-        return OrderItem::where('order_id', $orderId)->get();
+        return OrderItem::where('order_id', $order_id)->get();
     }
 
-    public function store(StoreOrderItemRequest $request, $orderId)
+    public function store(StoreOrderItemRequest $request, $order_id)
     {
-        $order = Order::findOrFail($orderId);
+        $order = Order::findOrFail($order_id);
         $authUser = request()->user();
         if ($authUser->role !== 'admin' && $order->user_id !== $authUser->id) {
-            return response()->json(['error' => 'Nincs jogod ehhez a művelethez'], 401);
+            return response()->json(['message' => 'Nincs jogod ehhez a művelethez'], 401);
         }
         $data = $request->validated();
         $product = Product::findOrFail($data['product_id']);
@@ -33,28 +33,28 @@ class OrderItemController extends Controller
         return $order->orderItems()->create($data);
     }
 
-    public function show($orderId, $id)
+    public function show($order_id, $id)
     {
         $orderItem = OrderItem::findOrFail($id);
-        if ($orderItem->order_id != $orderId) {
+        if ($orderItem->order_id != $order_id) {
             abort(404);
         }
         $authUser = request()->user();
         if ($authUser->role !== 'admin' && $orderItem->order->user_id !== $authUser->id) {
-            return response()->json(['error' => 'Nincs jogod ehhez a művelethez'], 401);
+            return response()->json(['message' => 'Nincs jogod ehhez a művelethez'], 401);
         }
         return $orderItem;
     }
 
-    public function update(UpdateOrderItemRequest $request, $orderId, $id)
+    public function update(UpdateOrderItemRequest $request, $order_id, $id)
     {
         $orderItem = OrderItem::findOrFail($id);
-        if ($orderItem->order_id != $orderId) {
+        if ($orderItem->order_id != $order_id) {
             abort(404);
         }
         $authUser = request()->user();
         if ($authUser->role !== 'admin' && $orderItem->order->user_id !== $authUser->id) {
-            return response()->json(['error' => 'Nincs jogod ehhez a művelethez'], 401);
+            return response()->json(['message' => 'Nincs jogod ehhez a művelethez'], 401);
         }
         $data = $request->validated();
         if (isset($data['product_id'])) {
@@ -65,15 +65,15 @@ class OrderItemController extends Controller
         return $orderItem;
     }
 
-    public function destroy($orderId, $id)
+    public function destroy($order_id, $id)
     {
         $orderItem = OrderItem::findOrFail($id);
-        if ($orderItem->order_id != $orderId) {
+        if ($orderItem->order_id != $order_id) {
             abort(404);
         }
         $authUser = request()->user();
         if ($authUser->role !== 'admin' && $orderItem->order->user_id !== $authUser->id) {
-            return response()->json(['error' => 'Nincs jogod ehhez a művelethez'], 401);
+            return response()->json(['message' => 'Nincs jogod ehhez a művelethez'], 401);
         }
         $orderItem->delete();
         return response()->noContent();

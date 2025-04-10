@@ -17,12 +17,13 @@ class RegisterRequest extends FormRequest
             'name'         => 'required|string',
             'email'        => 'required|email|unique:users,email',
             'phone_number' => 'required|phone:SK,HU,RO,PL,CZ,AT,DE,INTERNATIONAL',
-            'password'     => 'required|string|min:8|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/',
+            'password' => 'required|string|min:8|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+={}\[\]:;"\'<>,.?\/~`\\|-])[A-Za-z\d!@#$%^&*()_+={}\[\]:;"\'<>,.?\/~`\\|-]{8,}$/',
             'role'         => 'required|in:user,admin'
         ];
     }
 
-    public function messages(): array {
+    public function messages(): array
+    {
         return [
             'name.required'         => 'Név hiányzik',
             'email.required'        => 'Email cím hiányzik',

@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('order_schedules', function (Blueprint $table) {
             $table->id();
             $table->date('available_date')->unique();
+            $table->string('note')->nullable();
         });
     }
 
