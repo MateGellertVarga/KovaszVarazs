@@ -1,5 +1,4 @@
 export interface StatisticsModel {
-  month: Date;
   sales: SaleModel[];
   costs: CostModel[];
 }
@@ -13,7 +12,7 @@ export interface SaleModel {
 
 export interface CostModel {
   id: number;
-  month: Date;
+  month: string;
   name: string;
   amount: number;
 }

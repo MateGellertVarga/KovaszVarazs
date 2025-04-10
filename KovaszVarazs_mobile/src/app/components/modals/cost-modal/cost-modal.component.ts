@@ -11,6 +11,7 @@ import { CostModel } from 'src/models/statisticsModel';
 })
 export class CostModalComponent implements OnInit {
   @Input() cost: CostModel | null = null;
+  @Input() month!: Date;
   @Output() canceled = new EventEmitter<void>();
   @Output() saved = new EventEmitter<CostModel>();
 
@@ -35,15 +36,21 @@ export class CostModalComponent implements OnInit {
 
   save() {
     if (this.cost && this.checkRequiredFields()) {
-      // this.dataService.addCost(this.cost).subscribe({
-      //   next: (cost: CostModel) => {
-      //     this.saved.emit(cost);
-      //   },
-      //   error: (error:any) => {
-      //     this.errorMessage = error.error?.message ?? error.message;
-      //   },
-      // });
-      this.modalnavbarService.setEditingCost(false);
+      this.cost.month = this.formatMonthToDateString(this.month);
+
+      const saveObservable =
+        this.cost.id != 0
+          ? this.dataService.updateCost(this.cost.id, this.cost)
+          : this.dataService.addCost(this.cost);
+      saveObservable.subscribe({
+        next: (cost: CostModel) => {
+          this.saved.emit(cost);
+          this.modalnavbarService.setEditingCost(false);
+        },
+        error: (error: any) => {
+          this.errorMessage = error.error?.message ?? error.message;
+        },
+      });
     }
   }
 
@@ -59,5 +66,11 @@ export class CostModalComponent implements OnInit {
       this.errorMessage += 'Összeg nagyobb 0!';
     }
     return !this.errorMessage;
+  }
+
+  formatMonthToDateString(date: Date): string {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    return `${year}-${month}-01`;
   }
 }

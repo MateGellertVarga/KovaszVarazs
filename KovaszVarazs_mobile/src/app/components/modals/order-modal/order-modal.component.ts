@@ -115,8 +115,6 @@ export class OrderModalComponent implements OnInit {
   }
 
   checkRequiredFields(): boolean {
-    console.log(this.order);
-
     this.errorMessage = '';
     if (!this.order?.customer_name) {
       this.errorMessage += 'Név kötelező!\n';

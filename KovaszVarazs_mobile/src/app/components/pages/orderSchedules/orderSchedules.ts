@@ -65,7 +65,7 @@ export class OrderSchedules {
   editingOrderSchedule: OrderScheduleModel | null = null;
 
   ionViewWillEnter() {
-    this.dataService.getOrderSchedules().subscribe((data) => {
+    this.dataService.getOrderSchedules(0, 50).subscribe((data) => {
       this.orderSchedules = data;
     });
   }

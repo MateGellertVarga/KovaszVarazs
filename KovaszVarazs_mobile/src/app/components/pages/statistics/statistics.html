@@ -17,14 +17,13 @@
 >
   @if (statistics) {
   <div class="mx-auto flex justify-between items-center mt-2">
-    <ion-button fill="clear">
+    <ion-button fill="clear" (click)="previousMonth()">
       <ion-icon name="chevron-back-outline"></ion-icon>
     </ion-button>
     <h2 class="text-xl font-semibold">
-      {{statistics.month | date: 'yyyy MMMM' : undefined : 'hu' }} nincs
-      backenden még!!
+      {{currentMonth | date: 'yyyy MMMM' : undefined : 'hu' }}
     </h2>
-    <ion-button fill="clear">
+    <ion-button fill="clear" (click)="nextMonth()">
       <ion-icon name="chevron-forward-outline"></ion-icon>
     </ion-button>
   </div>
@@ -40,6 +39,13 @@
           <h3>{{product.income}} €</h3>
         </div>
       </ion-item>
+      } @if (statistics.sales.length > 0) {
+      <ion-item class="mt-2">
+        <div class="flex justify-between items-center w-full font-bold">
+          <h2 class="font-bold">Összesen:</h2>
+          <h2 class="font-bold">{{totalSales}} €</h2>
+        </div>
+      </ion-item>
       }
     </ion-list>
     <div class="flex justify-between items-center w-full mt-20">
@@ -52,7 +58,7 @@
     </div>
     <ion-list class="mt-4 px-1">
       @for (cost of statistics.costs; track $index) {
-      <ion-item>
+      <ion-item class="mb-1">
         <div class="w-full">
           <div class="flex justify-between items-center w-full">
             <h3>{{cost.name}}</h3>
@@ -90,12 +96,20 @@
           </div>
         </div>
       </ion-item>
+      } @if (statistics.costs.length > 0) {
+      <ion-item class="mt-2">
+        <div class="flex justify-between items-center w-full font-bold">
+          <h2 class="font-bold">Összesen:</h2>
+          <h2 class="font-bold">{{totalCosts}} €</h2>
+        </div>
+      </ion-item>
       }
     </ion-list>
   </div>
   } @if (editingCost !== null) {
   <app-cost-modal
     [cost]="editingCost"
+    [month]="currentMonth"
     (canceled)="editingCost = null"
     (saved)="saveCost($event)"
   ></app-cost-modal>

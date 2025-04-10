@@ -179,8 +179,7 @@
     </ion-item>
     }
   </ion-list>
-  }
-
+  } @if (orders.length > 0) {
   <h1
     class="text-center w-full text-2xl font-bold mt-5 border-t-2 border-black pt-2"
   >
@@ -197,13 +196,12 @@
     }
     <ion-item class="mt-2">
       <div class="flex justify-between items-center w-full font-bold">
-        <h2 class="text-xl font-bold">Össz:</h2>
+        <h2 class="text-xl font-bold">Összeg:</h2>
         <h2 class="text-xl font-bold">{{ totalIncome }} €</h2>
       </div>
     </ion-item>
   </ion-list>
-
-  @if (editingOrder !== null) {
+  } @if (editingOrder !== null) {
   <app-order-modal
     [order]="editingOrder"
     [orderSchedule]="currentOrderSchedule"

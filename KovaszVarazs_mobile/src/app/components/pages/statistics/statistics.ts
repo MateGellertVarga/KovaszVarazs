@@ -48,24 +48,52 @@ export class Statistics {
     registerLocaleData(localeHU);
   }
 
-  statistics: StatisticsModel = { month: new Date(), sales: [], costs: [] };
+  statistics: StatisticsModel = { sales: [], costs: [] };
+  currentMonth: Date = new Date();
   editingCost: CostModel | null = null;
+  totalSales: number = 0;
+  totalCosts: number = 0;
 
   ionViewWillEnter() {
-    this.dataService.getStatistics('2025-03').subscribe({
-      next: (result: StatisticsModel) => {
-        this.statistics = result;
-      },
-      error: (err) => {
-        console.log(err);
-      },
-    });
+    this.loadStatistics();
+  }
+
+  nextMonth() {
+    this.currentMonth = new Date(
+      this.currentMonth.getFullYear(),
+      this.currentMonth.getMonth() + 1,
+      1
+    );
+    this.loadStatistics();
+  }
+
+  previousMonth() {
+    this.currentMonth = new Date(
+      this.currentMonth.getFullYear(),
+      this.currentMonth.getMonth() - 1,
+      1
+    );
+    this.loadStatistics();
+  }
+
+  loadStatistics() {
+    this.dataService
+      .getStatistics(this.formatMonth(this.currentMonth))
+      .subscribe({
+        next: (result: StatisticsModel) => {
+          this.statistics = result;
+          this.calculateTotals();
+        },
+        error: (err) => {
+          console.log(err);
+        },
+      });
   }
 
   newCost() {
     this.editingCost = {
       id: 0,
-      month: new Date(),
+      month: '',
       name: '',
       amount: 0,
     };
@@ -87,7 +115,9 @@ export class Statistics {
       } else {
         this.statistics!.costs.push(cost);
       }
+      this.editingCost = null;
       this.modalNavbarService.setEditingCost(false);
+      this.calculateTotals();
     }
   }
 
@@ -102,27 +132,50 @@ export class Statistics {
         },
         {
           text: 'Törlés',
-          role: 'destructive',
-          handler: () => {
-            this.dataService.deleteCost(cost.id).subscribe({
-              next: () => {
-                const index = this.statistics!.costs.findIndex(
-                  (c) => c.id === cost.id
-                );
-                if (index !== -1) {
-                  this.statistics!.costs.splice(index, 1);
-                  this.changeDetectorRef.detectChanges();
-                }
-              },
-              error: (err) => {
-                console.error('Error deleting cost:', err);
-              },
-            });
-          },
+          role: 'confirm',
         },
       ],
     });
 
     await alert.present();
+
+    const { role } = await alert.onDidDismiss();
+    if (role === 'confirm') {
+      this.dataService.deleteCost(cost.id).subscribe({
+        next: () => {
+          const index = this.statistics.costs.findIndex(
+            (c) => c.id === cost.id
+          );
+          if (index !== -1) {
+            this.statistics.costs.splice(index, 1);
+            this.changeDetectorRef.detectChanges();
+            this.calculateTotals();
+          }
+        },
+        error: (err) => {
+          console.error('Error deleting cost:', err);
+        },
+      });
+    }
+  }
+
+  formatMonth(date: Date): string {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    return `${year}-${month}`;
+  }
+
+  calculateTotals() {
+    this.totalSales = 0;
+    this.totalCosts = 0;
+
+    this.totalSales = this.statistics.sales.reduce(
+      (sum, s) => sum + s.income,
+      0
+    );
+    this.totalCosts = this.statistics.costs.reduce(
+      (sum, c) => sum + c.amount,
+      0
+    );
   }
 }

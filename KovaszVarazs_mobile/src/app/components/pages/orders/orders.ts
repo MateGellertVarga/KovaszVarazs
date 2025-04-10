@@ -68,7 +68,7 @@ export default class Orders {
   totalIncome: number = 0;
 
   ionViewWillEnter() {
-    this.dataService.getOrderSchedules().subscribe((orderSchedules) => {
+    this.dataService.getOrderSchedules(50, 50).subscribe((orderSchedules) => {
       this.orderSchedules = orderSchedules;
       this.currentOrderSchedule =
         this.orderSchedules.find(
@@ -197,26 +197,29 @@ export default class Orders {
         },
         {
           text: 'Törlés',
-          role: 'destructive',
-          handler: () => {
-            this.dataService.deleteOrder(order.id).subscribe({
-              next: () => {
-                const index = this.orders.findIndex((o) => o.id === order.id);
-                if (index !== -1) {
-                  this.orders.splice(index, 1);
-                  this.changeDetectorRef.detectChanges();
-                }
-              },
-              error: (err) => {
-                console.error('Törlés sikertelen:', err);
-              },
-            });
-          },
+          role: 'confirm',
         },
       ],
     });
 
     await alert.present();
+
+    const { role } = await alert.onDidDismiss();
+    if (role === 'confirm') {
+      this.dataService.deleteOrder(order.id).subscribe({
+        next: () => {
+          const index = this.orders.findIndex((o) => o.id === order.id);
+          if (index !== -1) {
+            this.orders.splice(index, 1);
+            this.changeDetectorRef.detectChanges();
+            this.calculateSummary();
+          }
+        },
+        error: (err) => {
+          console.error('Törlés sikertelen:', err);
+        },
+      });
+    }
   }
 
   changeOrderStatus(id: number) {

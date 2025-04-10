@@ -60,9 +60,14 @@ export class DataService {
     return this.http.delete<void>(`${this.apiUrl}/orders/${id}`);
   }
 
-  getOrderSchedules(): Observable<OrderScheduleModel[]> {
+  getOrderSchedules(
+    before: number,
+    after: number
+  ): Observable<OrderScheduleModel[]> {
     return this.http
-      .get<OrderScheduleModel[]>(`${this.apiUrl}/orderSchedules`)
+      .get<OrderScheduleModel[]>(
+        `${this.apiUrl}/orderSchedules?before=${before}&after=${after}`
+      )
       .pipe(
         map((schedules) =>
           schedules.map((schedule) => ({
@@ -132,13 +137,10 @@ export class DataService {
 
   getStatistics(month: string): Observable<StatisticsModel> {
     return this.http
-      .get<StatisticsModel>(
-        `${this.apiUrl}/statistics?month=${month.replace("'", '')}`
-      )
+      .get<StatisticsModel>(`${this.apiUrl}/statistics?month=${month}`)
       .pipe(
         map((statistics) => ({
           ...statistics,
-          month: new Date(statistics.month),
         }))
       );
   }

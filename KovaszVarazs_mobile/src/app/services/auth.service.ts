@@ -12,7 +12,7 @@ export class AuthService {
   constructor(private http: HttpClient) {
     this.loadUserData();
   }
-  apiUrl: string = 'http://localhost:8000/api';
+  apiUrl: string = 'http://localhost:8000/api/auth';
 
   public loggedInUser: UserModel | null = null;
 
