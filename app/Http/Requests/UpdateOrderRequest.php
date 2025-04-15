@@ -18,6 +18,7 @@ class UpdateOrderRequest extends FormRequest
             'phone_number'        => 'sometimes|nullable|string',
             'note'                => 'sometimes|nullable|string',
             'status'              => 'sometimes|required|in:pending,processing,completed',
+            'already_paid'        => 'sometimes|required|boolean',
             'is_paying'           => 'sometimes|required|boolean',
             'order_schedule_id'   => 'sometimes|required|exists:order_schedules,id',
             'order_items'         => 'sometimes|array',

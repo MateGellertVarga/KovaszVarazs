@@ -15,6 +15,7 @@ class Order extends Model
         'phone_number',
         'note',
         'status',
+        'already_paid',
         'is_paying',
         'total_price',
         'order_schedule_id',
@@ -22,6 +23,7 @@ class Order extends Model
 
     protected $casts = [
         'is_paying' => 'boolean',
+        'already_paid' => 'boolean',
     ];
 
     public function orderItems()

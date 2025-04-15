@@ -57,8 +57,19 @@ class OrderController extends Controller
             $data['phone_number'] = $data['phone_number'] ?? null;
         }
 
-        if ($request->user_id == null && $request->customer_name == null) {
+        if (($data['user_id'] ?? null) === null && ($data['customer_name'] ?? null) === null) {
             return response()->json(['message' => 'Vevő megadása kötelező'], 400);
+        }
+
+        $existingOrder = Order::where('order_schedule_id', $data['order_schedule_id'])
+            ->when($data['user_id'] ?? null, fn($query) => $query->where('user_id', $data['user_id']))
+            ->when(($data['user_id'] ?? null) === null && ($data['customer_name'] ?? null), fn($query) => $query->where('customer_name', $data['customer_name']))
+            ->first();
+
+        if ($existingOrder) {
+            return response()->json([
+                'message' => 'Erre a névre már létezik rendelés ezen a napon.'
+            ], 400);
         }
 
         try {
@@ -100,6 +111,7 @@ class OrderController extends Controller
             return response()->json(['message' => $e->getMessage()], 400);
         }
     }
+
 
 
 

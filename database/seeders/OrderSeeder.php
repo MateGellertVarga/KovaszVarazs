@@ -19,6 +19,7 @@ class OrderSeeder extends Seeder
             'note' => 'Kérlek, gyorsan készítsd el!',
             'status' => 'pending',
             'is_paying' => true,
+            'already_paid' => false,
             'total_price' => 0,
             'order_schedule_id' => 1,
         ]);
@@ -34,6 +35,7 @@ class OrderSeeder extends Seeder
             'note' => 'Személyes átvétel',
             'status' => 'pending',
             'is_paying' => false,
+            'already_paid' => false,
             'total_price' => 0,
             'order_schedule_id' => 2,
         ]);
@@ -48,6 +50,7 @@ class OrderSeeder extends Seeder
             'note' => 'Kérlek, gyorsan készítsd el!',
             'status' => 'pending',
             'is_paying' => true,
+            'already_paid' => false,
             'total_price' => 0,
             'order_schedule_id' => 3,
         ]);

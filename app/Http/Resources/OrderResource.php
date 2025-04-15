@@ -24,6 +24,7 @@ class OrderResource extends JsonResource
             'note' => $this->note,
             'status' => $this->status,
             'is_paying' => $this->is_paying,
+            'already_paid' => $this->already_paid,
             'total_price' => $this->total_price,
             'order_schedule_id' => $this->order_schedule_id,
             'order_schedule_date' => optional($this->orderSchedule)->available_date,
