@@ -14,6 +14,8 @@ import {
   IonFabButton,
   IonFab,
   IonIcon,
+  IonList,
+  IonItem,
 } from '@ionic/angular/standalone';
 import { DataService } from 'src/app/services/data.service';
 import { ModalNavbarService } from 'src/app/services/modal-navbar.service';
@@ -24,6 +26,8 @@ import { ProductModalComponent } from '../../modals/product-modal/product-modal.
   selector: 'products',
   templateUrl: 'products.html',
   imports: [
+    IonItem,
+    IonList,
     IonIcon,
     IonFab,
     IonFabButton,

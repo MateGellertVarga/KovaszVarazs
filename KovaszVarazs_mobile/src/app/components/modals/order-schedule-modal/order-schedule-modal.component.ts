@@ -1,21 +1,46 @@
 import { DatePipe } from '@angular/common';
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  ViewChild,
+  viewChild,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DataService } from 'src/app/services/data.service';
 import { ModalNavbarService } from 'src/app/services/modal-navbar.service';
 import { OrderScheduleModel } from 'src/models/orderScheduleModel';
 import { ProductModel } from 'src/models/productModel';
+import {
+  IonDatetimeButton,
+  IonDatetime,
+  IonModal,
+  IonItem,
+  IonLabel,
+} from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-order-schedule-modal',
   templateUrl: './order-schedule-modal.component.html',
-  imports: [FormsModule, DatePipe],
+  imports: [
+    IonLabel,
+    IonItem,
+    IonModal,
+    IonDatetime,
+    IonDatetimeButton,
+    FormsModule,
+    DatePipe,
+  ],
   providers: [DatePipe],
 })
 export class OrderScheduleModalComponent implements OnInit {
   @Input() orderSchedule: OrderScheduleModel | null = null;
   @Output() canceled = new EventEmitter<void>();
   @Output() saved = new EventEmitter<OrderScheduleModel>();
+  @ViewChild('dateInput') dateInputRef!: ElementRef<HTMLInputElement>;
 
   constructor(
     private dataService: DataService,
@@ -40,6 +65,17 @@ export class OrderScheduleModalComponent implements OnInit {
     this.scrollY = window.scrollY || window.pageYOffset;
     this.viewportHeight = window.innerHeight;
     this.initProductMaxQuantities();
+  }
+
+  focusDateInput() {
+    const inputEl = this.dateInputRef?.nativeElement;
+    if (inputEl && typeof inputEl.showPicker === 'function') {
+      try {
+        inputEl.showPicker();
+      } catch (e) {
+        inputEl.focus();
+      }
+    }
   }
 
   onDateChange(newValue: string) {

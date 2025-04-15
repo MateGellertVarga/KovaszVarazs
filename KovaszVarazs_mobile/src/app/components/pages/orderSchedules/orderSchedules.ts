@@ -102,7 +102,7 @@ export class OrderSchedules {
   async deleteOrderSchedule(orderSchedule: OrderScheduleModel) {
     const alert = await this.alertController.create({
       header: 'Törlés',
-      message: 'Biztosan törölni szeretnéd ezt a sütési napot?',
+      message: `Biztosan törölni szeretnéd ezt a sütési napot? Az összes hozzá tartozó rendelés is törlődik!`,
       buttons: [
         {
           text: 'Mégse',

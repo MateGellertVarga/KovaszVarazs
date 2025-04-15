@@ -7,6 +7,7 @@ export interface OrderModel {
   note?: string;
   status: string;
   is_paying: boolean;
+  already_paid: boolean;
   total_price: number;
   order_schedule_id: number;
   order_schedule_date: Date;

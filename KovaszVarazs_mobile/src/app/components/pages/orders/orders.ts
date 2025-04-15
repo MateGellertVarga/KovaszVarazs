@@ -157,6 +157,7 @@ export default class Orders {
       note: '',
       status: 'pending',
       is_paying: true,
+      already_paid: false,
       total_price: 0,
       order_schedule_id: this.currentOrderSchedule!.id,
       order_schedule_date: new Date(),

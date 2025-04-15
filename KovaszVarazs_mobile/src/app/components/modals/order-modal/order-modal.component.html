@@ -45,14 +45,27 @@
           [(ngModel)]="order.note"
         ></textarea>
       </div>
-      <div class="flex items-center">
-        <input
-          type="checkbox"
-          name="is_paying"
-          class="h-4 w-4 text-blue-600 border-gray-300 rounded"
-          [(ngModel)]="order.is_paying"
-        />
-        <label class="ml-2 font-medium text-gray-700">Fizet-e</label>
+      <div class="flex justify-between">
+        <div class="flex items-center">
+          <input
+            type="checkbox"
+            name="is_paying"
+            class="h-4 w-4 text-blue-600 border-gray-300 rounded"
+            [(ngModel)]="order.is_paying"
+          />
+          <label class="ml-2 font-medium text-gray-700">Fizet-e</label>
+        </div>
+        @if (order.is_paying == true) {
+        <div class="flex items-center">
+          <input
+            type="checkbox"
+            name="already_paid"
+            class="h-4 w-4 text-blue-600 border-gray-300 rounded"
+            [(ngModel)]="order.already_paid"
+          />
+          <label class="ml-2 font-medium text-gray-700">Fizetve</label>
+        </div>
+        }
       </div>
       <div>
         <label class="block font-medium mb-1 text-gray-700">Termékek</label>

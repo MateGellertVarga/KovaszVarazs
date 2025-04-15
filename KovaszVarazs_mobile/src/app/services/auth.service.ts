@@ -36,9 +36,9 @@ export class AuthService {
     }
   }
 
-  register(user: UserModel) {
-    return this.http.post(`${this.apiUrl}/register`, user);
-  }
+  // register(user: UserModel) {
+  //   return this.http.post(`${this.apiUrl}/register`, user);
+  // }
 
   // refresh_token() {
   //   return this.http.post(`${this.apiUrl}/refresh`, {});

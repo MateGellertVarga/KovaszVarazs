@@ -33,13 +33,13 @@ export const routes: Routes = [
         loadComponent: () =>
           import('../pages/login/login').then((m) => m.Login),
       },
-      {
-        path: 'registration',
-        loadComponent: () =>
-          import('../pages/registration/registration').then(
-            (m) => m.Registration
-          ),
-      },
+      // {
+      //   path: 'registration',
+      //   loadComponent: () =>
+      //     import('../pages/registration/registration').then(
+      //       (m) => m.Registration
+      //     ),
+      // },
     ],
   },
   {

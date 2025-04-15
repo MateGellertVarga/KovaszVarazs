@@ -49,17 +49,27 @@
         class="w-[90vw] p-1 {{order.status == 'processing' ? 'border-4 border-yellow-500 bg-yellow-100' : order.status == 'completed' ? 'border-4 border-green-700 bg-green-200' : ''}}"
       >
         <ion-card-header class="flex flex-row justify-between items-center">
-          <div class="flex flex-col items-start">
-            <ion-card-title class="font-bold mb-1"
-              >{{order.customer_name}}</ion-card-title
-            >
+          <div class="flex flex-col items-start max-w-[65%] break-words">
+            <ion-card-title class="font-bold mb-1">
+              {{ order.customer_name }}
+            </ion-card-title>
             @if (order.phone_number) {
-            <ion-card-subtitle>{{order.phone_number}}</ion-card-subtitle>
+            <ion-card-subtitle>{{ order.phone_number }}</ion-card-subtitle>
             } @if (order.note) {
-            <ion-card-subtitle>{{order.note}}</ion-card-subtitle>
+            <ion-card-subtitle class="whitespace-normal break-words">
+              {{ order.note }}
+            </ion-card-subtitle>
             }
           </div>
-          <h1 class="font-bold text-2xl text-black">{{order.total_price}} €</h1>
+
+          <div class="flex flex-col items-end">
+            <h1 class="font-bold text-2xl text-black">
+              {{ order.total_price }} €
+            </h1>
+            @if (order.already_paid) {
+            <h1 class="font-bold text-lg text-green-700">Fizetve!</h1>
+            }
+          </div>
         </ion-card-header>
 
         <ion-card-content>
@@ -185,7 +195,7 @@
   >
     Összesítés
   </h1>
-  <ion-list class="px-1">
+  <ion-list class="px-1 mb-20">
     @for (item of orderSummary; track $index) {
     <ion-item>
       <div class="flex justify-between items-center w-full">

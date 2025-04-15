@@ -17,11 +17,14 @@
       <div>
         <label class="block font-medium text-gray-700">Dátum</label>
         <input
+          #dateInput
           type="date"
           name="available_date"
-          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-          [ngModel]="orderSchedule.available_date | date : 'yyyy-MM-dd'"
+          class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300 bg-white cursor-pointer"
+          [ngModel]="orderSchedule?.available_date | date : 'yyyy-MM-dd'"
           (ngModelChange)="onDateChange($event)"
+          (focus)="focusDateInput()"
+          (click)="focusDateInput()"
           required
         />
       </div>
