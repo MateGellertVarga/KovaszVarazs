@@ -79,8 +79,21 @@ class OrderController extends Controller
                 $orderItems = [];
                 foreach ($request->order_items as $item) {
                     $product = Product::findOrFail($item['product_id']);
-                    $item['unit_price'] = $product->price;
-                    $orderItems[] = $order->orderItems()->create($item);
+                    $unit_price = $product->price;
+
+                    DB::table('order_items')->insert([
+                        'order_id' => $order->id,
+                        'product_id' => $item['product_id'],
+                        'quantity' => $item['quantity'],
+                        'unit_price' => $unit_price,
+                    ]);
+
+                    $orderItems[] = (object) [
+                        'product_id' => $item['product_id'],
+                        'quantity' => $item['quantity'],
+                        'unit_price' => $unit_price,
+                        'product' => $product
+                    ];
                 }
 
                 $total_price = $order->is_paying
@@ -111,9 +124,6 @@ class OrderController extends Controller
             return response()->json(['message' => $e->getMessage()], 400);
         }
     }
-
-
-
 
     public function show(Request $request, $id)
     {
@@ -153,7 +163,7 @@ class OrderController extends Controller
                     foreach ($orderItemsData as $item) {
                         if ($item['quantity'] > 0) {
                             $product = Product::findOrFail($item['product_id']);
-                            $item['unit_price'] = $product->price;
+                            $unit_price = $product->price;
 
                             $remaining = DB::table('order_schedule_products')
                                 ->where('order_schedule_id', $order->order_schedule_id)
@@ -164,18 +174,20 @@ class OrderController extends Controller
                                 throw new Exception("Nincs elég szabad termék: {$product->name}");
                             }
 
-                            DB::table('order_schedule_products')
-                                ->where('order_schedule_id', $order->order_schedule_id)
-                                ->where('product_id', $item['product_id'])
-                                ->decrement('remaining_quantity', $item['quantity']);
-
-                            $order->orderItems()->create($item);
+                            DB::table('order_items')->insert([
+                                'order_id' => $order->id,
+                                'product_id' => $item['product_id'],
+                                'quantity' => $item['quantity'],
+                                'unit_price' => $unit_price,
+                            ]);
                         }
                     }
                 }
 
                 $total_price = $order->is_paying
-                    ? $order->orderItems->sum(fn($item) => $item->quantity * $item->unit_price)
+                    ? DB::table('order_items')
+                    ->where('order_id', $order->id)
+                    ->sum(DB::raw('quantity * unit_price'))
                     : 0;
 
                 $order->update(['total_price' => $total_price]);
@@ -187,9 +199,6 @@ class OrderController extends Controller
             return response()->json(['message' => $e->getMessage()], 400);
         }
     }
-
-
-
 
     public function destroy(Request $request, $id)
     {
