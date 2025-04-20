@@ -15,6 +15,10 @@
   [scrollY]="editingCost != null ? 'false':'true'"
   class="relative {{editingCost != null ? 'pointer-events-none' : ''}}"
 >
+  <ion-refresher slot="fixed" (ionRefresh)="refresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
   @if (statistics) {
   <div class="mx-auto flex justify-between items-center mt-2 mb-16">
     <ion-button fill="clear" (click)="previousMonth()">
@@ -36,14 +40,14 @@
         <div class="flex justify-between items-center w-full">
           <h3>{{product.product_name}}</h3>
           <h3>{{product.quantity}} db</h3>
-          <h3>{{product.income}} €</h3>
+          <h3>{{product.income| number:'1.0-2' }} €</h3>
         </div>
       </ion-item>
       } @if (statistics.sales.length > 0) {
       <ion-item class="mt-2">
         <div class="flex justify-between items-center w-full font-bold">
           <h2 class="font-bold">Összesen:</h2>
-          <h2 class="font-bold">{{totalSales}} €</h2>
+          <h2 class="font-bold">{{totalSales| number:'1.0-2' }} €</h2>
         </div>
       </ion-item>
       }
@@ -62,7 +66,7 @@
         <div class="w-full">
           <div class="flex justify-between items-center w-full">
             <h3>{{cost.name}}</h3>
-            <h3>{{cost.amount}} €</h3>
+            <h3>{{cost.amount| number:'1.0-2' }} €</h3>
           </div>
 
           <div class="flex justify-evenly w-full mt-2">
@@ -100,7 +104,7 @@
       <ion-item class="mt-2">
         <div class="flex justify-between items-center w-full font-bold">
           <h2 class="font-bold">Összesen:</h2>
-          <h2 class="font-bold">{{totalCosts}} €</h2>
+          <h2 class="font-bold">{{totalCosts| number:'1.0-2' }} €</h2>
         </div>
       </ion-item>
       }

@@ -73,7 +73,7 @@ export class OrderModalComponent implements OnInit {
   }
 
   cancel() {
-    this.modalnavbarService.setEditingOrder(false);
+    this.modalnavbarService.closeModal();
     this.canceled.emit();
   }
 
@@ -90,10 +90,11 @@ export class OrderModalComponent implements OnInit {
       saveObservable.subscribe({
         next: (order: OrderModel) => {
           this.saved.emit(order);
-          this.modalnavbarService.setEditingOrder(false);
+          this.modalnavbarService.closeModal();
         },
         error: (error: any) => {
           this.errorMessage = error.error?.message ?? error.message;
+          console.error(error);
         },
       });
     }

@@ -25,7 +25,7 @@ export class Navbar {
     private modalNavbarService: ModalNavbarService,
     private router: Router
   ) {
-    this.modalNavbarService.isAnyModalOpen.subscribe((isOpen) => {
+    this.modalNavbarService.isModalOpen.subscribe((isOpen) => {
       this.isModalOpen = isOpen;
     });
     this.router.events.subscribe(() => {

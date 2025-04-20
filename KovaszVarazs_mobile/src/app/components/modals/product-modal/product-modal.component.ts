@@ -30,7 +30,7 @@ export class ProductModalComponent implements OnInit {
   }
 
   cancel() {
-    this.modalnavbarService.setEditingProduct(false);
+    this.modalnavbarService.closeModal();
     this.canceled.emit();
   }
 
@@ -61,7 +61,7 @@ export class ProductModalComponent implements OnInit {
       saveObservable.subscribe({
         next: (product: ProductModel) => {
           this.saved.emit(product);
-          this.modalnavbarService.setEditingProduct(false);
+          this.modalnavbarService.closeModal();
         },
         error: (error: any) => {
           this.errorMessage = error.error?.message ?? error.message;

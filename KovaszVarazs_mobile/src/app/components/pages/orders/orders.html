@@ -1,5 +1,5 @@
 <ion-header
-  [translucent]="true"
+  [translucent]="false"
   class="{{editingOrder != null ? 'opacity-50 pointer-events-none' : ''}}"
 >
   <ion-toolbar>
@@ -21,6 +21,10 @@
   [scrollY]="editingOrder != null ? 'false':'true'"
   class="relative {{editingOrder != null ? 'pointer-events-none' : ''}}"
 >
+  <ion-refresher slot="fixed" (ionRefresh)="refresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
   <div class="w-[95%] mx-auto flex justify-between items-center mt-2">
     <ion-button
       fill="clear"
@@ -41,7 +45,14 @@
       <ion-icon name="chevron-forward-outline"></ion-icon>
     </ion-button>
   </div>
-  @if (orders.length > 0) {
+
+  @if (currentOrderSchedule && allOrders.length > 0) {
+  <ion-searchbar
+    class="w-[80%] mx-auto rounded-full"
+    (ionInput)="searchOrders($event)"
+    placeholder="Keresés"
+  ></ion-searchbar>
+  } @if (orders.length > 0) {
   <ion-list>
     @for (order of orders; track $index) {
     <ion-item class="w-full flex justify-center">
@@ -64,7 +75,7 @@
 
           <div class="flex flex-col items-end">
             <h1 class="font-bold text-2xl text-black">
-              {{ order.total_price }} €
+              {{ order.total_price| number:'1.0-2' }} €
             </h1>
             @if (order.already_paid) {
             <h1 class="font-bold text-lg text-green-700">Fizetve!</h1>
@@ -189,7 +200,7 @@
     </ion-item>
     }
   </ion-list>
-  } @if (orders.length > 0) {
+
   <h1
     class="text-center w-full text-2xl font-bold mt-5 border-t-2 border-black pt-2"
   >
@@ -207,7 +218,7 @@
     <ion-item class="mt-2">
       <div class="flex justify-between items-center w-full font-bold">
         <h2 class="text-xl font-bold">Összeg:</h2>
-        <h2 class="text-xl font-bold">{{ totalIncome }} €</h2>
+        <h2 class="text-xl font-bold">{{ totalIncome}} €</h2>
       </div>
     </ion-item>
   </ion-list>

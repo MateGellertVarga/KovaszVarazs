@@ -109,7 +109,7 @@ export class OrderScheduleModalComponent implements OnInit {
   }
 
   cancel() {
-    this.modalnavbarService.setEditingOrderSchedule(false);
+    this.modalnavbarService.closeModal();
     this.canceled.emit();
   }
 
@@ -130,7 +130,7 @@ export class OrderScheduleModalComponent implements OnInit {
       saveObservable.subscribe({
         next: (orderSchedule: OrderScheduleModel) => {
           this.saved.emit(orderSchedule);
-          this.modalnavbarService.setEditingOrderSchedule(false);
+          this.modalnavbarService.closeModal();
         },
         error: (error: any) => {
           console.log(error.error.message);

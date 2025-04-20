@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component } from '@angular/core';
-import { DatePipe, registerLocaleData } from '@angular/common';
+import { CommonModule, DatePipe, registerLocaleData } from '@angular/common';
 import localeHU from '@angular/common/locales/hu';
 import {
   AlertController,
@@ -13,6 +13,8 @@ import {
   IonList,
   IonFab,
   IonFabButton,
+  IonRefresher,
+  IonRefresherContent,
 } from '@ionic/angular/standalone';
 import { DataService } from 'src/app/services/data.service';
 import { CostModel, StatisticsModel } from 'src/models/statisticsModel';
@@ -23,6 +25,9 @@ import { ModalNavbarService } from 'src/app/services/modal-navbar.service';
   selector: 'statistics',
   templateUrl: './statistics.html',
   imports: [
+    CommonModule,
+    IonRefresherContent,
+    IonRefresher,
     IonFabButton,
     IonFab,
     IonList,
@@ -56,6 +61,11 @@ export class Statistics {
 
   ionViewWillEnter() {
     this.loadStatistics();
+  }
+
+  refresh(event: any) {
+    this.ionViewWillEnter();
+    event.target.complete();
   }
 
   nextMonth() {
@@ -97,12 +107,12 @@ export class Statistics {
       name: '',
       amount: 0,
     };
-    this.modalNavbarService.setEditingCost(true);
+    this.modalNavbarService.openModal();
   }
 
   modifyCost(cost: CostModel) {
     this.editingCost = { ...cost };
-    this.modalNavbarService.setEditingCost(true);
+    this.modalNavbarService.openModal();
   }
 
   saveCost(cost: CostModel) {
@@ -116,7 +126,7 @@ export class Statistics {
         this.statistics!.costs.push(cost);
       }
       this.editingCost = null;
-      this.modalNavbarService.setEditingCost(false);
+      this.modalNavbarService.closeModal();
       this.calculateTotals();
     }
   }
@@ -166,15 +176,12 @@ export class Statistics {
   }
 
   calculateTotals() {
-    this.totalSales = 0;
-    this.totalCosts = 0;
-
     this.totalSales = this.statistics.sales.reduce(
-      (sum, s) => sum + s.income,
+      (sum, s) => sum + Number(s.income || 0),
       0
     );
     this.totalCosts = this.statistics.costs.reduce(
-      (sum, c) => sum + c.amount,
+      (sum, c) => sum + Number(c.amount || 0),
       0
     );
   }

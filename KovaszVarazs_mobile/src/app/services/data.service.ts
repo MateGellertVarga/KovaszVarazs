@@ -6,29 +6,34 @@ import { OrderScheduleModel } from 'src/models/orderScheduleModel';
 import { ProductModel } from 'src/models/productModel';
 import { CostModel, StatisticsModel } from 'src/models/statisticsModel';
 import { AuthService } from './auth.service';
-import { p } from '@angular/core/weak_ref.d-Bp6cSy-X';
+import { ConfigService } from './config.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class DataService {
-  constructor(private http: HttpClient, private authService: AuthService) {}
-  apiUrl: string = 'http://127.0.0.1:8000/api';
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService,
+    private configService: ConfigService
+  ) {}
 
   getOrders(): Observable<OrderModel[]> {
-    return this.http.get<OrderModel[]>(`${this.apiUrl}/orders`).pipe(
-      map((orders) =>
-        orders.map((order) => ({
-          ...order,
-          order_schedule_date: new Date(order.order_schedule_date),
-        }))
-      )
-    );
+    return this.http
+      .get<OrderModel[]>(`${this.configService.apiUrl}/orders`)
+      .pipe(
+        map((orders) =>
+          orders.map((order) => ({
+            ...order,
+            order_schedule_date: new Date(order.order_schedule_date),
+          }))
+        )
+      );
   }
 
   getOrdersByOrderScheduleId(scheduleId: number): Observable<OrderModel[]> {
     return this.http
-      .get<OrderModel[]>(`${this.apiUrl}/orders/${scheduleId}`)
+      .get<OrderModel[]>(`${this.configService.apiUrl}/orders/${scheduleId}`)
       .pipe(
         map((orders) =>
           orders.map((order) => ({
@@ -40,24 +45,32 @@ export class DataService {
   }
 
   getOrder(id: number): Observable<OrderModel> {
-    return this.http.get<OrderModel>(`${this.apiUrl}/orders/${id}`).pipe(
-      map((order) => ({
-        ...order,
-        order_schedule_date: new Date(order.order_schedule_date),
-      }))
-    );
+    return this.http
+      .get<OrderModel>(`${this.configService.apiUrl}/orders/${id}`)
+      .pipe(
+        map((order) => ({
+          ...order,
+          order_schedule_date: new Date(order.order_schedule_date),
+        }))
+      );
   }
 
   addOrder(order: OrderModel): Observable<OrderModel> {
-    return this.http.post<OrderModel>(`${this.apiUrl}/orders`, order);
+    return this.http.post<OrderModel>(
+      `${this.configService.apiUrl}/orders`,
+      order
+    );
   }
 
   updateOrder(id: number, order: OrderModel): Observable<OrderModel> {
-    return this.http.put<OrderModel>(`${this.apiUrl}/orders/${id}`, order);
+    return this.http.put<OrderModel>(
+      `${this.configService.apiUrl}/orders/${id}`,
+      order
+    );
   }
 
   deleteOrder(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/orders/${id}`);
+    return this.http.delete<void>(`${this.configService.apiUrl}/orders/${id}`);
   }
 
   getOrderSchedules(
@@ -66,7 +79,7 @@ export class DataService {
   ): Observable<OrderScheduleModel[]> {
     return this.http
       .get<OrderScheduleModel[]>(
-        `${this.apiUrl}/orderSchedules?before=${before}&after=${after}`
+        `${this.configService.apiUrl}/orderSchedules?before=${before}&after=${after}`
       )
       .pipe(
         map((schedules) =>
@@ -80,7 +93,9 @@ export class DataService {
 
   getOrderSchedule(id: number): Observable<OrderScheduleModel> {
     return this.http
-      .get<OrderScheduleModel>(`${this.apiUrl}/orderSchedules/${id}`)
+      .get<OrderScheduleModel>(
+        `${this.configService.apiUrl}/orderSchedules/${id}`
+      )
       .pipe(
         map((schedule) => ({
           ...schedule,
@@ -93,7 +108,7 @@ export class DataService {
     orderSchedule: OrderScheduleModel
   ): Observable<OrderScheduleModel> {
     return this.http.post<OrderScheduleModel>(
-      `${this.apiUrl}/orderSchedules`,
+      `${this.configService.apiUrl}/orderSchedules`,
       orderSchedule
     );
   }
@@ -103,41 +118,54 @@ export class DataService {
     orderSchedule: OrderScheduleModel
   ): Observable<OrderScheduleModel> {
     return this.http.put<OrderScheduleModel>(
-      `${this.apiUrl}/orderSchedules/${id}`,
+      `${this.configService.apiUrl}/orderSchedules/${id}`,
       orderSchedule
     );
   }
 
   deleteOrderSchedule(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/orderSchedules/${id}`);
+    return this.http.delete<void>(
+      `${this.configService.apiUrl}/orderSchedules/${id}`
+    );
   }
 
   getProducts(): Observable<ProductModel[]> {
-    return this.http.get<ProductModel[]>(`${this.apiUrl}/products`);
+    return this.http.get<ProductModel[]>(
+      `${this.configService.apiUrl}/products`
+    );
   }
 
   getProduct(id: number): Observable<ProductModel> {
-    return this.http.get<ProductModel>(`${this.apiUrl}/products/${id}`);
+    return this.http.get<ProductModel>(
+      `${this.configService.apiUrl}/products/${id}`
+    );
   }
 
   addProduct(productData: FormData): Observable<ProductModel> {
-    return this.http.post<ProductModel>(`${this.apiUrl}/products`, productData);
+    return this.http.post<ProductModel>(
+      `${this.configService.apiUrl}/products`,
+      productData
+    );
   }
 
   updateProduct(id: number, productData: FormData): Observable<ProductModel> {
     return this.http.post<ProductModel>(
-      `${this.apiUrl}/products/${id}`,
+      `${this.configService.apiUrl}/products/${id}`,
       productData
     );
   }
 
   deleteProduct(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/products/${id}`);
+    return this.http.delete<void>(
+      `${this.configService.apiUrl}/products/${id}`
+    );
   }
 
   getStatistics(month: string): Observable<StatisticsModel> {
     return this.http
-      .get<StatisticsModel>(`${this.apiUrl}/statistics?month=${month}`)
+      .get<StatisticsModel>(
+        `${this.configService.apiUrl}/statistics?month=${month}`
+      )
       .pipe(
         map((statistics) => ({
           ...statistics,
@@ -146,14 +174,20 @@ export class DataService {
   }
 
   addCost(cost: CostModel): Observable<CostModel> {
-    return this.http.post<CostModel>(`${this.apiUrl}/costs`, cost);
+    return this.http.post<CostModel>(
+      `${this.configService.apiUrl}/costs`,
+      cost
+    );
   }
 
   updateCost(id: number, cost: CostModel): Observable<CostModel> {
-    return this.http.put<CostModel>(`${this.apiUrl}/costs/${id}`, cost);
+    return this.http.put<CostModel>(
+      `${this.configService.apiUrl}/costs/${id}`,
+      cost
+    );
   }
 
   deleteCost(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/costs/${id}`);
+    return this.http.delete<void>(`${this.configService.apiUrl}/costs/${id}`);
   }
 }

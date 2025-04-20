@@ -16,16 +16,22 @@ import {
   IonIcon,
   IonList,
   IonItem,
+  IonRefresher,
+  IonRefresherContent,
 } from '@ionic/angular/standalone';
 import { DataService } from 'src/app/services/data.service';
 import { ModalNavbarService } from 'src/app/services/modal-navbar.service';
 import { ProductModel } from 'src/models/productModel';
 import { ProductModalComponent } from '../../modals/product-modal/product-modal.component';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'products',
   templateUrl: 'products.html',
   imports: [
+    CommonModule,
+    IonRefresherContent,
+    IonRefresher,
     IonItem,
     IonList,
     IonIcon,
@@ -65,6 +71,11 @@ export class Products {
     });
   }
 
+  refresh(event: any) {
+    this.ionViewWillEnter();
+    event.target.complete();
+  }
+
   newProduct() {
     this.editingProduct = {
       id: 0,
@@ -72,12 +83,12 @@ export class Products {
       price: 0,
       image_url: '',
     };
-    this.modalNavbarService.setEditingProduct(true);
+    this.modalNavbarService.openModal();
   }
 
   modifyProduct(product: ProductModel) {
     this.editingProduct = { ...product };
-    this.modalNavbarService.setEditingProduct(true);
+    this.modalNavbarService.openModal();
   }
 
   saveProduct(product: ProductModel) {

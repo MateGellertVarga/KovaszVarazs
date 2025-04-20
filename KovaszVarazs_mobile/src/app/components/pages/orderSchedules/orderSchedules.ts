@@ -19,6 +19,8 @@ import {
   IonCard,
   IonCardTitle,
   IonCardContent,
+  IonRefresher,
+  IonRefresherContent,
 } from '@ionic/angular/standalone';
 import { DataService } from 'src/app/services/data.service';
 import { OrderScheduleModel } from 'src/models/orderScheduleModel';
@@ -30,6 +32,8 @@ import { OrderScheduleModalComponent } from '../../modals/order-schedule-modal/o
   templateUrl: 'orderSchedules.html',
   providers: [DatePipe],
   imports: [
+    IonRefresherContent,
+    IonRefresher,
     IonCardContent,
     IonCardTitle,
     IonCardSubtitle,
@@ -70,6 +74,11 @@ export class OrderSchedules {
     });
   }
 
+  refresh(event: any) {
+    this.ionViewWillEnter();
+    event.target.complete();
+  }
+
   newOrderSchedule() {
     this.editingOrderSchedule = {
       id: 0,
@@ -77,12 +86,12 @@ export class OrderSchedules {
       note: '',
       products: [],
     };
-    this.modalNavbarService.setEditingOrderSchedule(true);
+    this.modalNavbarService.openModal();
   }
 
   modifyOrderSchedule(orderSchedule: OrderScheduleModel) {
     this.editingOrderSchedule = { ...orderSchedule };
-    this.modalNavbarService.setEditingOrderSchedule(true);
+    this.modalNavbarService.openModal();
   }
 
   saveOrderSchedule(orderSchedule: OrderScheduleModel) {

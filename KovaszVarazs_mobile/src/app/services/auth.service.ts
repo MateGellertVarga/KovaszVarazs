@@ -4,21 +4,24 @@ import { UserModel } from 'src/models/userModel';
 import { Capacitor } from '@capacitor/core';
 import { SecureStorage } from '@aparajita/capacitor-secure-storage';
 import { map, Observable } from 'rxjs';
+import { ConfigService } from './config.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private configService: ConfigService) {
     this.loadUserData();
   }
-  apiUrl: string = 'http://localhost:8000/api/auth';
 
   public loggedInUser: UserModel | null = null;
 
   login(email: string, password: string): Observable<boolean> {
     return this.http
-      .post<UserModel>(`${this.apiUrl}/login`, { email, password })
+      .post<UserModel>(`${this.configService.apiUrl}/auth/login`, {
+        email,
+        password,
+      })
       .pipe(
         map((result: UserModel) => {
           this.loggedInUser = result;
@@ -31,17 +34,19 @@ export class AuthService {
   logout() {
     this.removeUserData();
     if (this.loggedInUser) {
-      this.http.post(`${this.apiUrl}/logout`, {}).subscribe();
+      this.http
+        .post(`${this.configService.apiUrl}/auth/logout`, {})
+        .subscribe();
       this.loggedInUser = null;
     }
   }
 
   // register(user: UserModel) {
-  //   return this.http.post(`${this.apiUrl}/register`, user);
+  //   return this.http.post(`${this.configService.apiUrl}/auth/register`, user);
   // }
 
   // refresh_token() {
-  //   return this.http.post(`${this.apiUrl}/refresh`, {});
+  //   return this.http.post(`${this.configService.apiUrl}/auth/refresh`, {});
   // }
 
   async loadUserData(): Promise<void> {

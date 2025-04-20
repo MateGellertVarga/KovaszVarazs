@@ -21,6 +21,10 @@
   [scrollY]="editingProduct != null ? 'false':'true'"
   class="relative {{editingProduct != null ? 'pointer-events-none' : ''}}"
 >
+  <ion-refresher slot="fixed" (ionRefresh)="refresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
   <ion-list class="mb-16">
     @if (products.length> 0) { @for (product of products; track $index) {
 
@@ -30,7 +34,9 @@
         <ion-card-header>
           <div class="flex justify-between">
             <ion-card-title class="font-bold">{{product.name}}</ion-card-title>
-            <ion-card-title>{{product.price}} €/db</ion-card-title>
+            <ion-card-title
+              >{{product.price| number:'1.0-2' }} €/db</ion-card-title
+            >
           </div>
         </ion-card-header>
         <ion-card-content>

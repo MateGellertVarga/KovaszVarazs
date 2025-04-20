@@ -30,7 +30,7 @@ export class CostModalComponent implements OnInit {
   }
 
   cancel() {
-    this.modalnavbarService.setEditingCost(false);
+    this.modalnavbarService.closeModal();
     this.canceled.emit();
   }
 
@@ -45,7 +45,7 @@ export class CostModalComponent implements OnInit {
       saveObservable.subscribe({
         next: (cost: CostModel) => {
           this.saved.emit(cost);
-          this.modalnavbarService.setEditingCost(false);
+          this.modalnavbarService.closeModal();
         },
         error: (error: any) => {
           this.errorMessage = error.error?.message ?? error.message;

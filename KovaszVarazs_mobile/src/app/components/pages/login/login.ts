@@ -29,7 +29,7 @@ export class Login {
   constructor(private authService: AuthService, private router: Router) {}
 
   email: string = 'admin@admin.com';
-  password: string = 'admin';
+  password: string = 'KenyeresAdmin1_';
   errorMessage: string = '';
 
   login(email: string, password: string) {

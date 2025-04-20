@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component } from '@angular/core';
-import { DatePipe, registerLocaleData } from '@angular/common';
+import { CommonModule, DatePipe, registerLocaleData } from '@angular/common';
 import localeHu from '@angular/common/locales/hu';
 import {
   AlertController,
@@ -18,6 +18,9 @@ import {
   IonCardTitle,
   IonFab,
   IonFabButton,
+  IonRefresherContent,
+  IonRefresher,
+  IonSearchbar,
 } from '@ionic/angular/standalone';
 import { DataService } from 'src/app/services/data.service';
 import { OrderModel } from 'src/models/orderModel';
@@ -29,6 +32,10 @@ import { ModalNavbarService } from 'src/app/services/modal-navbar.service';
   selector: 'orders',
   templateUrl: 'orders.html',
   imports: [
+    CommonModule,
+    IonSearchbar,
+    IonRefresher,
+    IonRefresherContent,
     IonFabButton,
     IonFab,
     IonCardTitle,
@@ -60,6 +67,7 @@ export default class Orders {
   }
 
   orderSchedules: OrderScheduleModel[] = [];
+  allOrders: OrderModel[] = [];
   orders: OrderModel[] = [];
 
   currentOrderSchedule: OrderScheduleModel | null = null;
@@ -70,17 +78,42 @@ export default class Orders {
   ionViewWillEnter() {
     this.dataService.getOrderSchedules(50, 50).subscribe((orderSchedules) => {
       this.orderSchedules = orderSchedules;
-      this.currentOrderSchedule =
-        this.orderSchedules.find(
-          (s) => s.available_date.getTime() >= new Date().getTime()
-        ) ?? null;
+
+      if (!this.currentOrderSchedule) {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const todaySchedule = this.orderSchedules.find(
+          (s) =>
+            new Date(s.available_date).toDateString() === today.toDateString()
+        );
+
+        const futureSchedules = this.orderSchedules.filter(
+          (s) => new Date(s.available_date) > today
+        );
+
+        const pastSchedules = this.orderSchedules.filter(
+          (s) => new Date(s.available_date) < today
+        );
+
+        if (todaySchedule) {
+          this.currentOrderSchedule = todaySchedule;
+        } else if (futureSchedules.length > 0) {
+          this.currentOrderSchedule = futureSchedules[0];
+        } else if (pastSchedules.length > 0) {
+          this.currentOrderSchedule = pastSchedules[pastSchedules.length - 1];
+        } else {
+          this.currentOrderSchedule = null;
+        }
+      }
 
       if (this.currentOrderSchedule) {
         this.dataService
-          .getOrdersByOrderScheduleId(this.currentOrderSchedule!.id)
+          .getOrdersByOrderScheduleId(this.currentOrderSchedule.id)
           .subscribe({
             next: (orders) => {
-              this.orders = orders;
+              this.allOrders = orders;
+              this.orders = [...orders];
               this.sortOrders();
               this.calculateSummary();
             },
@@ -88,8 +121,15 @@ export default class Orders {
               console.error(err);
             },
           });
+      } else {
+        console.error('Nincs egyetlen elérhető sütési nap sem!');
       }
     });
+  }
+
+  refresh(event: any) {
+    this.ionViewWillEnter();
+    event.target.complete();
   }
 
   sortOrders() {
@@ -118,7 +158,8 @@ export default class Orders {
         .getOrdersByOrderScheduleId(this.currentOrderSchedule.id)
         .subscribe({
           next: (orders) => {
-            this.orders = orders;
+            this.allOrders = orders;
+            this.orders = [...orders];
             this.sortOrders();
             this.calculateSummary();
           },
@@ -138,7 +179,8 @@ export default class Orders {
         .getOrdersByOrderScheduleId(this.currentOrderSchedule.id)
         .subscribe({
           next: (orders) => {
-            this.orders = orders;
+            this.allOrders = orders;
+            this.orders = [...orders];
             this.sortOrders();
             this.calculateSummary();
           },
@@ -147,6 +189,14 @@ export default class Orders {
           },
         });
     }
+  }
+
+  searchOrders(event: Event) {
+    const target = event.target as HTMLIonSearchbarElement;
+    const query = target.value?.toLowerCase() || '';
+    this.orders = this.allOrders.filter((d) =>
+      d.customer_name!.toLowerCase().includes(query)
+    );
   }
 
   newOrder() {
@@ -163,12 +213,12 @@ export default class Orders {
       order_schedule_date: new Date(),
       order_items: [],
     };
-    this.modalNavbarService.setEditingOrder(true);
+    this.modalNavbarService.openModal();
   }
 
   modifyOrder(order: OrderModel) {
     this.editingOrder = { ...order };
-    this.modalNavbarService.setEditingOrder(true);
+    this.modalNavbarService.openModal();
   }
 
   saveOrder(order: OrderModel) {
@@ -265,7 +315,7 @@ export default class Orders {
 
     this.orders.forEach((order) => {
       if (order.status === 'completed') {
-        this.totalIncome += order.total_price;
+        this.totalIncome += Number(order.total_price || 0);
       }
     });
   }
