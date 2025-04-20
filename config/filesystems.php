@@ -41,7 +41,7 @@ return [
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
-            'url' => env('APP_URL').'/storage',
+            'url' => env('APP_URL') . '/storage',
             'visibility' => 'public',
             'throw' => false,
             'report' => false,
@@ -60,6 +60,17 @@ return [
             'report' => false,
         ],
 
+        'images' => [
+            'driver' => 's3',
+            'key' => '7d7bf29cddf5796b52d14629da8ec7af',
+            'secret' => 'f5ffaffedaed1601830c22ac1bb92efbff0b7116aebcd7418cc59d2969bca1e4',
+            'region' => 'auto',
+            'bucket' => 'fls-9eaec0c7-9471-4769-8e31-3f5526df4eae',
+            'endpoint' => 'https://367be3a2035528943240074d0096e0cd.r2.cloudflarestorage.com',
+            'url' => 'https://367be3a2035528943240074d0096e0cd.r2.cloudflarestorage.com/fls-9eaec0c7-9471-4769-8e31-3f5526df4eae',
+            'use_path_style_endpoint' => false,
+            'visibility' => 'public',
+        ],
     ],
 
     /*

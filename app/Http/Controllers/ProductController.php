@@ -21,20 +21,23 @@ class ProductController extends Controller
             return response()->json(['message' => 'Nincs jogod ehhez a művelethez'], 401);
         }
 
-        $imagePath = null;
+        $imageUrl = null;
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('products', 'public');
+            $image = $request->file('image');
+            $filename = uniqid() . '.' . $image->getClientOriginalExtension();
+
+            $path = $image->storeAs('products', $filename, 'images');
+            $imageUrl = rtrim(config('filesystems.disks.images.url'), '/') . '/' . ltrim($path, '/');
         }
 
         $product = Product::create([
             'name' => $request->name,
             'price' => $request->price,
-            'image_url' => $imagePath ? asset('storage/' . $imagePath) : null
+            'image_url' => $imageUrl,
         ]);
 
         return response()->json($product, 201);
     }
-
 
     public function show($id)
     {
@@ -52,14 +55,16 @@ class ProductController extends Controller
 
         if ($request->hasFile('image')) {
             if ($product->image_url) {
-                $oldPath = str_replace(asset('storage/'), '', $product->image_url);
-                Storage::disk('public')->delete($oldPath);
+                $baseUrl = rtrim(config('filesystems.disks.images.url'), '/') . '/';
+                $relativePath = str_replace($baseUrl, '', $product->image_url);
+                Storage::disk('images')->delete($relativePath);
             }
 
             $image = $request->file('image');
             $filename = uniqid() . '.' . $image->getClientOriginalExtension();
-            $imagePath = $image->storeAs('products', $filename, 'public');
-            $product->image_url = asset('storage/products/' . $filename);
+
+            $path = $image->storeAs('products', $filename, 'images');
+            $product->image_url = rtrim(config('filesystems.disks.images.url'), '/') . '/' . ltrim($path, '/');
         }
 
         if ($request->has('name')) {
@@ -75,9 +80,6 @@ class ProductController extends Controller
         return response()->json($product);
     }
 
-
-
-
     public function destroy($id)
     {
         $authUser = request()->user();
@@ -88,8 +90,9 @@ class ProductController extends Controller
         $product = Product::findOrFail($id);
 
         if ($product->image_url) {
-            $oldPath = str_replace(asset('storage/'), '', $product->image_url);
-            Storage::disk('public')->delete($oldPath);
+            $baseUrl = rtrim(config('filesystems.disks.images.url'), '/') . '/';
+            $relativePath = str_replace($baseUrl, '', $product->image_url);
+            Storage::disk('images')->delete($relativePath);
         }
 
         $product->delete();
