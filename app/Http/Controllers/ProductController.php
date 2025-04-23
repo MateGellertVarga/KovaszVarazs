@@ -27,7 +27,7 @@ class ProductController extends Controller
             $filename = uniqid() . '.' . $image->getClientOriginalExtension();
 
             $path = $image->storeAs('products', $filename, 'images');
-            $imageUrl = config('filesystems.disks.images.url') . '/' . ltrim($path, '/');
+            $imageUrl = 'https://367be3a2035528943240074d0096e0cd.r2.cloudflarestorage.com/fls-9eaec0c7-9471-4769-8e31-3f5526df4eae' . '/' . ltrim($path, '/');
         }
 
         $product = Product::create([
@@ -64,7 +64,7 @@ class ProductController extends Controller
             $filename = uniqid() . '.' . $image->getClientOriginalExtension();
 
             $path = $image->storeAs('products', $filename, 'images');
-            $product->image_url = config('filesystems.disks.images.url') . '/' . ltrim($path, '/');
+            $product->image_url = 'https://367be3a2035528943240074d0096e0cd.r2.cloudflarestorage.com/fls-9eaec0c7-9471-4769-8e31-3f5526df4eae' . '/' . ltrim($path, '/');
         }
 
         if ($request->has('name')) {
