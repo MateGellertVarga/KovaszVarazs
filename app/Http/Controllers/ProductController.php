@@ -27,13 +27,13 @@ class ProductController extends Controller
             $filename = uniqid() . '.' . $image->getClientOriginalExtension();
 
             $path = $image->storeAs('products', $filename, 'images');
-            $imageUrl = rtrim(config('filesystems.disks.images.url'), '/') . '/' . ltrim($path, '/');
+            $imageUrl = config('filesystems.disks.images.url') . '/' . ltrim($path, '/');
         }
 
         $product = Product::create([
             'name' => $request->name,
             'price' => $request->price,
-            'image_url' => $imageUrl,
+            'image_url' => $imageUrl
         ]);
 
         return response()->json($product, 201);
@@ -64,7 +64,7 @@ class ProductController extends Controller
             $filename = uniqid() . '.' . $image->getClientOriginalExtension();
 
             $path = $image->storeAs('products', $filename, 'images');
-            $product->image_url = rtrim(config('filesystems.disks.images.url'), '/') . '/' . ltrim($path, '/');
+            $product->image_url = config('filesystems.disks.images.url') . '/' . ltrim($path, '/');
         }
 
         if ($request->has('name')) {
