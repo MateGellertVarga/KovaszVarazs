@@ -46,7 +46,15 @@
     </ion-button>
   </div>
 
-  @if (currentOrderSchedule && allOrders.length > 0) {
+  @if (isLoading) {
+  <div class="w-full flex justify-center items-center mt-2">
+    <img src="assets/loading.gif" alt="Loading..." />
+  </div>
+  } @else if (!isLoading && currentOrderSchedule && orders.length === 0) {
+  <div class="w-full flex justify-center items-center mt-2">
+    <p class="text-muted">Nincs rendelés erre a napra</p>
+  </div>
+  } @else {
   <ion-searchbar
     class="w-[80%] mx-auto rounded-full"
     (ionInput)="searchOrders($event)"

@@ -12,11 +12,7 @@ import { ConfigService } from './config.service';
   providedIn: 'root',
 })
 export class DataService {
-  constructor(
-    private http: HttpClient,
-    private authService: AuthService,
-    private configService: ConfigService
-  ) {}
+  constructor(private http: HttpClient, private configService: ConfigService) {}
 
   getOrders(): Observable<OrderModel[]> {
     return this.http

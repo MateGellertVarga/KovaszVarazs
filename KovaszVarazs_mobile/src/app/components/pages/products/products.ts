@@ -57,16 +57,20 @@ export class Products {
     private changeDetectorRef: ChangeDetectorRef
   ) {}
 
+  isLoading: boolean = true;
   products: ProductModel[] = [];
   editingProduct: ProductModel | null = null;
 
   ionViewWillEnter() {
+    this.isLoading = true;
     this.dataService.getProducts().subscribe({
       next: (result: ProductModel[]) => {
         this.products = result;
+        this.isLoading = false;
       },
       error: (err) => {
         console.log(err);
+        this.isLoading = false;
       },
     });
   }

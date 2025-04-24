@@ -53,6 +53,7 @@ export class Statistics {
     registerLocaleData(localeHU);
   }
 
+  isLoading: boolean = true;
   statistics: StatisticsModel = { sales: [], costs: [] };
   currentMonth: Date = new Date();
   editingCost: CostModel | null = null;
@@ -87,15 +88,18 @@ export class Statistics {
   }
 
   loadStatistics() {
+    this.isLoading = true;
     this.dataService
       .getStatistics(this.formatMonth(this.currentMonth))
       .subscribe({
         next: (result: StatisticsModel) => {
           this.statistics = result;
+          this.isLoading = false;
           this.calculateTotals();
         },
         error: (err) => {
           console.log(err);
+          this.isLoading = false;
         },
       });
   }

@@ -29,7 +29,15 @@
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
 
-  @if (orderSchedules.length > 0) {
+  @if (isLoading) {
+  <div class="w-full flex justify-center items-center mt-2">
+    <img src="assets/loading.gif" alt="Loading..." />
+  </div>
+  } @else if (!isLoading && orderSchedules.length === 0) {
+  <div class="w-full flex justify-center items-center mt-4">
+    <p class="text-muted">Nincs jövőbeli sütési nap. Hozz létre!</p>
+  </div>
+  } @else {
   <ion-list class="mb-20">
     @for (orderSchedule of orderSchedules; track $index) {
     <ion-item class="w-full flex justify-between">

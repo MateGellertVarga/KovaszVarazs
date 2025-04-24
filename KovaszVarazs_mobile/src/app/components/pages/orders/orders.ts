@@ -66,6 +66,7 @@ export default class Orders {
     registerLocaleData(localeHu);
   }
 
+  isLoading: boolean = true;
   orderSchedules: OrderScheduleModel[] = [];
   allOrders: OrderModel[] = [];
   orders: OrderModel[] = [];
@@ -76,6 +77,7 @@ export default class Orders {
   totalIncome: number = 0;
 
   ionViewWillEnter() {
+    this.isLoading = true;
     this.dataService.getOrderSchedules(50, 50).subscribe((orderSchedules) => {
       this.orderSchedules = orderSchedules;
 
@@ -114,11 +116,13 @@ export default class Orders {
             next: (orders) => {
               this.allOrders = orders;
               this.orders = [...orders];
+              this.isLoading = false;
               this.sortOrders();
               this.calculateSummary();
             },
             error: (err) => {
               console.error(err);
+              this.isLoading = false;
             },
           });
       } else {

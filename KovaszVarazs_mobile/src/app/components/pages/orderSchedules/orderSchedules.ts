@@ -64,13 +64,15 @@ export class OrderSchedules {
     registerLocaleData(localeHu);
   }
 
+  isLoading: boolean = true;
   orderSchedules: OrderScheduleModel[] = [];
-
   editingOrderSchedule: OrderScheduleModel | null = null;
 
   ionViewWillEnter() {
+    this.isLoading = true;
     this.dataService.getOrderSchedules(0, 50).subscribe((data) => {
       this.orderSchedules = data;
+      this.isLoading = false;
     });
   }
 

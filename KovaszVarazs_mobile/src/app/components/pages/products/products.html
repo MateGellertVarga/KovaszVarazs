@@ -25,9 +25,17 @@
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
 
+  @if (isLoading) {
+  <div class="w-full flex justify-center items-center mt-4">
+    <img src="assets/loading.gif" alt="Loading..." />
+  </div>
+  } @else if (!isLoading && products.length === 0) {
+  <div class="w-full flex justify-center items-center mt-2">
+    <p class="text-muted">Nincs termék</p>
+  </div>
+  } @else {
   <ion-list class="mb-16">
-    @if (products.length> 0) { @for (product of products; track $index) {
-
+    @for (product of products; track $index) {
     <ion-item>
       <ion-card class="w-10/12 mx-auto">
         <img [src]="product.image_url" />
@@ -71,9 +79,9 @@
         </ion-card-content>
       </ion-card>
     </ion-item>
-    }}
+    }
   </ion-list>
-  @if (editingProduct !== null) {
+  } @if (editingProduct !== null) {
   <app-product-modal
     [product]="editingProduct"
     (canceled)="editingProduct = null"
