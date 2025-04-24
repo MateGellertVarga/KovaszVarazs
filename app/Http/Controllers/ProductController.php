@@ -26,8 +26,8 @@ class ProductController extends Controller
             $image = $request->file('image');
             $filename = uniqid() . '.' . $image->getClientOriginalExtension();
 
-            $path = $image->storeAs('products', $filename, 'images');
-            $imageUrl = 'https://367be3a2035528943240074d0096e0cd.r2.cloudflarestorage.com/fls-9eaec0c7-9471-4769-8e31-3f5526df4eae' . '/' . ltrim($path, '/');
+            $image->storeAs('products', $filename, 'public');
+            $imageUrl = asset('storage/products/' . $filename);
         }
 
         $product = Product::create([
@@ -55,16 +55,15 @@ class ProductController extends Controller
 
         if ($request->hasFile('image')) {
             if ($product->image_url) {
-                $baseUrl = rtrim(config('filesystems.disks.images.url'), '/') . '/';
-                $relativePath = str_replace($baseUrl, '', $product->image_url);
-                Storage::disk('images')->delete($relativePath);
+                $oldPath = str_replace(asset('storage/'), '', $product->image_url);
+                Storage::disk('public')->delete($oldPath);
             }
 
             $image = $request->file('image');
             $filename = uniqid() . '.' . $image->getClientOriginalExtension();
 
-            $path = $image->storeAs('products', $filename, 'images');
-            $product->image_url = 'https://367be3a2035528943240074d0096e0cd.r2.cloudflarestorage.com/fls-9eaec0c7-9471-4769-8e31-3f5526df4eae' . '/' . ltrim($path, '/');
+            $image->storeAs('products', $filename, 'public');
+            $product->image_url = asset('storage/products/' . $filename);
         }
 
         if ($request->has('name')) {
@@ -90,9 +89,8 @@ class ProductController extends Controller
         $product = Product::findOrFail($id);
 
         if ($product->image_url) {
-            $baseUrl = rtrim(config('filesystems.disks.images.url'), '/') . '/';
-            $relativePath = str_replace($baseUrl, '', $product->image_url);
-            Storage::disk('images')->delete($relativePath);
+            $oldPath = str_replace(asset('storage/'), '', $product->image_url);
+            Storage::disk('public')->delete($oldPath);
         }
 
         $product->delete();
