@@ -44,6 +44,14 @@
 //   font-size: 1.1rem;
 // }
 
+:root {
+  --ion-color-primary: #C68958;
+}
+
+button {
+  @apply bg-[#C68958];
+}
+
 ion-content {
   --padding-bottom: 0 !important;
   --overflow: hidden auto;

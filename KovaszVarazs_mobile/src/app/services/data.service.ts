@@ -5,7 +5,6 @@ import { OrderModel } from 'src/models/orderModel';
 import { OrderScheduleModel } from 'src/models/orderScheduleModel';
 import { ProductModel } from 'src/models/productModel';
 import { CostModel, StatisticsModel } from 'src/models/statisticsModel';
-import { AuthService } from './auth.service';
 import { ConfigService } from './config.service';
 
 @Injectable({
