@@ -32,6 +32,15 @@ export class OrderModalComponent implements OnInit {
     this.initProductQuantities();
   }
 
+  scrollIntoView(event: FocusEvent) {
+    const target = event.target as HTMLElement;
+    if (target) {
+      setTimeout(() => {
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+    }
+  }
+
   initProductQuantities() {
     if (this.order && this.order.order_items.length > 0) {
       this.order.order_items.forEach((item) => {

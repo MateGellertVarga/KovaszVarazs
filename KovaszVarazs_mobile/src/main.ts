@@ -21,6 +21,11 @@ import { authInterceptor } from './app/services/auth.interceptor';
 import { APP_INITIALIZER, provideZoneChangeDetection } from '@angular/core';
 import { startup } from './app/services/startup.service';
 import { AuthService } from './app/services/auth.service';
+import { LOCALE_ID } from '@angular/core';
+import { registerLocaleData } from '@angular/common';
+import localeHu from '@angular/common/locales/hu';
+
+registerLocaleData(localeHu);
 
 bootstrapApplication(AppComponent, {
   providers: [
@@ -35,5 +40,6 @@ bootstrapApplication(AppComponent, {
       deps: [AuthService],
       multi: true,
     },
+    { provide: LOCALE_ID, useValue: 'hu' },
   ],
 });

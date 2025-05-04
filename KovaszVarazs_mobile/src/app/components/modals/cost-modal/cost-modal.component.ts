@@ -29,6 +29,15 @@ export class CostModalComponent implements OnInit {
     this.viewportHeight = window.innerHeight;
   }
 
+  scrollIntoView(event: FocusEvent) {
+    const target = event.target as HTMLElement;
+    if (target) {
+      setTimeout(() => {
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+    }
+  }
+
   cancel() {
     this.modalnavbarService.closeModal();
     this.canceled.emit();

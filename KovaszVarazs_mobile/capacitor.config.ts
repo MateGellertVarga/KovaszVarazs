@@ -1,3 +1,5 @@
+/// <reference types="@capacitor/status-bar" />
+/// <reference types="@capacitor/splash-screen" />
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
@@ -12,6 +14,11 @@ const config: CapacitorConfig = {
       showSpinner: false,
       splashFullScreen: true,
       splashImmersive: true,
+    },
+    StatusBar: {
+      overlaysWebView: false,
+      style: 'LIGHT',
+      backgroundColor: '#ffffff',
     },
   },
 };

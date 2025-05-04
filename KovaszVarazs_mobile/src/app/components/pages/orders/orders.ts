@@ -79,7 +79,11 @@ export default class Orders {
   ionViewWillEnter() {
     this.isLoading = true;
     this.dataService.getOrderSchedules(50, 50).subscribe((orderSchedules) => {
-      this.orderSchedules = orderSchedules;
+      this.orderSchedules = orderSchedules.sort(
+        (a, b) =>
+          new Date(a.available_date).getTime() -
+          new Date(b.available_date).getTime()
+      );
 
       if (!this.currentOrderSchedule) {
         const today = new Date();
@@ -110,25 +114,49 @@ export default class Orders {
       }
 
       if (this.currentOrderSchedule) {
-        this.dataService
-          .getOrdersByOrderScheduleId(this.currentOrderSchedule.id)
-          .subscribe({
-            next: (orders) => {
-              this.allOrders = orders;
-              this.orders = [...orders];
-              this.isLoading = false;
-              this.sortOrders();
-              this.calculateSummary();
-            },
-            error: (err) => {
-              console.error(err);
-              this.isLoading = false;
-            },
-          });
+        this.loadOrdersForCurrentSchedule();
       } else {
         console.error('Nincs egyetlen elérhető sütési nap sem!');
       }
     });
+  }
+
+  loadOrdersForCurrentSchedule() {
+    this.dataService
+      .getOrdersByOrderScheduleId(this.currentOrderSchedule!.id)
+      .subscribe({
+        next: (orders) => {
+          this.allOrders = orders;
+          this.orders = [...orders];
+          this.isLoading = false;
+          this.sortOrders();
+          this.calculateSummary();
+        },
+        error: (err) => {
+          console.error(err);
+          this.isLoading = false;
+        },
+      });
+  }
+
+  nextOrderSchedule() {
+    const currentIndex = this.orderSchedules.findIndex(
+      (s) => s.id === this.currentOrderSchedule?.id
+    );
+    if (currentIndex >= 0 && currentIndex < this.orderSchedules.length - 1) {
+      this.currentOrderSchedule = this.orderSchedules[currentIndex + 1];
+      this.loadOrdersForCurrentSchedule();
+    }
+  }
+
+  previousOrderSchedule() {
+    const currentIndex = this.orderSchedules.findIndex(
+      (s) => s.id === this.currentOrderSchedule?.id
+    );
+    if (currentIndex > 0) {
+      this.currentOrderSchedule = this.orderSchedules[currentIndex - 1];
+      this.loadOrdersForCurrentSchedule();
+    }
   }
 
   refresh(event: any) {
@@ -151,48 +179,6 @@ export default class Orders {
         ? statusDiff
         : a.customer_name!.localeCompare(b.customer_name!);
     });
-  }
-
-  nextOrderSchedule(id: number) {
-    if (id === this.orderSchedules.length) return;
-    this.currentOrderSchedule =
-      this.orderSchedules.find((s) => s.id === id + 1) ?? null;
-    if (this.currentOrderSchedule) {
-      this.dataService
-        .getOrdersByOrderScheduleId(this.currentOrderSchedule.id)
-        .subscribe({
-          next: (orders) => {
-            this.allOrders = orders;
-            this.orders = [...orders];
-            this.sortOrders();
-            this.calculateSummary();
-          },
-          error: (err) => {
-            console.error(err);
-          },
-        });
-    }
-  }
-
-  previousOrderSchedule(id: number) {
-    if (id === 1) return;
-    this.currentOrderSchedule =
-      this.orderSchedules.find((s) => s.id === id - 1) ?? null;
-    if (this.currentOrderSchedule) {
-      this.dataService
-        .getOrdersByOrderScheduleId(this.currentOrderSchedule.id)
-        .subscribe({
-          next: (orders) => {
-            this.allOrders = orders;
-            this.orders = [...orders];
-            this.sortOrders();
-            this.calculateSummary();
-          },
-          error: (err) => {
-            console.error(err);
-          },
-        });
-    }
   }
 
   searchOrders(event: Event) {

@@ -29,6 +29,15 @@ export class ProductModalComponent implements OnInit {
     this.scrollY = window.scrollY || window.pageYOffset;
   }
 
+  scrollIntoView(event: FocusEvent) {
+    const target = event.target as HTMLElement;
+    if (target) {
+      setTimeout(() => {
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+    }
+  }
+
   cancel() {
     this.modalnavbarService.closeModal();
     this.canceled.emit();

@@ -3,7 +3,7 @@
   class="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 backdrop-blur-lg z-[9999] pointer-events-auto"
 >
   <div
-    class="p-6 bg-white border-2 border-black rounded-lg shadow-lg w-[96%] max-w-lg absolute left-1/2 transform -translate-x-1/2"
+    class="p-6 bg-white border-2 border-black rounded-lg shadow-lg w-[96%] max-w-lg absolute left-1/2 transform -translate-x-1/2 overflow-y-auto max-h-[80vh]"
     [style.top.px]="scrollY + viewportHeight / 10"
   >
     <h2 class="text-2xl font-bold mb-4 text-center">
@@ -13,6 +13,11 @@
           : "Új sütési nap"
       }}
     </h2>
+    @if (isLoading) {
+    <div class="w-full flex justify-center items-center mt-2">
+      <img src="assets/loading.gif" alt="Loading..." />
+    </div>
+    } @else{
     <form class="space-y-4">
       <div>
         <label class="block font-medium text-gray-700">Dátum</label>
@@ -34,6 +39,7 @@
           name="note"
           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
           [(ngModel)]="orderSchedule.note"
+          (focus)="scrollIntoView($event)"
           placeholder="Opcionális"
           rows="2"
         ></textarea>
@@ -51,6 +57,7 @@
                 class="w-12 text-center border rounded-md"
                 [value]="productMaxQuantities[product.name]"
                 (change)="onQuantityChange(product.name, $event)"
+                (focus)="scrollIntoView($event)"
               />
             </div>
           </div>
@@ -74,7 +81,7 @@
         </button>
       </div>
     </form>
-    @if (errorMessage) {
+    } @if (errorMessage) {
     <div class="text-red-500 font-bold text-center mt-2">
       {{ errorMessage }}
     </div>

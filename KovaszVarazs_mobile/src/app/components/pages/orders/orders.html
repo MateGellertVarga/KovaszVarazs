@@ -26,10 +26,7 @@
   </ion-refresher>
 
   <div class="w-[95%] mx-auto flex justify-between items-center mt-2">
-    <ion-button
-      fill="clear"
-      (click)="previousOrderSchedule(currentOrderSchedule!.id)"
-    >
+    <ion-button fill="clear" (click)="previousOrderSchedule()">
       <ion-icon name="chevron-back-outline"></ion-icon>
     </ion-button>
     @if (currentOrderSchedule) {
@@ -38,10 +35,7 @@
       undefined : 'hu' }}
     </h2>
     }
-    <ion-button
-      fill="clear"
-      (click)="nextOrderSchedule(currentOrderSchedule!.id)"
-    >
+    <ion-button fill="clear" (click)="nextOrderSchedule()">
       <ion-icon name="chevron-forward-outline"></ion-icon>
     </ion-button>
   </div>
@@ -226,7 +220,7 @@
     <ion-item class="mt-2">
       <div class="flex justify-between items-center w-full font-bold">
         <h2 class="text-xl font-bold">Összeg:</h2>
-        <h2 class="text-xl font-bold">{{ totalIncome}} €</h2>
+        <h2 class="text-xl font-bold">{{ totalIncome | number}} €</h2>
       </div>
     </ion-item>
   </ion-list>

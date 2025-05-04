@@ -47,6 +47,7 @@ export class OrderScheduleModalComponent implements OnInit {
     private modalnavbarService: ModalNavbarService
   ) {}
 
+  isLoading: boolean = true;
   scrollY: number = 0;
   viewportHeight: number = 0;
   products: ProductModel[] = [];
@@ -54,17 +55,30 @@ export class OrderScheduleModalComponent implements OnInit {
   errorMessage: string = '';
 
   ngOnInit() {
+    this.isLoading = true;
     this.dataService.getProducts().subscribe({
       next: (result: ProductModel[]) => {
         this.products = result;
+        this.isLoading = false;
       },
       error: (err) => {
         console.log(err);
+        this.errorMessage = 'Failed to load products.';
+        this.isLoading = false;
       },
     });
     this.scrollY = window.scrollY || window.pageYOffset;
     this.viewportHeight = window.innerHeight;
     this.initProductMaxQuantities();
+  }
+
+  scrollIntoView(event: FocusEvent) {
+    const target = event.target as HTMLElement;
+    if (target) {
+      setTimeout(() => {
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+    }
   }
 
   focusDateInput() {

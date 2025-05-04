@@ -3,6 +3,7 @@ import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 import { AuthService } from './services/auth.service';
 import { Router } from '@angular/router';
 import { StatusBar, Style } from '@capacitor/status-bar';
+import { Keyboard } from '@capacitor/keyboard';
 
 @Component({
   selector: 'app-root',
@@ -13,9 +14,7 @@ export class AppComponent implements OnInit {
   constructor(private authService: AuthService, private router: Router) {}
 
   async ngOnInit() {
-    await StatusBar.setStyle({ style: Style.Light });
-    await StatusBar.setBackgroundColor({ color: '#ffffff' });
-    await StatusBar.setOverlaysWebView({ overlay: false });
+    await Keyboard.setScroll({ isDisabled: false });
 
     const user = await this.authService.getUserData();
     if (!user || user.role !== 'admin') {
