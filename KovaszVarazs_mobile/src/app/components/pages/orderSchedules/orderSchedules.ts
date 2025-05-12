@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { DatePipe, registerLocaleData } from '@angular/common';
 import localeHu from '@angular/common/locales/hu';
 import {

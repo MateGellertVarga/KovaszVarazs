@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule, DatePipe, registerLocaleData } from '@angular/common';
 import localeHU from '@angular/common/locales/hu';
 import {
@@ -22,7 +22,6 @@ import { CostModel, StatisticsModel } from 'src/models/statisticsModel';
 import { CostModalComponent } from '../../modals/cost-modal/cost-modal.component';
 import { ModalNavbarService } from 'src/app/services/modal-navbar.service';
 import { Router } from '@angular/router';
-
 @Component({
   selector: 'statistics',
   templateUrl: './statistics.html',
@@ -58,7 +57,14 @@ export class Statistics {
   }
 
   isLoading: boolean = true;
-  statistics: StatisticsModel = { sales: [], costs: [] };
+  statistics: StatisticsModel = { sales: { all: [], paid: [] }, costs: [] };
+  combinedSales: {
+    product_name: string;
+    product_id: number;
+    all_quantity: number;
+    paid_quantity: number;
+    income: number;
+  }[] = [];
   currentMonth: Date = new Date();
   editingCost: CostModel | null = null;
   totalSales: number = 0;
@@ -98,6 +104,19 @@ export class Statistics {
       .subscribe({
         next: (result: StatisticsModel) => {
           this.statistics = result;
+          this.combinedSales = result.sales.all.map((allItem) => {
+            const match = result.sales.paid.find(
+              (p) => p.product_id === allItem.product_id
+            );
+            return {
+              product_id: allItem.product_id,
+              product_name: allItem.product_name,
+              all_quantity: allItem.quantity,
+              paid_quantity: match?.quantity || 0,
+              income: match?.income || 0,
+            };
+          });
+
           this.isLoading = false;
           this.calculateTotals();
         },
@@ -184,7 +203,7 @@ export class Statistics {
   }
 
   calculateTotals() {
-    this.totalSales = this.statistics.sales.reduce(
+    this.totalSales = this.statistics.sales.paid.reduce(
       (sum, s) => sum + Number(s.income || 0),
       0
     );

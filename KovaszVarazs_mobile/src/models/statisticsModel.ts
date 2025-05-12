@@ -1,12 +1,18 @@
 export interface StatisticsModel {
-  sales: SaleModel[];
+  sales: {
+    all: SaleQuantityModel[];
+    paid: SaleModel[];
+  };
   costs: CostModel[];
 }
 
-export interface SaleModel {
+export interface SaleQuantityModel {
   product_id: number;
   product_name: string;
   quantity: number;
+}
+
+export interface SaleModel extends SaleQuantityModel {
   income: number;
 }
 

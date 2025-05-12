@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule, DatePipe, registerLocaleData } from '@angular/common';
 import localeHu from '@angular/common/locales/hu';
 import {
@@ -78,14 +78,15 @@ export default class Orders {
 
   ionViewWillEnter() {
     this.isLoading = true;
-    this.dataService.getOrderSchedules(50, 50).subscribe((orderSchedules) => {
-      this.orderSchedules = orderSchedules.sort(
-        (a, b) =>
-          new Date(a.available_date).getTime() -
-          new Date(b.available_date).getTime()
-      );
 
-      if (!this.currentOrderSchedule) {
+    this.dataService.getOrderSchedules(50, 50).subscribe({
+      next: (orderSchedules) => {
+        this.orderSchedules = orderSchedules.sort(
+          (a, b) =>
+            new Date(a.available_date).getTime() -
+            new Date(b.available_date).getTime()
+        );
+
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
@@ -102,22 +103,31 @@ export default class Orders {
           (s) => new Date(s.available_date) < today
         );
 
-        if (todaySchedule) {
-          this.currentOrderSchedule = todaySchedule;
-        } else if (futureSchedules.length > 0) {
-          this.currentOrderSchedule = futureSchedules[0];
-        } else if (pastSchedules.length > 0) {
-          this.currentOrderSchedule = pastSchedules[pastSchedules.length - 1];
-        } else {
-          this.currentOrderSchedule = null;
-        }
-      }
+        const existing = this.orderSchedules.find(
+          (s) => s.id === this.currentOrderSchedule?.id
+        );
 
-      if (this.currentOrderSchedule) {
-        this.loadOrdersForCurrentSchedule();
-      } else {
-        console.error('Nincs egyetlen elérhető sütési nap sem!');
-      }
+        if (!this.currentOrderSchedule || !existing) {
+          this.currentOrderSchedule =
+            todaySchedule ??
+            futureSchedules[0] ??
+            pastSchedules[pastSchedules.length - 1] ??
+            null;
+        } else {
+          this.currentOrderSchedule = existing;
+        }
+
+        if (this.currentOrderSchedule) {
+          this.loadOrdersForCurrentSchedule();
+        } else {
+          console.error('Nincs egyetlen elérhető sütési nap sem!');
+          this.isLoading = false;
+        }
+      },
+      error: (err) => {
+        console.error('Nem sikerült lekérni a sütési napokat:', err);
+        this.isLoading = false;
+      },
     });
   }
 
