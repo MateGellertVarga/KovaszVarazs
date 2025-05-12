@@ -118,6 +118,7 @@ class OrderController extends Controller
                 }
 
                 $order->load(['orderItems.product', 'orderSchedule', 'user']);
+                $this->recalculateRemainingQuantities($order->orderSchedule);
                 return new OrderResource($order);
             });
         } catch (Exception $e) {
@@ -193,6 +194,7 @@ class OrderController extends Controller
                 $order->update(['total_price' => $total_price]);
 
                 $order->load(['orderItems.product', 'orderSchedule', 'user']);
+                $this->recalculateRemainingQuantities($order->orderSchedule);
                 return new OrderResource($order);
             });
         } catch (Exception $e) {
@@ -219,5 +221,28 @@ class OrderController extends Controller
         $order->delete();
 
         return response()->noContent();
+    }
+
+    private function recalculateRemainingQuantities(OrderSchedule $orderSchedule)
+    {
+        $productIds = $orderSchedule->products()->pluck('products.id');
+
+        foreach ($productIds as $productId) {
+            $max = DB::table('order_schedule_products')
+                ->where('order_schedule_id', $orderSchedule->id)
+                ->where('product_id', $productId)
+                ->value('max_quantity');
+
+            $ordered = DB::table('orders')
+                ->join('order_items', 'orders.id', '=', 'order_items.order_id')
+                ->where('orders.order_schedule_id', $orderSchedule->id)
+                ->where('order_items.product_id', $productId)
+                ->sum('order_items.quantity');
+
+            DB::table('order_schedule_products')
+                ->where('order_schedule_id', $orderSchedule->id)
+                ->where('product_id', $productId)
+                ->update(['remaining_quantity' => $max - $ordered]);
+        }
     }
 }
