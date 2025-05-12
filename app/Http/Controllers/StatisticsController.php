@@ -25,7 +25,21 @@ class StatisticsController extends Controller
             return response()->json(['message' => 'Invalid month format. Use YYYY-MM.'], 400);
         }
 
-        $sales = DB::table('order_items')
+        $all = DB::table('order_items')
+            ->join('orders', 'order_items.order_id', '=', 'orders.id')
+            ->join('order_schedules', 'orders.order_schedule_id', '=', 'order_schedules.id')
+            ->join('products', 'order_items.product_id', '=', 'products.id')
+            ->select(
+                'products.id as product_id',
+                'products.name as product_name',
+                DB::raw('SUM(order_items.quantity) as quantity')
+            )
+            ->where('orders.status', 'completed')
+            ->where('order_schedules.available_date', 'like', "$month%")
+            ->groupBy('products.id', 'products.name')
+            ->get();
+
+        $paid = DB::table('order_items')
             ->join('orders', 'order_items.order_id', '=', 'orders.id')
             ->join('order_schedules', 'orders.order_schedule_id', '=', 'order_schedules.id')
             ->join('products', 'order_items.product_id', '=', 'products.id')
@@ -47,7 +61,10 @@ class StatisticsController extends Controller
             ->get();
 
         return response()->json([
-            'sales' => $sales,
+            'sales' => [
+                'all' => $all,
+                'paid' => $paid,
+            ],
             'costs' => $costs,
         ]);
     }
