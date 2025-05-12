@@ -4,6 +4,9 @@
   class="{{editingCost != null ? 'opacity-50 pointer-events-none' : ''}}"
 >
   <ion-toolbar>
+    <ion-button slot="start" (click)="toLogin()">
+      <ion-icon name="person-outline"></ion-icon>
+    </ion-button>
     <ion-title class="font-bold text-2xl text-center text-black">
       Statisztika
     </ion-title>
@@ -19,7 +22,7 @@
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
 
-  <div class="mx-auto flex justify-between items-center mt-2 mb-16">
+  <div class="mx-auto flex justify-between items-center mt-2">
     <ion-button fill="clear" (click)="previousMonth()">
       <ion-icon name="chevron-back-outline"></ion-icon>
     </ion-button>
@@ -36,7 +39,7 @@
     <img src="assets/loading.gif" alt="Loading..." />
   </div>
   } @else {
-  <div class="mx-auto mt-10">
+  <div class="mx-auto mt-10 overflow-auto h-full">
     <ion-title class="text-xl font-semibold">Bevételek</ion-title>
     <ion-list class="px-1">
       @for (product of statistics.sales; track $index) {
@@ -56,7 +59,7 @@
       </ion-item>
       }
     </ion-list>
-    <div class="flex justify-between items-center w-full mt-20">
+    <div class="flex justify-between items-center w-full mt-10">
       <ion-title class="text-xl font-semibold">Kiadások</ion-title>
       <ion-fab horizontal="end">
         <ion-fab-button size="small" color="primary" (click)="newCost()">

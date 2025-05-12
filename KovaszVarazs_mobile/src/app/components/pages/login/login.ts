@@ -28,13 +28,13 @@ import { UserModel } from 'src/models/userModel';
 export class Login {
   constructor(private authService: AuthService, private router: Router) {}
 
-  email: string = 'admin@admin.com';
-  password: string = 'KenyeresAdmin1_';
+  email: string = '';
+  password: string = '';
   errorMessage: string = '';
 
   login(email: string, password: string) {
     this.errorMessage = '';
-    if (!email || !password) {
+    if (email == '' || password == '') {
       this.errorMessage = 'Add meg az összes adatot!';
       return;
     }

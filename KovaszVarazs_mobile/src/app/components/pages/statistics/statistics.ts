@@ -15,16 +15,19 @@ import {
   IonFabButton,
   IonRefresher,
   IonRefresherContent,
+  IonButtons,
 } from '@ionic/angular/standalone';
 import { DataService } from 'src/app/services/data.service';
 import { CostModel, StatisticsModel } from 'src/models/statisticsModel';
 import { CostModalComponent } from '../../modals/cost-modal/cost-modal.component';
 import { ModalNavbarService } from 'src/app/services/modal-navbar.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'statistics',
   templateUrl: './statistics.html',
   imports: [
+    IonButtons,
     CommonModule,
     IonRefresherContent,
     IonRefresher,
@@ -48,7 +51,8 @@ export class Statistics {
     private dataService: DataService,
     private modalNavbarService: ModalNavbarService,
     private alertController: AlertController,
-    private changeDetectorRef: ChangeDetectorRef
+    private changeDetectorRef: ChangeDetectorRef,
+    private router: Router
   ) {
     registerLocaleData(localeHU);
   }
@@ -188,5 +192,9 @@ export class Statistics {
       (sum, c) => sum + Number(c.amount || 0),
       0
     );
+  }
+
+  toLogin() {
+    this.router.navigate(['/tabs/login']);
   }
 }

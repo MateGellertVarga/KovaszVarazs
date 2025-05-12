@@ -190,25 +190,39 @@ export default class Orders {
   }
 
   newOrder() {
-    this.editingOrder = {
-      id: 0,
-      customer_name: '',
-      phone_number: '',
-      note: '',
-      status: 'pending',
-      is_paying: true,
-      already_paid: false,
-      total_price: 0,
-      order_schedule_id: this.currentOrderSchedule!.id,
-      order_schedule_date: new Date(),
-      order_items: [],
-    };
-    this.modalNavbarService.openModal();
+    this.dataService.getOrderSchedule(this.currentOrderSchedule!.id).subscribe({
+      next: (schedule) => {
+        this.currentOrderSchedule = schedule;
+        this.editingOrder = {
+          id: 0,
+          customer_name: '',
+          phone_number: '',
+          note: '',
+          status: 'pending',
+          is_paying: true,
+          already_paid: false,
+          total_price: 0,
+          order_schedule_id: schedule.id,
+          order_schedule_date: new Date(schedule.available_date),
+          order_items: [],
+        };
+        this.modalNavbarService.openModal();
+      },
+      error: (err) =>
+        console.error('Nem sikerült lekérni a sütési nap részleteit:', err),
+    });
   }
 
   modifyOrder(order: OrderModel) {
-    this.editingOrder = { ...order };
-    this.modalNavbarService.openModal();
+    this.dataService.getOrderSchedule(order.order_schedule_id).subscribe({
+      next: (schedule) => {
+        this.currentOrderSchedule = schedule;
+        this.editingOrder = { ...order };
+        this.modalNavbarService.openModal();
+      },
+      error: (err) =>
+        console.error('Nem sikerült lekérni a sütési nap részleteit:', err),
+    });
   }
 
   saveOrder(order: OrderModel) {
