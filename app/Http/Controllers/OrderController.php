@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\OrdersChanged;
 use App\Http\Requests\StoreOrderRequest;
 use App\Http\Requests\UpdateOrderRequest;
 use App\Http\Resources\OrderResource;
@@ -119,6 +120,7 @@ class OrderController extends Controller
 
                 $order->load(['orderItems.product', 'orderSchedule', 'user']);
                 $this->recalculateRemainingQuantities($order->orderSchedule);
+                event(new OrdersChanged($order));
                 return new OrderResource($order);
             });
         } catch (Exception $e) {
@@ -195,6 +197,7 @@ class OrderController extends Controller
 
                 $order->load(['orderItems.product', 'orderSchedule', 'user']);
                 $this->recalculateRemainingQuantities($order->orderSchedule);
+                event(new OrdersChanged($order));
                 return new OrderResource($order);
             });
         } catch (Exception $e) {
@@ -219,7 +222,7 @@ class OrderController extends Controller
         }
 
         $order->delete();
-
+        event(new OrdersChanged($order));
         return response()->noContent();
     }
 
