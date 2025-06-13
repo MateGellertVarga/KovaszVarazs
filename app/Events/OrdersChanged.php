@@ -27,10 +27,10 @@ class OrdersChanged implements ShouldBroadcastNow
         return new PrivateChannel('orders');
     }
 
-    public function broadcastWith(): OrderResource
-    {
-        return $this->order;
-    }
+    // public function broadcastWith(): OrderResource
+    // {
+    //     return $this->order;
+    // }
 
     public function broadcastAs(): string
     {
