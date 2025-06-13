@@ -6,8 +6,6 @@ use App\Http\Resources\OrderResource;
 use App\Models\Order;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
@@ -23,9 +21,14 @@ class OrdersChanged implements ShouldBroadcastNow
         $this->order = new OrderResource($order);
     }
 
-    public function broadcastOn(): PrivateChannel
+    public function broadcastOn(): Channel
     {
-        return new PrivateChannel('orders');
+        return new Channel('orders');
+    }
+
+    public function broadcastWith(): OrderResource
+    {
+        return $this->order;
     }
 
     public function broadcastAs(): string
