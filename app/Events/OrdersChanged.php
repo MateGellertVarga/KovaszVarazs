@@ -22,9 +22,9 @@ class OrdersChanged implements ShouldBroadcastNow
         $this->order = new OrderResource($order);
     }
 
-    public function broadcastOn(): PrivateChannel
+    public function broadcastOn(): Channel
     {
-        return new PrivateChannel('orders');
+        return new Channel('orders');
     }
 
     public function broadcastAs(): string
