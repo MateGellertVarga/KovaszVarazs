@@ -2,6 +2,6 @@
 
 use Illuminate\Support\Facades\Broadcast;
 
-Broadcast::channel('orders', function ($user) {
-    return $user->role === 'admin';
-});
+// Broadcast::channel('orders', function ($user) {
+//     return $user->role === 'admin';
+// });
