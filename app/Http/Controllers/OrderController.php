@@ -120,7 +120,11 @@ class OrderController extends Controller
 
                 $order->load(['orderItems.product', 'orderSchedule', 'user']);
                 $this->recalculateRemainingQuantities($order->orderSchedule);
-                event(new OrdersChanged($order));
+                try {
+                    event(new OrdersChanged($order));
+                } catch (Exception $e) {
+                    return response()->json(['message' => $e->getMessage()], 400);
+                }
                 return new OrderResource($order);
             });
         } catch (Exception $e) {
@@ -132,7 +136,7 @@ class OrderController extends Controller
     {
         $order = Order::with(['orderItems.product', 'orderSchedule', 'user'])->findOrFail($id);
         $user = $request->user();
-        if ($user->role !== 'admin' && $order->user_id !== $user->id) {
+        if ($user->role !== 'admin' && $order->user_id !== $user->id) { //TODO
             return response()->json(['message' => 'Nincs jogod ehhez a művelethez'], 401);
         }
         return new OrderResource($order);
@@ -197,7 +201,11 @@ class OrderController extends Controller
 
                 $order->load(['orderItems.product', 'orderSchedule', 'user']);
                 $this->recalculateRemainingQuantities($order->orderSchedule);
-                event(new OrdersChanged($order));
+                try {
+                    event(new OrdersChanged($order));
+                } catch (Exception $e) {
+                    return response()->json(['message' => $e->getMessage()], 400);
+                }
                 return new OrderResource($order);
             });
         } catch (Exception $e) {
@@ -222,7 +230,11 @@ class OrderController extends Controller
         }
 
         $order->delete();
-        event(new OrdersChanged($order));
+        try {
+            event(new OrdersChanged($order));
+        } catch (Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 400);
+        }
         return response()->noContent();
     }
 
