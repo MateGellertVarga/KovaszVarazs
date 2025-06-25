@@ -122,7 +122,7 @@ class OrderController extends Controller
                 $order->load(['orderItems.product', 'orderSchedule', 'user']);
                 $this->recalculateRemainingQuantities($order->orderSchedule);
                 try {
-                    event(new OrdersChanged($order));
+                    broadcast(event(new OrdersChanged($order)))->toOthers();
                     Log::info('Event fired on store: ' . $order->id);
                 } catch (Exception $e) {
                     Log::error('Broadcast error on store: ' . $e->getMessage());
@@ -205,7 +205,7 @@ class OrderController extends Controller
                 $order->load(['orderItems.product', 'orderSchedule', 'user']);
                 $this->recalculateRemainingQuantities($order->orderSchedule);
                 try {
-                    event(new OrdersChanged($order));
+                    broadcast(event(new OrdersChanged($order)))->toOthers();
                     Log::info('Event fired on update: ' . $order->id);
                 } catch (Exception $e) {
                     Log::error('Broadcast error on update: ' . $e->getMessage());
@@ -235,7 +235,7 @@ class OrderController extends Controller
 
         $order->delete();
         try {
-            event(new OrdersChanged($order));
+            broadcast(event(new OrdersChanged($order)))->toOthers();
             Log::info('Event fired on delete: ' . $order->id);
         } catch (Exception $e) {
             Log::error('Broadcast error on delete: ' . $e->getMessage());
