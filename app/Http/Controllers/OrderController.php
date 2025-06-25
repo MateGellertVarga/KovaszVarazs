@@ -12,6 +12,7 @@ use App\Models\Product;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
 {
@@ -122,12 +123,14 @@ class OrderController extends Controller
                 $this->recalculateRemainingQuantities($order->orderSchedule);
                 try {
                     event(new OrdersChanged($order));
+                    Log::info('Event fired on store: ' . $order->id);
                 } catch (Exception $e) {
-                    return response()->json(['message' => $e->getMessage()], 400);
+                    Log::error('Broadcast error on store: ' . $e->getMessage());
                 }
                 return new OrderResource($order);
             });
         } catch (Exception $e) {
+            Log::error('Broadcast error: ' . $e->getMessage());
             return response()->json(['message' => $e->getMessage()], 400);
         }
     }
@@ -203,8 +206,9 @@ class OrderController extends Controller
                 $this->recalculateRemainingQuantities($order->orderSchedule);
                 try {
                     event(new OrdersChanged($order));
+                    Log::info('Event fired on update: ' . $order->id);
                 } catch (Exception $e) {
-                    return response()->json(['message' => $e->getMessage()], 400);
+                    Log::error('Broadcast error on update: ' . $e->getMessage());
                 }
                 return new OrderResource($order);
             });
@@ -232,8 +236,9 @@ class OrderController extends Controller
         $order->delete();
         try {
             event(new OrdersChanged($order));
+            Log::info('Event fired on delete: ' . $order->id);
         } catch (Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 400);
+            Log::error('Broadcast error on delete: ' . $e->getMessage());
         }
         return response()->noContent();
     }

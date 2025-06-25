@@ -10,6 +10,7 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class OrdersChanged implements ShouldBroadcastNow
 {
@@ -19,7 +20,11 @@ class OrdersChanged implements ShouldBroadcastNow
 
     public function __construct(Order $order)
     {
-        $this->order = new OrderResource($order);
+        try {
+            $this->order = new OrderResource($order);
+        } catch (\Exception $e) {
+            Log::error('Error creating OrderResource: ' . $e->getMessage());
+        }
     }
 
     public function broadcastOn(): Channel
