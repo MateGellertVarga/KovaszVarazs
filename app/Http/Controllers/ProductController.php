@@ -6,6 +6,7 @@ use App\Models\Product;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
@@ -21,14 +22,7 @@ class ProductController extends Controller
             return response()->json(['message' => 'Nincs jogod ehhez a művelethez'], 401);
         }
 
-        $imageUrl = null;
-        if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $filename = uniqid() . '.' . $image->getClientOriginalExtension();
-
-            $image->storeAs('products', $filename, 'public');
-            $imageUrl = asset('storage/products/' . $filename);
-        }
+        $imageUrl = $this->handleImageUpload($request);
 
         $product = Product::create([
             'name' => $request->name,
@@ -54,16 +48,8 @@ class ProductController extends Controller
         $product = Product::findOrFail($id);
 
         if ($request->hasFile('image')) {
-            if ($product->image_url) {
-                $oldPath = str_replace(asset('storage/'), '', $product->image_url);
-                Storage::disk('public')->delete($oldPath);
-            }
-
-            $image = $request->file('image');
-            $filename = uniqid() . '.' . $image->getClientOriginalExtension();
-
-            $image->storeAs('products', $filename, 'public');
-            $product->image_url = asset('storage/products/' . $filename);
+            $this->deleteImageIfExists($product->image_url);
+            $product->image_url = $this->handleImageUpload($request);
         }
 
         if ($request->has('name')) {
@@ -88,13 +74,27 @@ class ProductController extends Controller
 
         $product = Product::findOrFail($id);
 
-        if ($product->image_url) {
-            $oldPath = str_replace(asset('storage/'), '', $product->image_url);
-            Storage::disk('public')->delete($oldPath);
-        }
+        $this->deleteImageIfExists($product->image_url);
 
         $product->delete();
 
         return response()->noContent();
+    }
+
+    protected function handleImageUpload($request): ?string
+    {
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('products', 'public');
+            return Storage::url($path);
+        }
+        return null;
+    }
+
+    protected function deleteImageIfExists(?string $url): void
+    {
+        if ($url) {
+            $relativePath = Str::after($url, '/storage/');
+            Storage::disk('public')->delete($relativePath);
+        }
     }
 }
