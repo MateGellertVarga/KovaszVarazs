@@ -27,6 +27,9 @@ import { OrderModel } from 'src/models/orderModel';
 import { OrderScheduleModel } from 'src/models/orderScheduleModel';
 import { OrderModalComponent } from '../../modals/order-modal/order-modal.component';
 import { ModalNavbarService } from 'src/app/services/modal-navbar.service';
+import Pusher from 'pusher-js';
+import { AuthService } from 'src/app/services/auth.service';
+import { ConfigService } from 'src/app/services/config.service';
 
 @Component({
   selector: 'orders',
@@ -61,7 +64,9 @@ export default class Orders {
     private dataService: DataService,
     private modalNavbarService: ModalNavbarService,
     private alertController: AlertController,
-    private changeDetectorRef: ChangeDetectorRef
+    private changeDetectorRef: ChangeDetectorRef,
+    private authService: AuthService,
+    private configService: ConfigService
   ) {
     registerLocaleData(localeHu);
   }
@@ -70,13 +75,15 @@ export default class Orders {
   orderSchedules: OrderScheduleModel[] = [];
   allOrders: OrderModel[] = [];
   orders: OrderModel[] = [];
-
   currentOrderSchedule: OrderScheduleModel | null = null;
   editingOrder: OrderModel | null = null;
   orderSummary: { product_name: string; totalQuantity: number }[] = [];
   totalIncome: number = 0;
+  pusher: any;
+  channel: any;
 
   ionViewWillEnter() {
+    //this.subscribeToOrdersChannel();
     this.isLoading = true;
 
     this.dataService.getOrderSchedules(50, 50).subscribe({
@@ -130,6 +137,13 @@ export default class Orders {
       },
     });
   }
+
+  // ionViewWillLeave() {
+  //   if (this.channel) {
+  //     this.channel.stopListening('.orders.changed');
+  //     this.channel == null;
+  //   }
+  // }
 
   loadOrdersForCurrentSchedule() {
     this.dataService
@@ -333,4 +347,33 @@ export default class Orders {
       }
     });
   }
+
+  //   subscribeToOrdersChannel() {
+  //     Pusher.logToConsole = true;
+  //     this.pusher = new Pusher('ecdd4099f54ec246d3ae', {
+  //       cluster: 'eu',
+  //       authEndpoint: `${this.configService.apiUrl}/broadcasting/auth`,
+  //       auth: {
+  //         headers: {
+  //           Authorization: `Bearer ${this.authService.loggedInUser?.token}`,
+  //         },
+  //       },
+  //     });
+
+  //     this.channel = this.pusher.subscribe('orders');
+  //     this.channel.bind('.orders.changed', (data: any) => {
+  //       console.log('Data received:', data);
+
+  //       const existingIndex = this.orders.findIndex(
+  //         (o) => o.id === data.order.id
+  //       );
+  //       if (existingIndex !== -1) {
+  //         this.orders[existingIndex] = data.order;
+  //       } else {
+  //         this.orders.push(data.order);
+  //       }
+  //       this.sortOrders();
+  //       this.calculateSummary();
+  //     });
+  //   }
 }

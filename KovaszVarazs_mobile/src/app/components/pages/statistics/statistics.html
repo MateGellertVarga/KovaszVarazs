@@ -39,27 +39,38 @@
     <img src="assets/loading.gif" alt="Loading..." />
   </div>
   } @else {
-  <div class="mx-auto mt-5 mb-16 overflow-auto h-full">
-    <ion-title class="text-xl font-semibold">Bevételek</ion-title>
+  <div class="mx-auto mt-5 mb-20">
+    <ion-title class="text-xl font-semibold mb-1">Bevételek</ion-title>
+
     <ion-list class="px-1">
+      <div class="grid grid-cols-4 w-full font-semibold border-b px-1 pb-1">
+        <div class="text-left">Termék</div>
+        <div class="text-center">Összes</div>
+        <div class="text-center">Fizetett</div>
+        <div class="text-right">Bevétel</div>
+      </div>
+
       @for (product of combinedSales; track $index) {
-      <ion-item>
-        <div class="flex justify-between items-center w-full">
-          <h3>{{product.product_name}}</h3>
-          <h3>{{product.all_quantity}} db</h3>
-          <h3>{{product.paid_quantity}} db</h3>
-          <h3>{{product.income| number:'1.0-2' }} €</h3>
+      <ion-item class="!p-0">
+        <div class="grid grid-cols-4 w-full py-1 px-1">
+          <div class="text-left">{{ product.product_name }}</div>
+          <div class="text-center">{{ product.all_quantity }} db</div>
+          <div class="text-center">{{ product.paid_quantity }} db</div>
+          <div class="text-right">{{ product.income | number:'1.0-2' }} €</div>
         </div>
       </ion-item>
       } @if (combinedSales.length > 0) {
-      <ion-item class="mt-2">
-        <div class="flex justify-between items-center w-full font-bold">
-          <h2 class="font-bold">Összesen:</h2>
-          <h2 class="font-bold">{{totalSales| number:'1.0-2' }} €</h2>
+      <ion-item lines="none" class="mt-2 !p-0">
+        <div
+          class="flex justify-between items-center w-full font-bold text-base px-1"
+        >
+          <h2>Összesen:</h2>
+          <h2>{{ totalSales | number:'1.0-2' }} €</h2>
         </div>
       </ion-item>
       }
     </ion-list>
+
     <div class="flex justify-between items-center w-full mt-10">
       <ion-title class="text-xl font-semibold">Kiadások</ion-title>
       <ion-button

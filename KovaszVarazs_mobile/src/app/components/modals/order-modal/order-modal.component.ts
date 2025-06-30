@@ -103,7 +103,7 @@ export class OrderModalComponent implements OnInit {
         },
         error: (error: any) => {
           this.errorMessage = error.error?.message ?? error.message;
-          console.error(error);
+          console.log(error.error?.message ?? error.message);
         },
       });
     }
