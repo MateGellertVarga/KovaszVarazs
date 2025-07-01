@@ -67,6 +67,7 @@ export class Products {
       next: (result: ProductModel[]) => {
         this.products = result;
         this.isLoading = false;
+        console.log(this.products);
       },
       error: (err) => {
         console.log(err);

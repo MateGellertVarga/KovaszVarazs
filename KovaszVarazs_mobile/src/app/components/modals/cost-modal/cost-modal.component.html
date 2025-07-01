@@ -7,7 +7,7 @@
     [style.top.px]="scrollY + viewportHeight / 4"
   >
     <h2 class="text-2xl font-bold mb-4 text-center">
-      {{ cost.name != "" ? "Kiadás módosítása" : "Új kiadás" }}
+      {{ cost.id != 0 ? "Kiadás módosítása" : "Új kiadás" }}
     </h2>
     <form class="space-y-4">
       <div>
