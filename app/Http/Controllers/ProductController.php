@@ -75,7 +75,6 @@ class ProductController extends Controller
         $product = Product::findOrFail($id);
 
         $this->deleteImageIfExists($product->image_url);
-
         $product->delete();
 
         return response()->noContent();
@@ -84,7 +83,7 @@ class ProductController extends Controller
     protected function handleImageUpload($request): ?string
     {
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('products', 'public');
+            $path = $request->file('image')->store('', 'images');
             return Storage::url($path);
         }
         return null;
@@ -93,8 +92,8 @@ class ProductController extends Controller
     protected function deleteImageIfExists(?string $url): void
     {
         if ($url) {
-            $relativePath = Str::after($url, '/storage/');
-            Storage::disk('public')->delete($relativePath);
+            $filename = Str::after($url, env('AWS_URL') . '/');
+            Storage::disk('images')->delete($filename);
         }
     }
 }
