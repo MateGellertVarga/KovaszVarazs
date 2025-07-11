@@ -128,7 +128,10 @@
                 />
               </svg>
             </ion-button>
-            <ion-button color="white" (click)="changeOrderStatus(order.id)">
+            <ion-button
+              color="white"
+              (click)="changeOrderStatusForward(order.id)"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="32"
@@ -168,7 +171,10 @@
                 />
               </svg>
             </ion-button>
-            <ion-button color="white" (click)="changeOrderStatus(order.id)">
+            <ion-button
+              color="white"
+              (click)="changeOrderStatusForward(order.id)"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="32"
@@ -182,7 +188,7 @@
               </svg>
             </ion-button>
             } @else {
-            <ion-button color="white">
+            <ion-button color="white" (click)="orderStatusReverse(order.id)">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="32"

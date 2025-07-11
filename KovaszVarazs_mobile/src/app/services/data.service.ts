@@ -13,19 +13,6 @@ import { ConfigService } from './config.service';
 export class DataService {
   constructor(private http: HttpClient, private configService: ConfigService) {}
 
-  getOrders(): Observable<OrderModel[]> {
-    return this.http
-      .get<OrderModel[]>(`${this.configService.apiUrl}/orders`)
-      .pipe(
-        map((orders) =>
-          orders.map((order) => ({
-            ...order,
-            order_schedule_date: new Date(order.order_schedule_date),
-          }))
-        )
-      );
-  }
-
   getOrdersByOrderScheduleId(scheduleId: number): Observable<OrderModel[]> {
     return this.http
       .get<OrderModel[]>(`${this.configService.apiUrl}/orders/${scheduleId}`)
@@ -36,17 +23,6 @@ export class DataService {
             order_schedule_date: new Date(order.order_schedule_date),
           }))
         )
-      );
-  }
-
-  getOrder(id: number): Observable<OrderModel> {
-    return this.http
-      .get<OrderModel>(`${this.configService.apiUrl}/orders/${id}`)
-      .pipe(
-        map((order) => ({
-          ...order,
-          order_schedule_date: new Date(order.order_schedule_date),
-        }))
       );
   }
 
@@ -127,12 +103,6 @@ export class DataService {
   getProducts(): Observable<ProductModel[]> {
     return this.http.get<ProductModel[]>(
       `${this.configService.apiUrl}/products`
-    );
-  }
-
-  getProduct(id: number): Observable<ProductModel> {
-    return this.http.get<ProductModel>(
-      `${this.configService.apiUrl}/products/${id}`
     );
   }
 

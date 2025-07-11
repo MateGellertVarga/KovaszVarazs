@@ -301,7 +301,7 @@ export default class Orders {
     }
   }
 
-  changeOrderStatus(id: number) {
+  changeOrderStatusForward(id: number) {
     const order = this.orders.find((o) => o.id === id);
     if (!order) return;
 
@@ -310,6 +310,22 @@ export default class Orders {
     } else if (order.status === 'processing') {
       order.status = 'completed';
     }
+
+    this.dataService.updateOrder(order.id, order).subscribe({
+      next: () => {
+        this.sortOrders();
+        this.calculateSummary();
+      },
+      error: (err) => {
+        console.error('Hiba a státusz frissítésekor:', err);
+      },
+    });
+  }
+
+  orderStatusReverse(id: number) {
+    const order = this.orders.find((o) => o.id === id);
+    if (!order) return;
+    order.status = 'processing';
 
     this.dataService.updateOrder(order.id, order).subscribe({
       next: () => {
