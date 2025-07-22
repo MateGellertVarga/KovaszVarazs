@@ -1,7 +1,2 @@
-:root {
-  --primary-color: #C68958;
-}
-
-button {
-  background-color: #C68958;
-}
+@import 'tailwindcss';
+@import "primeicons/primeicons.css";
