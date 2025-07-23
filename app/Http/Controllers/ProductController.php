@@ -27,7 +27,9 @@ class ProductController extends Controller
         $product = Product::create([
             'name' => $request->name,
             'price' => $request->price,
-            'image_url' => $imageUrl
+            'image_url' => $imageUrl,
+            'category' => $request->category,
+            'is_used' => $request->is_used,
         ]);
 
         return response()->json($product, 201);
@@ -58,6 +60,14 @@ class ProductController extends Controller
 
         if ($request->has('price')) {
             $product->price = $request->price;
+        }
+
+        if ($request->has('category')) {
+            $product->category = $request->category;
+        }
+
+        if ($request->has('is_used')) {
+            $product->is_used = $request->is_used;
         }
 
         $product->save();

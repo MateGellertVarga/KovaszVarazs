@@ -16,6 +16,8 @@ return new class extends Migration
             $table->string('name');
             $table->decimal('price', 8, 2);
             $table->string('image_url')->nullable();
+            $table->string('category');
+            $table->boolean('is_used');
             $table->softDeletes();
         });
     }

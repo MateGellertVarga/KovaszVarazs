@@ -37,7 +37,10 @@ class OrderScheduleController extends Controller
 
     public function show($id)
     {
-        $schedule = OrderSchedule::with('products')->findOrFail($id);
+        $schedule = OrderSchedule::with(['products' => function ($query) {
+            $query->where('is_used', true);
+        }])->findOrFail($id);
+
         return new OrderScheduleResource($schedule);
     }
 
@@ -62,7 +65,11 @@ class OrderScheduleController extends Controller
             ]);
         }
 
-        return (new OrderScheduleResource($schedule->load('products')))
+        $schedule->load(['products' => function ($query) {
+            $query->where('is_used', true);
+        }]);
+
+        return (new OrderScheduleResource($schedule))
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);
     }
@@ -118,15 +125,16 @@ class OrderScheduleController extends Controller
                     }
                 }
 
-                return new OrderScheduleResource($orderSchedule->load('products'));
+                $orderSchedule->load(['products' => function ($query) {
+                    $query->where('is_used', true);
+                }]);
+
+                return new OrderScheduleResource($orderSchedule);
             });
         } catch (Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
         }
     }
-
-
-
 
     public function destroy($id)
     {
