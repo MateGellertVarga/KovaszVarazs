@@ -1,11 +1,13 @@
 import { Component } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { UserModel } from '../../../models/userModel';
+import { NavbarComponent } from '../navbar/navbar.component';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-registration-page',
-  imports: [],
+  imports: [NavbarComponent, FormsModule, RouterLink],
   templateUrl: './registration-page.component.html',
   styleUrl: './registration-page.component.css',
 })
@@ -17,10 +19,12 @@ export class RegistrationPageComponent {
     email: '',
     phone_number: '',
     password: '',
-    role: 'admin',
+    role: 'user',
   };
   passwordAgain: string = '';
   errorMessage: string = '';
+  showPassword: boolean = false;
+  showPasswordAgain: boolean = false;
 
   register() {
     if (this.validation()) {
@@ -28,7 +32,7 @@ export class RegistrationPageComponent {
         next: () => {
           this.router.navigate(['/login']);
         },
-        error: (error:any) => {
+        error: (error: any) => {
           this.errorMessage = error.error.message;
         },
       });
