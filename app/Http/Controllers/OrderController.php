@@ -24,6 +24,7 @@ class OrderController extends Controller
         } else {
             $orders = Order::with(['orderItems.product', 'orderSchedule', 'user'])
                 ->where('user_id', $user->id)
+                ->where('status', '!=', 'completed')
                 ->get();
         }
         return OrderResource::collection($orders);
