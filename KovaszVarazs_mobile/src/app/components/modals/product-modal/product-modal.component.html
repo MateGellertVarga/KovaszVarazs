@@ -37,6 +37,31 @@
       </div>
 
       <div>
+        <label class="block font-medium text-gray-700">Kategória</label>
+        <select
+          name="category"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+          [(ngModel)]="product.category"
+          required
+        >
+          <option value="" disabled selected>Válassz kategóriát</option>
+          <option value="Kenyerek">Kenyerek</option>
+          <option value="Édes kalácsok">Édes kalácsok</option>
+          <option value="Sós kalácsok">Sós kalácsok</option>
+          <option value="Egyéb">Egyéb</option>
+        </select>
+      </div>
+      <div class="flex items-center mt-2">
+        <label class="block font-medium text-gray-700 mr-2">Használatban</label>
+        <input
+          type="checkbox"
+          name="is_used"
+          [(ngModel)]="product.is_used"
+          class="form-checkbox"
+        />
+      </div>
+
+      <div>
         <label class="block font-medium text-gray-700">{{
           product.image_url != "" ? "Új kép" : "Kép"
         }}</label>

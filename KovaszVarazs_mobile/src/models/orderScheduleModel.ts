@@ -10,4 +10,5 @@ export interface Product {
   product_name: string;
   max_quantity: number;
   remaining_quantity: number;
+  unit_price: number;
 }

@@ -46,7 +46,14 @@
               >{{product.price| number:'1.0-2' }} €/db</ion-card-title
             >
           </div>
+          <div class="flex justify-between mt-2 text-sm">
+            <span>Kategória: <b>{{ product.category }}</b></span>
+            @if (!product.is_used) {
+            <span class="text-red-500 font-bold">(inaktív)</span>
+            }
+          </div>
         </ion-card-header>
+
         <ion-card-content>
           <div class="flex justify-evenly mt-2">
             <ion-button color="white" (click)="deleteProduct(product)">
