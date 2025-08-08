@@ -26,6 +26,7 @@ class OrderScheduleResource extends JsonResource
                     'max_quantity' => $product->pivot->max_quantity,
                     'remaining_quantity' => $product->pivot->remaining_quantity,
                     'unit_price' => $product->price,
+                    'image_url' => $product->image_url,
                 ];
             })->all(),
         ];
