@@ -64,6 +64,9 @@ export class RegistrationPageComponent {
     }
     if (!this.newUser!.password!.trim()) {
       this.errorMessage += 'Jelszó kötelező!\n';
+    } else if (this.newUser.password!.length < 8) {
+      this.errorMessage +=
+        'Jelszónak legalább 8 karakter hosszúnak kell lennie!\n';
     } else if (!passwordRegex.test(this.newUser!.password!)) {
       this.errorMessage +=
         'Jelszónak tartalmaznia kell legalább egy kisbetűt, egy nagybetűt, egy számot és egy speciális karaktert!\n';

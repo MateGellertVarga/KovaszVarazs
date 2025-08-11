@@ -4,7 +4,7 @@ import { LoginPageComponent } from './components/login-page/login-page.component
 import { RegistrationPageComponent } from './components/registration-page/registration-page.component';
 import { OrdersPageComponent } from './components/orders-page/orders-page.component';
 import { ProductsPageComponent } from './components/products-page/products-page.component';
-import { ForgotPasswordPageComponent } from './forgot-password-page/forgot-password-page.component';
+import { ForgotPasswordPageComponent } from './components/forgot-password-page/forgot-password-page.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },

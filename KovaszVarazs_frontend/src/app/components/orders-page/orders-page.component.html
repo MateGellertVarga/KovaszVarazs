@@ -1,1 +1,84 @@
-<p>orders-page works!</p>
+<app-navbar></app-navbar>
+
+<div class="mx-auto px-2 pt-4">
+  @if (this.authService.loggedInUser && !this.isLoading && orders.length > 0) {
+  <div class="flex justify-center">
+    <h2 class="text-2xl font-bold text-[#c68958] mb-6 mt-4">
+      Aktív rendeléseim
+    </h2>
+  </div>
+  <div
+    class="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 justify-center mb-8"
+  >
+    @for (order of orders; track order.id) {
+    <div
+      class="bg-white rounded-3xl shadow-lg border border-gray-200 p-6 flex flex-col gap-2 w-xs mx-auto mb-4"
+    >
+      <div class="flex justify-center items-center mb-1">
+        <div>
+          <div class="text-lg font-bold text-gray-800 text-center">
+            {{ order.order_schedule_date | date : "yyyy.MM.dd EEEE" }}
+          </div>
+        </div>
+      </div>
+      <div class="mt-2 space-y-1">
+        @for (item of order.order_items; track item.product_id) {
+        <div class="flex justify-between text-base">
+          <span>{{ item.product_name }}</span>
+          <span class="font-semibold">{{ item.quantity }} db</span>
+        </div>
+        }
+      </div>
+      <div class="flex justify-end mt-2">
+        <span class="text-lg font-bold text-gray-900"
+          >Összesen: {{ order.total_price | number : "1.0-2" }} €</span
+        >
+      </div>
+      <div class="flex justify-center gap-20 mt-4">
+        <button
+          (click)="editOrder(order)"
+          class="rounded-full bg-[#c68958] text-white px-6 py-2 text-xl hover:bg-[#a96e34] shadow transition flex items-center justify-center"
+          aria-label="Szerkesztés"
+        >
+          <span class="pi pi-pencil"></span>
+        </button>
+        <button
+          (click)="deleteOrder(order)"
+          class="rounded-full bg-red-100 text-red-700 px-6 py-2 text-xl hover:bg-red-200 shadow transition flex items-center justify-center"
+          aria-label="Törlés"
+        >
+          <span class="pi pi-trash"></span>
+        </button>
+      </div>
+    </div>
+    }
+  </div>
+  }
+
+  <div class="flex justify-center mb-8">
+    <button
+      class="flex items-center gap-2 bg-[#c68958] hover:bg-[#a96e34] text-white text-lg font-semibold rounded-3xl px-8 py-4 shadow-lg transition"
+      (click)="newOrder()"
+    >
+      <span class="text-2xl font-bold">+</span>
+      Új rendelés
+    </button>
+  </div>
+
+  <p-dialog
+    [modal]="true"
+    [(visible)]="showOrderModal"
+    [showHeader]="true"
+    [dismissableMask]="false"
+    [closable]="true"
+    [style]="{ width: '98%', maxWidth: '460px' }"
+    [contentStyle]="{ height: '620px', padding: '0' }"
+    (onHide)="closeOrderModal()"
+  >
+    <app-order-modal
+      [order]="order"
+      (saved)="saveOrder($event)"
+      (canceled)="closeOrderModal()"
+    ></app-order-modal>
+  </p-dialog>
+</div>

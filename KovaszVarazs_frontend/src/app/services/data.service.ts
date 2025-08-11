@@ -25,6 +25,21 @@ export class DataService {
       );
   }
 
+  getActiveOrdersByUserId(
+    userId: number | undefined //nagyon csúnyaaaaa, but works
+  ): Observable<OrderModel[]> {
+    return this.http
+      .get<OrderModel[]>(`${this.configService.apiUrl}/orders`)
+      .pipe(
+        map((orders) =>
+          orders.map((order) => ({
+            ...order,
+            order_schedule_date: new Date(order.order_schedule_date),
+          }))
+        )
+      );
+  }
+
   addOrder(order: OrderModel): Observable<OrderModel> {
     return this.http.post<OrderModel>(
       `${this.configService.apiUrl}/orders`,

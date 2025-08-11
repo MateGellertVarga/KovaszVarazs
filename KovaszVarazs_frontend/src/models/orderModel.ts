@@ -2,6 +2,7 @@ import { OrderItemModel } from './orderItemModel';
 
 export interface OrderModel {
   id: number;
+  user_id?: number;
   customer_name?: string;
   phone_number?: string;
   note?: string;

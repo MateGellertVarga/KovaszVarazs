@@ -2,7 +2,8 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ProductModel } from '../../../models/productModel';
 import { DataService } from '../../services/data.service';
 import { NavbarComponent } from '../navbar/navbar.component';
-import { CommonModule } from '@angular/common';
+import { CommonModule, registerLocaleData } from '@angular/common';
+import localeHu from '@angular/common/locales/hu';
 
 @Component({
   selector: 'app-products-page',
@@ -11,7 +12,9 @@ import { CommonModule } from '@angular/common';
   styleUrl: './products-page.component.css',
 })
 export class ProductsPageComponent implements OnInit {
-  constructor(private dataService: DataService) {}
+  constructor(private dataService: DataService) {
+    registerLocaleData(localeHu);
+  }
 
   isLoading: boolean = true;
   products: ProductModel[] = [];

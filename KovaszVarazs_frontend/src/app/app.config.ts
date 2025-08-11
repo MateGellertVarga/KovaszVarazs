@@ -11,6 +11,9 @@ import {
   withInterceptors,
 } from '@angular/common/http';
 import { authInterceptor } from './services/auth.interceptor';
+import { LOCALE_ID } from '@angular/core';
+import { registerLocaleData } from '@angular/common';
+import localeHu from '@angular/common/locales/hu';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -26,5 +29,6 @@ export const appConfig: ApplicationConfig = {
         },
       },
     }),
+    { provide: LOCALE_ID, useValue: 'hu' },
   ],
 };
