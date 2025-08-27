@@ -192,6 +192,7 @@ export class OrderScheduleModalComponent implements OnInit {
           product_name: existingProduct!.name,
           max_quantity: quantity,
           remaining_quantity: quantity,
+          unit_price: existingProduct!.price,
         };
       });
   }
