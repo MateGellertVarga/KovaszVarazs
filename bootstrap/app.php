@@ -20,7 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->append(EncryptCookies::class);
         //$middleware->append(StartSession::class);
         $middleware->alias([
-            'admin' => EnsureUserIsAdmin::class,
+            'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
         ]);
         $middleware->alias([
             'cookie_or_bearer' => \App\Http\Middleware\CookieOrBearerAuth::class,
