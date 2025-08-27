@@ -16,7 +16,6 @@ use App\Http\Controllers\UserController;
 Route::prefix('auth')->group(function () {
     Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login']);
-    Route::post('refresh', [AuthController::class, 'refresh']);
 });
 
 Route::get('products', [ProductController::class, 'index']);
@@ -31,8 +30,8 @@ Route::post('orders', [OrderController::class, 'store']);
 
 Route::middleware('auth:sanctum')->prefix('auth')->group(function () {
     Route::post('logout', [AuthController::class, 'logout']);
-    Route::get('user', [UserController::class, 'show']);
-    Route::put('user', [UserController::class, 'update']);
+    Route::get('me', [UserController::class, 'show']);
+    Route::put('me', [UserController::class, 'update']);
 });
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('orders', [OrderController::class, 'index']);

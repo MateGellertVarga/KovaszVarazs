@@ -7,6 +7,7 @@ use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Session\Middleware\StartSession;
 use App\Http\Middleware\EnsureUserIsAdmin;
 use App\Providers\BroadcastServiceProvider;
+use Illuminate\Routing\Middleware\SubstituteBindings;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -20,6 +21,15 @@ return Application::configure(basePath: dirname(__DIR__))
         //$middleware->append(StartSession::class);
         $middleware->alias([
             'admin' => EnsureUserIsAdmin::class,
+        ]);
+        $middleware->alias([
+            'cookie_or_bearer' => \App\Http\Middleware\CookieOrBearerAuth::class,
+        ]);
+
+        $middleware->group('api', [
+            'cookie_or_bearer',
+            'throttle:api',
+            SubstituteBindings::class,
         ]);
     })
     ->withProviders([

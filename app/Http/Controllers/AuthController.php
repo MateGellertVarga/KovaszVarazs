@@ -35,50 +35,42 @@ class AuthController extends Controller
             return response()->json(['message' => 'Helytelen email cím vagy jelszó'], 400);
         }
 
-        //$accessToken = $user->createToken('access_token', ['access'], now()->addHour())->plainTextToken;
-        $refreshToken = $user->createToken('token')->plainTextToken;
+        $token = $user->createToken('token')->plainTextToken;
 
-        return response()->json([
-            'id' => $user->id,
-            'name' => $user->name,
-            'email' => $user->email,
-            'phone_number' => $user->phone_number,
-            'role' => $user->role,
-            //'access_token' => $accessToken,
-            'token' => $refreshToken
-        ], 200);
+        $cookie = cookie(
+            'auth_token',
+            $token,
+            60 * 24 * 30, // 30 nap
+            '/',
+            null,
+            true,   // Secure (HTTPS kell)
+            true,   // HttpOnly
+            false,  // raw
+            'none'  // SameSite
+        );
+
+        return response()
+            ->json([
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'phone_number' => $user->phone_number,
+                'role' => $user->role,
+                'token' => $token // mobil
+            ], 200)
+            ->cookie($cookie);
     }
-
-    // public function refresh(Request $request)
-    // {
-    //     $refreshToken = $request->bearerToken();
-
-    //     if (!$refreshToken) {
-    //         return response()->json(['message' => 'Hiba! Hiáynzó token'], 401);
-    //     }
-
-    //     $token = PersonalAccessToken::findToken($refreshToken);
-    //     if (!$token || !$token->can('refresh')) {
-    //         return response()->json(['message' => 'Érvenytelen token'], 401);
-    //     }
-
-    //     $user = $token->tokenable;
-
-    //     $newAccessToken = $user->createToken('access_token', ['access'], now()->addHour())->plainTextToken;
-
-    //     return response()->json([
-    //         'access_token' => $newAccessToken,
-    //         'token_type'   => 'Bearer',
-    //     ]);
-    // }
-
-
 
 
     public function logout(Request $request)
     {
         $user = $request->user();
         $user->tokens()->where('name', 'token')->delete();
-        return response()->json(['message' => 'Sikeres kijelentkezés']);
+
+        $cookie = cookie('auth_token', '', -1, '/', null, true, true, false, 'none');
+
+        return response()
+            ->json(['message' => 'Sikeres kijelentkezés'])
+            ->cookie($cookie);
     }
 }
