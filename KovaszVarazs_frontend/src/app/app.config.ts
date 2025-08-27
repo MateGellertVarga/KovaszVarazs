@@ -11,22 +11,19 @@ import {
   withInterceptors,
 } from '@angular/common/http';
 import { authInterceptor } from './services/auth.interceptor';
+import { credentialsInterceptor } from './services/credentials.interceptor';
 import { LOCALE_ID } from '@angular/core';
-import { registerLocaleData } from '@angular/common';
-import localeHu from '@angular/common/locales/hu';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
-    provideHttpClient(withFetch(), withInterceptors([authInterceptor])),
+    provideHttpClient(withFetch(), withInterceptors([credentialsInterceptor])),
     provideAnimationsAsync(),
     providePrimeNG({
       theme: {
         preset: Aura,
-        options: {
-          darkModeSelector: false,
-        },
+        options: { darkModeSelector: false },
       },
     }),
     { provide: LOCALE_ID, useValue: 'hu' },
