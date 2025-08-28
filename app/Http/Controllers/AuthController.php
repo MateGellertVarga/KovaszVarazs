@@ -37,18 +37,6 @@ class AuthController extends Controller
 
         $token = $user->createToken('token')->plainTextToken;
 
-        $cookie = cookie(
-            'auth_token',
-            $token,
-            60 * 24 * 30, // 30 nap
-            '/',
-            null,
-            true,   // Secure (HTTPS kell)
-            true,   // HttpOnly
-            false,  // raw
-            'none'  // SameSite
-        );
-
         return response()
             ->json([
                 'id' => $user->id,
@@ -56,21 +44,66 @@ class AuthController extends Controller
                 'email' => $user->email,
                 'phone_number' => $user->phone_number,
                 'role' => $user->role,
-                'token' => $token // mobil
+                'token' => $token
             ], 200)
-            ->cookie($cookie);
+            ->header('Set-Cookie', "auth_token={$token}; Path=/; Max-Age=2592000; HttpOnly; Secure; SameSite=None; Partitioned");
     }
-
 
     public function logout(Request $request)
     {
         $user = $request->user();
-        $user->tokens()->where('name', 'token')->delete();
-
-        $cookie = cookie('auth_token', '', -1, '/', null, true, true, false, 'none');
+        $user?->tokens()->where('name', 'token')->delete();
 
         return response()
             ->json(['message' => 'Sikeres kijelentkezés'])
-            ->cookie($cookie);
+            ->header('Set-Cookie', "auth_token=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=None; Partitioned");
     }
+
+
+    // public function login(LoginRequest $request)
+    // {
+    //     $user = User::where('email', $request->email)->first();
+
+    //     if (!$user || !Hash::check($request->password, $user->password)) {
+    //         return response()->json(['message' => 'Helytelen email cím vagy jelszó'], 400);
+    //     }
+
+    //     $token = $user->createToken('token')->plainTextToken;
+
+    //     $cookie = cookie(
+    //         'auth_token',
+    //         $token,
+    //         60 * 24 * 30, // 30 nap
+    //         '/',
+    //         null,
+    //         true,   // Secure (HTTPS kell)
+    //         true,   // HttpOnly
+    //         false,  // raw
+    //         'none'  // SameSite
+    //     );
+
+    //     return response()
+    //         ->json([
+    //             'id' => $user->id,
+    //             'name' => $user->name,
+    //             'email' => $user->email,
+    //             'phone_number' => $user->phone_number,
+    //             'role' => $user->role,
+    //             'token' => $token // mobil
+    //         ], 200)
+    //         ->cookie($cookie);
+    // }
+
+
+    // public function logout(Request $request)
+    // {
+    //     $user = $request->user();
+    //     $user->tokens()->where('name', 'token')->delete();
+
+    //     $cookie = cookie('auth_token', '', -1, '/', null, true, true, false, 'none');
+
+    //     return response()
+    //         ->json(['message' => 'Sikeres kijelentkezés'])
+    //         ->cookie($cookie);
+    // }
 }
