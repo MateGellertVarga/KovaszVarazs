@@ -33,56 +33,6 @@ export class OrdersPageComponent {
   }
   isLoading: boolean = true;
   orders: OrderModel[] = [];
-  //[
-  // {
-  //   id: 1,
-  //   customer_name: 'John Doe',
-  //   phone_number: '123456789',
-  //   note: 'Please deliver after 5 PM',
-  //   status: 'Pending',
-  //   is_paying: false,
-  //   already_paid: false,
-  //   total_price: 100.0,
-  //   order_schedule_id: 1,
-  //   order_schedule_date: new Date('2023-10-01T10:00:00'),
-  //   order_items: [
-  //     { product_id: 1, product_name: 'Product A', quantity: 2 },
-  //     { product_id: 2, product_name: 'Product B', quantity: 1 },
-  //   ],
-  // },
-  // {
-  //   id: 2,
-  //   customer_name: 'John Doe',
-  //   phone_number: '123456789',
-  //   note: 'Please deliver after 5 PM',
-  //   status: 'Pending',
-  //   is_paying: false,
-  //   already_paid: false,
-  //   total_price: 100.0,
-  //   order_schedule_id: 1,
-  //   order_schedule_date: new Date('2023-10-01T10:00:00'),
-  //   order_items: [
-  //     { product_id: 1, product_name: 'Product A', quantity: 2 },
-  //     { product_id: 2, product_name: 'Product B', quantity: 1 },
-  //   ],
-  // },
-  // {
-  //   id: 3,
-  //   customer_name: 'John Doe',
-  //   phone_number: '123456789',
-  //   note: 'Please deliver after 5 PM',
-  //   status: 'Pending',
-  //   is_paying: false,
-  //   already_paid: false,
-  //   total_price: 100.0,
-  //   order_schedule_id: 1,
-  //   order_schedule_date: new Date('2023-10-01T10:00:00'),
-  //   order_items: [
-  //     { product_id: 1, product_name: 'Product A', quantity: 2 },
-  //     { product_id: 2, product_name: 'Product B', quantity: 1 },
-  //   ],
-  // },
-  //];
   showOrderModal = false;
   order: OrderModel | null = null;
   errorMessage: string = '';
