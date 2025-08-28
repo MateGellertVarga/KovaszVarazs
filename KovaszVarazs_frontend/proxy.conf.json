@@ -1,0 +1,8 @@
+{
+  "/api": {
+    "target": "https://kovaszvarazs-backend-bhsorj.laravel.cloud",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  }
+}

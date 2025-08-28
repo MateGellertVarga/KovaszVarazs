@@ -146,6 +146,7 @@
   </div>
   <!-- ------ -->
 
+  @if (showOrderModal) {
   <p-dialog
     [modal]="true"
     [(visible)]="showOrderModal"
@@ -162,4 +163,5 @@
       (canceled)="closeOrderModal()"
     ></app-order-modal>
   </p-dialog>
+  }
 </div>

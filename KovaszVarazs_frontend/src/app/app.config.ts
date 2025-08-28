@@ -1,4 +1,8 @@
-import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import {
+  ApplicationConfig,
+  provideZoneChangeDetection,
+  APP_INITIALIZER,
+} from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { providePrimeNG } from 'primeng/config';
@@ -13,6 +17,11 @@ import {
 import { authInterceptor } from './services/auth.interceptor';
 import { credentialsInterceptor } from './services/credentials.interceptor';
 import { LOCALE_ID } from '@angular/core';
+import { AuthService } from './services/auth.service';
+
+function initAuth(auth: AuthService) {
+  return () => auth.loadUserData();
+}
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -27,5 +36,11 @@ export const appConfig: ApplicationConfig = {
       },
     }),
     { provide: LOCALE_ID, useValue: 'hu' },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: initAuth,
+      deps: [AuthService],
+      multi: true,
+    },
   ],
 };

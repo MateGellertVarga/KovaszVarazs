@@ -17,12 +17,20 @@ export class AuthService {
 
   login(email: string, password: string): Observable<boolean> {
     return this.http
-      .post(`${this.configService.apiUrl}/auth/login`, { email, password })
+      .post<UserModel>(`${this.configService.apiUrl}/auth/login`, {
+        email,
+        password,
+      })
       .pipe(
-        switchMap(() =>
-          this.http.get<UserModel>(`${this.configService.apiUrl}/auth/me`)
-        ),
-        tap((user) => (this.loggedInUser = user)),
+        tap((res) => {
+          this.loggedInUser = {
+            id: res.id,
+            name: res.name,
+            email: res.email,
+            phone_number: res.phone_number ?? '',
+            role: (res as any).role ?? '',
+          } as UserModel;
+        }),
         map(() => true)
       );
   }

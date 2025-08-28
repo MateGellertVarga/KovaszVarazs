@@ -6,5 +6,6 @@ import { Injectable } from '@angular/core';
 export class ConfigService {
   constructor() {}
 
-  apiUrl = 'https://kovaszvarazs-backend-bhsorj.laravel.cloud/api';
+  apiUrl = '/api';
+  // https://kovaszvarazs-backend-bhsorj.laravel.cloud
 }

@@ -6,5 +6,4 @@ export interface UserModel {
   password?: string;
   role: string;
   token?: string;
-  //refresh_token?: string;
 }
