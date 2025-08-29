@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateUserRequest extends FormRequest
 {
@@ -15,7 +16,12 @@ class UpdateUserRequest extends FormRequest
     {
         return [
             'name' => 'sometimes|required|string',
-            'email' => 'sometimes|required|email|unique:users,email,',
+            'email' => [
+                'sometimes',
+                'required',
+                'email',
+                Rule::unique('users', 'email')->ignore($this->user()->id)
+            ],
             'phone_number' => 'sometimes|nullable|phone:SK,HU,RO,PL,CZ,AT,DE,INTERNATIONAL',
             'password'     => 'sometimes|required|string|min:8|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/',
         ];
