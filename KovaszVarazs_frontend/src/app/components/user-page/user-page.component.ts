@@ -7,7 +7,7 @@ import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-user-page',
-  imports: [NavbarComponent, FormsModule, RouterLink],
+  imports: [NavbarComponent, FormsModule],
   templateUrl: './user-page.component.html',
   styleUrl: './user-page.component.css',
 })
