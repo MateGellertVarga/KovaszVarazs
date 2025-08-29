@@ -5,6 +5,7 @@ import { RegistrationPageComponent } from './components/registration-page/regist
 import { OrdersPageComponent } from './components/orders-page/orders-page.component';
 import { ProductsPageComponent } from './components/products-page/products-page.component';
 import { ForgotPasswordPageComponent } from './components/forgot-password-page/forgot-password-page.component';
+import { UserPageComponent } from './components/user-page/user-page.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -14,6 +15,6 @@ export const routes: Routes = [
   { path: 'forgot-password', component: ForgotPasswordPageComponent },
   { path: 'orders', component: OrdersPageComponent },
   { path: 'products', component: ProductsPageComponent },
-  // { path: 'user', component: UserComponent },
+  { path: 'user', component: UserPageComponent },
   { path: '**', redirectTo: 'home' },
 ];

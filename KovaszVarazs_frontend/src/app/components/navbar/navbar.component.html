@@ -41,6 +41,7 @@
             @for (item of menuItems; track $index) {
             <a
               routerLink="{{ item.path }}"
+              routerLinkActive="bg-yellow-900"
               aria-current="page"
               class="rounded-md bg-brown px-3 py-2 font-medium text-white hover:bg-yellow-900"
               >{{ item.label }}</a
@@ -53,7 +54,7 @@
         class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0"
       >
         <!-- Profile dropdown -->
-        <div class="relative ml-3">
+        <div class="relative ml-3" #profileWrap>
           <div>
             <button
               id="user-menu-button"
@@ -92,7 +93,7 @@
               id="user-menu-item-1"
               role="menuitem"
               tabindex="-1"
-              class="block px-4 py-2 text-sm text-gray-700 hover:underline"
+              class="block px-4 py-2 text-sm text-gray-700"
               (click)="this.authService.logout()"
               >Kijelentkezés</a
             >
@@ -100,7 +101,7 @@
               id="user-menu-item-0"
               role="menuitem"
               tabindex="-1"
-              class="block px-4 py-2 text-sm text-gray-700 hover:underline"
+              class="block px-4 py-2 text-sm text-gray-700"
               routerLink="/login"
               >Bejelentkezés</a
             >
@@ -114,11 +115,12 @@
 
   <!-- Mobile menu -->
   @if (mobileMenuOpen) {
-  <div id="mobile-menu" class="sm:hidden">
+  <div id="mobile-menu" class="sm:hidden" #mobileWrap>
     <div class="space-y-1 px-2 pt-2 pb-3">
       @for (item of menuItems; track $index) {
       <a
         routerLink="{{ item.path }}"
+        routerLinkActive="bg-yellow-900"
         aria-current="page"
         class="block rounded-md bg-brown px-3 py-2 text-base font-medium text-white"
         >{{ item.label }}</a

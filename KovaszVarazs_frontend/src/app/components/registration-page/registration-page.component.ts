@@ -51,6 +51,9 @@ export class RegistrationPageComponent {
     if (!this.newUser!.name.trim()) {
       this.errorMessage += 'Név kötelező!\n';
     }
+    if (this.newUser!.name.trim().length < 3) {
+      this.errorMessage += 'Név túl rövid!\n';
+    }
     if (!this.newUser!.email.trim()) {
       this.errorMessage += 'Email cím kötelező!\n';
     }

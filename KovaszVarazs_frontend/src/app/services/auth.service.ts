@@ -46,6 +46,22 @@ export class AuthService {
     return this.http.post(`${this.configService.apiUrl}/auth/register`, user);
   }
 
+  updateUserData(user: UserModel) {
+    return this.http
+      .put<UserModel>(`${this.configService.apiUrl}/auth/me`, user)
+      .pipe(
+        tap((res) => {
+          this.loggedInUser = {
+            id: res.id,
+            name: res.name,
+            email: res.email,
+            phone_number: res.phone_number ?? '',
+            role: (res as any).role ?? '',
+          } as UserModel;
+        })
+      );
+  }
+
   async loadUserData(): Promise<void> {
     try {
       const user = await firstValueFrom(
