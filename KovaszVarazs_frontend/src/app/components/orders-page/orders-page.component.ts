@@ -36,6 +36,8 @@ export class OrdersPageComponent {
   showOrderModal = false;
   order: OrderModel | null = null;
   errorMessage: string = '';
+  showLoginHint: boolean = true;
+  showInfo: boolean = true;
 
   ngOnInit(): void {
     if (this.authService.loggedInUser) {
@@ -45,6 +47,8 @@ export class OrdersPageComponent {
           next: (orders) => {
             this.orders = orders;
             this.isLoading = false;
+            this.showLoginHint = true;
+            this.showInfo = true;
           },
           error: (err) => {
             this.errorMessage = 'Hiba történt a rendelések betöltésekor';
@@ -106,5 +110,10 @@ export class OrdersPageComponent {
   closeOrderModal() {
     this.showOrderModal = false;
     this.order = null;
+  }
+
+  dismiss(which: 'login' | 'info') {
+    if (which === 'login') this.showLoginHint = false;
+    else this.showInfo = false;
   }
 }

@@ -55,11 +55,62 @@
     </div>
     }
   </div>
+  } @if (!this.authService.loggedInUser && showLoginHint) {
+  <div class="flex justify-center">
+    <div
+      class="relative inline-flex items-center gap-2 rounded-xl bg-[#fff7ec] ring-1 ring-black/5 px-4 py-2 text-[#7a5334] mb-4 animate-fadeInUp"
+    >
+      <button
+        type="button"
+        (click)="dismiss('login')"
+        aria-label="Bezárás"
+        class="absolute top-1 right-1 rounded-full bg-white text-[#7a5334] flex items-center justify-center"
+      >
+        <span class="pi pi-times text-xs"></span>
+      </button>
+      <span class="pi pi-lock"></span>
+      <span class="text-sm">
+        Bejelentkezve kezelheted leadott rendeléseidet.
+        <a
+          routerLink="/login"
+          class="text-[#c68958] underline hover:no-underline cursor-pointer mr-2"
+          >Bejelentkezés</a
+        >
+      </span>
+    </div>
+  </div>
+  } @if (showInfo) {
+  <div class="flex justify-center">
+    <div
+      class="relative inline-flex items-start gap-3 rounded-2xl bg-white ring-1 ring-[#c68958]/30 px-5 py-4 text-[#7a5334] max-w-2xl mb-6 animate-fadeInUp"
+    >
+      <button
+        type="button"
+        (click)="dismiss('info')"
+        aria-label="Bezárás"
+        class="absolute top-2 right-2 size-4 rounded-full bg-white text-[#7a5334] flex items-center justify-center"
+      >
+        <span class="pi pi-times text-xs"></span>
+      </button>
+      <span class="pi pi-info-circle mt-0.5 text-lg text-[#c68958]"></span>
+      <div class="text-sm leading-relaxed">
+        <div class="font-semibold text-[#7a5334]">Kovászvarázs</div>
+        <div>
+          Természetes kovász, valódi ízek. Frissen sütve, pár kattintással az
+          asztalodra.
+        </div>
+        <div class="mt-1 text-gray-700">
+          Kérjük, lehetőség szerint legalább <b>2 nappal előre</b> add le a
+          rendelésed.
+        </div>
+      </div>
+    </div>
+  </div>
   }
 
   <div class="flex justify-center mb-8">
     <button
-      class="flex items-center gap-2 bg-[#c68958] hover:bg-[#a96e34] text-white text-lg font-semibold rounded-3xl px-8 py-4 shadow-lg transition"
+      class="flex items-center gap-2 bg-gradient-to-r from-[#c68958] to-[#a96e34] hover:from-[#a96e34] hover:to-[#7a5334] text-white text-lg font-semibold rounded-full px-10 py-4 shadow-lg shadow-[#c68958]/40 transition transform hover:scale-105 active:scale-95 animate-fadeInUp"
       (click)="newOrder()"
     >
       <span class="text-2xl font-bold">+</span>
