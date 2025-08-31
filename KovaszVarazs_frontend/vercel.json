@@ -1,18 +1,5 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist/kovasz-varazs-frontend/browser"
-      }
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
-    }
-  ]
+  "buildCommand": "npm ci && npm run build",
+  "outputDirectory": "dist/kovasz-varazs-frontend",
+  "rewrites": [{ "source": "/(.*)", "destination": "/" }]
 }
