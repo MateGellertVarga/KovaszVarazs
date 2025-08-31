@@ -25,6 +25,7 @@ return [
         'http://10.0.2.2',
         'capacitor://localhost',
         'ionic://localhost',
+        'https://localhost',
     ],
     'allowed_origins_patterns' => [
         '^http:\/\/localhost:\d+$',
