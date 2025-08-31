@@ -24,13 +24,18 @@ export class NavbarComponent {
   @ViewChild('mobileWrap') mobileWrap?: ElementRef<HTMLElement>;
 
   menuItems = [
-    { label: 'Főoldal', path: '/home' },
-    { label: 'Termékek', path: '/products' },
-    { label: 'Rendelés', path: '/orders' },
+    { label: 'Főoldal', path: '/fooldal' },
+    { label: 'Termékek', path: '/termekek' },
+    { label: 'Rendelés', path: '/rendeles' },
   ];
 
   dropDownOpen = false;
   mobileMenuOpen = false;
+
+  logout() {
+    this.authService.logout();
+    this.router.navigate(['/fooldal']);
+  }
 
   toggleDropdown() {
     this.dropDownOpen = !this.dropDownOpen;

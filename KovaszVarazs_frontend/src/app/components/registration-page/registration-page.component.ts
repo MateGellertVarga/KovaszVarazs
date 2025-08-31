@@ -30,7 +30,7 @@ export class RegistrationPageComponent {
     if (this.validation()) {
       this.authservice.register(this.newUser).subscribe({
         next: () => {
-          this.router.navigate(['/login']);
+          this.router.navigate(['/bejelentkezes']);
         },
         error: (error: any) => {
           this.errorMessage = error.error.message;

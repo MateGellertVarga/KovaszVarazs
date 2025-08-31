@@ -32,7 +32,7 @@
         class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start"
       >
         <div class="flex shrink-0 items-center">
-          <a routerLink="/home"
+          <a routerLink="/fooldal"
             ><span class="h-8 w-auto text-2xl title">Kovászvarázs</span></a
           >
         </div>
@@ -94,7 +94,7 @@
               role="menuitem"
               tabindex="-1"
               class="block px-4 py-2 text-sm text-gray-700"
-              (click)="this.authService.logout()"
+              (click)="logout()"
               >Kijelentkezés</a
             >
             } @else {<a
@@ -102,7 +102,7 @@
               role="menuitem"
               tabindex="-1"
               class="block px-4 py-2 text-sm text-gray-700"
-              routerLink="/login"
+              routerLink="/bejelentkezes"
               >Bejelentkezés</a
             >
             }

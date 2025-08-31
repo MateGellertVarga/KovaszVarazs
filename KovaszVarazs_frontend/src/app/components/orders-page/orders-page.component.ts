@@ -9,6 +9,7 @@ import { DialogModule } from 'primeng/dialog';
 import { FormsModule } from '@angular/forms';
 import { OrderScheduleModel } from '../../../models/orderScheduleModel';
 import { OrderModalComponent } from '../order-modal/order-modal.component';
+import { Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-orders-page',
@@ -19,6 +20,7 @@ import { OrderModalComponent } from '../order-modal/order-modal.component';
     DialogModule,
     FormsModule,
     OrderModalComponent,
+    RouterLink,
   ],
   providers: [DatePipe],
   templateUrl: './orders-page.component.html',
@@ -39,6 +41,8 @@ export class OrdersPageComponent {
   showLoginHint: boolean = true;
   showInfo: boolean = true;
 
+  isDeleteDialogOpen = false;
+
   ngOnInit(): void {
     if (this.authService.loggedInUser) {
       this.dataService
@@ -50,7 +54,7 @@ export class OrdersPageComponent {
             this.showLoginHint = true;
             this.showInfo = true;
           },
-          error: (err) => {
+          error: () => {
             this.errorMessage = 'Hiba történt a rendelések betöltésekor';
             this.isLoading = false;
           },
@@ -89,9 +93,22 @@ export class OrdersPageComponent {
     this.showOrderModal = true;
   }
 
-  deleteOrder(order: OrderModel) {
-    this.dataService.deleteOrder(order.id).subscribe(() => {
-      this.orders = this.orders.filter((o) => o.id !== order.id);
+  openDelete(order: OrderModel) {
+    this.order = order;
+    this.isDeleteDialogOpen = true;
+  }
+
+  closeDelete() {
+    this.isDeleteDialogOpen = false;
+  }
+
+  confirmDelete() {
+    if (!this.order) return;
+    const toDelete = this.order;
+    this.dataService.deleteOrder(toDelete.id).subscribe(() => {
+      this.orders = this.orders.filter((o) => o.id !== toDelete.id);
+      this.isDeleteDialogOpen = false;
+      this.order = null;
     });
   }
 

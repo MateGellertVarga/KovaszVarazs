@@ -8,13 +8,13 @@ import { ForgotPasswordPageComponent } from './components/forgot-password-page/f
 import { UserPageComponent } from './components/user-page/user-page.component';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'home', pathMatch: 'full' },
-  { path: 'home', component: HomePageComponent },
-  { path: 'login', component: LoginPageComponent },
-  { path: 'registration', component: RegistrationPageComponent },
-  { path: 'forgot-password', component: ForgotPasswordPageComponent },
-  { path: 'orders', component: OrdersPageComponent },
-  { path: 'products', component: ProductsPageComponent },
+  { path: '', redirectTo: 'fooldal', pathMatch: 'full' },
+  { path: 'fooldal', component: HomePageComponent },
+  { path: 'bejelentkezes', component: LoginPageComponent },
+  { path: 'regisztracio', component: RegistrationPageComponent },
+  { path: 'elfelejtett-jelszo', component: ForgotPasswordPageComponent },
+  { path: 'rendeles', component: OrdersPageComponent },
+  { path: 'termekek', component: ProductsPageComponent },
   { path: 'user', component: UserPageComponent },
-  { path: '**', redirectTo: 'home' },
+  { path: '**', redirectTo: 'fooldal' },
 ];
