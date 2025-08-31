@@ -18,22 +18,26 @@ return [
     'paths' => ['api/*'],
     'allowed_methods' => ['*'],
     'allowed_origins' => [
-        'https://localhost:4200',
-        'http://localhost:4200',
-        'http://localhost:8100',
-        'capacitor://localhost',
-        'ionic://localhost',
+        'https://kovaszvarazs.sk',
+        'https://www.kovaszvarazs.sk',
         'http://localhost',
         'http://127.0.0.1',
         'http://10.0.2.2',
-        'https://www.kovaszvarazs.sk',
+        'capacitor://localhost',
+        'ionic://localhost',
     ],
     'allowed_origins_patterns' => [
+        '^http:\/\/localhost:\d+$',
+        '^http:\/\/127\.0\.0\.1:\d+$',
+        '^http:\/\/10\.0\.2\.2:\d+$',
         '^https?:\/\/192\.168\.\d{1,3}\.\d{1,3}(:\d+)?$',
+        '^capacitor:\/\/localhost$',
+        '^ionic:\/\/localhost$',
     ],
     'allowed_headers' => ['*'],
     'exposed_headers' => [],
     'max_age' => 0,
     'supports_credentials' => true,
+
 
 ];
