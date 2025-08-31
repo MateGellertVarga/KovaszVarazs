@@ -32,10 +32,19 @@ export class AppComponent implements OnInit {
   }
 
   async ngOnInit() {
-    await Keyboard.setScroll({ isDisabled: false });
+    try {
+      await Keyboard.setScroll({ isDisabled: false });
+    } catch {}
 
-    const user = await this.authService.getUserData();
-    if (!user || user.role !== 'admin') {
+    try {
+      await this.authService.loadUserData();
+      if (
+        !this.authService.loggedInUser ||
+        this.authService.loggedInUser.role !== 'admin'
+      ) {
+        this.router.navigate(['/tabs/login']);
+      }
+    } catch {
       this.router.navigate(['/tabs/login']);
     }
   }

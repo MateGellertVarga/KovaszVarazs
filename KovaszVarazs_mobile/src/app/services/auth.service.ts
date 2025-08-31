@@ -6,6 +6,9 @@ import { SecureStorage } from '@aparajita/capacitor-secure-storage';
 import { map, Observable, of, firstValueFrom } from 'rxjs';
 import { ConfigService } from './config.service';
 
+type LoginResponseA = { user: UserModel; token: string };
+type LoginResponseB = UserModel & { token: string };
+
 @Injectable({
   providedIn: 'root',
 })
@@ -19,14 +22,26 @@ export class AuthService {
 
   login(email: string, password: string): Observable<boolean> {
     return this.http
-      .post<LoginResponse>(`${this.configService.apiUrl}/auth/login`, {
-        email,
-        password,
-      })
+      .post<LoginResponseA | LoginResponseB>(
+        `${this.configService.apiUrl}/auth/login`,
+        { email, password }
+      )
       .pipe(
-        map((res: LoginResponse) => {
-          this.loggedInUser = res.user;
-          this.setToken(res.token);
+        map((res) => {
+          const token = (res as any).token;
+          if (!token) throw new Error('Missing token');
+
+          const user: UserModel = (res as any).user ?? {
+            id: (res as any).id,
+            name: (res as any).name,
+            email: (res as any).email,
+            phone_number: (res as any).phone_number,
+            role: (res as any).role,
+          };
+
+          this.loggedInUser = user;
+          this.storeUserData(user);
+          this.setToken(token);
           return true;
         })
       );
