@@ -1,0 +1,148 @@
+<app-navbar></app-navbar>
+
+<!-- <div class="fixed inset-0">
+  <img
+    src="background_bread.jpg"
+    alt="háttér"
+    class="w-full object-cover blur-xs"
+  />
+</div> -->
+
+<div
+  class="min-h-screen bg-gray-100 flex items-center justify-center px-2 shadow-lg"
+>
+  <div class="relative w-full max-w-md">
+    <div class="relative bg-white shadow-xl rounded-3xl px-6 py-10 sm:p-12">
+      <h1 class="text-3xl font-semibold text-center mb-6">Regisztráció</h1>
+      <form autocomplete="off" (ngSubmit)="register()" class="space-y-6">
+        <div class="relative">
+          <input
+            autocomplete="off"
+            id="name"
+            name="name"
+            type="text"
+            class="pl-4 peer placeholder-transparent h-12 w-full border-2 border-gray-300 rounded-2xl text-gray-900 focus:outline-none focus:border-[#c68958] focus:ring-2 focus:ring-[#c68958] bg-transparent transition"
+            placeholder="Név"
+            [(ngModel)]="newUser.name"
+            [formNoValidate]="true"
+          />
+          <label
+            for="email"
+            class="absolute left-4 -top-3.5 bg-white px-1 text-gray-600 text-sm pointer-events-none peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-3 transition-all peer-focus:-top-3.5 peer-focus:text-[#c68958] peer-focus:text-sm"
+            >Név</label
+          >
+        </div>
+        <div class="relative">
+          <input
+            autocomplete="off"
+            id="email"
+            name="email"
+            type="email"
+            class="pl-4 peer placeholder-transparent h-12 w-full border-2 border-gray-300 rounded-2xl text-gray-900 focus:outline-none focus:border-[#c68958] focus:ring-2 focus:ring-[#c68958] bg-transparent transition"
+            placeholder="Email"
+            [(ngModel)]="newUser.email"
+            [formNoValidate]="true"
+          />
+          <label
+            for="email"
+            class="absolute left-4 -top-3.5 bg-white px-1 text-gray-600 text-sm pointer-events-none peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-3 transition-all peer-focus:-top-3.5 peer-focus:text-[#c68958] peer-focus:text-sm"
+            >Email cím</label
+          >
+        </div>
+        <div class="relative">
+          <input
+            autocomplete="off"
+            id="phone_number"
+            name="phone_number"
+            type="text"
+            class="pl-4 peer placeholder-transparent h-12 w-full border-2 border-gray-300 rounded-2xl text-gray-900 focus:outline-none focus:border-[#c68958] focus:ring-2 focus:ring-[#c68958] bg-transparent transition"
+            placeholder="Telefonszám"
+            [(ngModel)]="newUser.phone_number"
+            [formNoValidate]="true"
+          />
+          <label
+            for="phone_number"
+            class="absolute left-4 -top-3.5 bg-white px-1 text-gray-600 text-sm pointer-events-none peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-3 transition-all peer-focus:-top-3.5 peer-focus:text-[#c68958] peer-focus:text-sm"
+            >Telefonszám</label
+          >
+        </div>
+        <div class="relative">
+          <input
+            autocomplete="off"
+            id="password"
+            name="password"
+            [type]="showPassword ? 'text' : 'password'"
+            class="pl-4 peer placeholder-transparent h-12 w-full border-2 border-gray-300 rounded-2xl text-gray-900 focus:outline-none focus:border-[#c68958] focus:ring-2 focus:ring-[#c68958] bg-transparent transition"
+            placeholder="Jelszó"
+            [(ngModel)]="newUser.password"
+            [formNoValidate]="true"
+          />
+          <label
+            for="password"
+            class="absolute left-4 -top-3.5 bg-white px-1 text-gray-600 text-sm pointer-events-none peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-3 transition-all peer-focus:-top-3.5 peer-focus:text-[#c68958] peer-focus:text-sm"
+            >Jelszó</label
+          >
+          <button
+            type="button"
+            (click)="showPassword = !showPassword"
+            class="absolute right-2 top-3 text-gray-400 hover:text-[#c68958] focus:outline-none"
+            tabindex="-1"
+            aria-label="Jelszó mutatása/elrejtése"
+          >
+            <i class="pi {{ showPassword ? 'pi-eye-slash' : 'pi-eye' }}"></i>
+          </button>
+        </div>
+        <div class="relative">
+          <input
+            autocomplete="off"
+            id="passwordAgain"
+            name="passwordAgain"
+            [type]="showPasswordAgain ? 'text' : 'password'"
+            class="pl-4 peer placeholder-transparent h-12 w-full border-2 border-gray-300 rounded-2xl text-gray-900 focus:outline-none focus:border-[#c68958] focus:ring-2 focus:ring-[#c68958] bg-transparent transition"
+            placeholder="Jelszó"
+            [(ngModel)]="passwordAgain"
+            [formNoValidate]="true"
+          />
+          <label
+            for="passwordAgain"
+            class="absolute left-4 -top-3.5 bg-white px-1 text-gray-600 text-sm pointer-events-none peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-3 transition-all peer-focus:-top-3.5 peer-focus:text-[#c68958] peer-focus:text-sm"
+            >Jelszó újra</label
+          >
+          <button
+            type="button"
+            (click)="showPasswordAgain = !showPasswordAgain"
+            class="absolute right-2 top-3 text-gray-400 hover:text-[#c68958] focus:outline-none"
+            tabindex="-1"
+            aria-label="Jelszó mutatása/elrejtése"
+          >
+            <i
+              class="pi {{ showPasswordAgain ? 'pi-eye-slash' : 'pi-eye' }}"
+            ></i>
+          </button>
+        </div>
+        <div class="flex justify-center mt-2">
+          <button
+            type="submit"
+            class="bg-[#c68958] text-white rounded-lg px-8 py-2 font-semibold shadow hover:bg-[#a96e34] transition"
+          >
+            Regisztráció
+          </button>
+        </div>
+        <div class="flex justify-center gap-4 mt-2">
+          <a
+            routerLink="/bejelentkezes"
+            class="rounded-full border border-[#c68958] text-[#c68958] px-4 py-1 font-semibold hover:bg-[#c68958] hover:text-white transition shadow-sm text-sm"
+            >Bejelentkezés</a
+          >
+        </div>
+        @if (errorMessage) {
+        <div
+          class="text-center text-red-500 text-lg font-bold min-h-[1.5rem] break-keep"
+        >
+          {{ errorMessage }}
+        </div>
+        }
+      </form>
+    </div>
+  </div>
+</div>

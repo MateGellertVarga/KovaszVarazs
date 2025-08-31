@@ -1,0 +1,313 @@
+@if (!successfullySent) {
+<div class="flex flex-col h-[620px]">
+  <div class="flex-shrink-0 flex justify-center items-center py-3 bg-white">
+    <h2 class="text-2xl font-bold text-[#c68958]">
+      {{ stepTitles[displayedStep] }}
+    </h2>
+  </div>
+
+  @if (errorMessage) {
+  <div
+    class="mb-4 text-center bg-red-100 text-red-700 font-semibold rounded-lg py-2 px-4 shadow"
+  >
+    {{ errorMessage }}
+  </div>
+  }
+  <div class="flex-1 overflow-hidden relative bg-white">
+    <div
+      *ngFor="let idx of [0, 1, 2, 3]; let i = index"
+      [ngClass]="{
+        'absolute inset-0 w-full h-full transition-all duration-500 ease-in-out': true,
+        'opacity-0 pointer-events-none translate-x-full': displayedStep < i,
+        'opacity-0 pointer-events-none -translate-x-full': displayedStep > i,
+        'opacity-100 pointer-events-auto translate-x-0': displayedStep === i
+      }"
+    >
+      <div class="h-full flex flex-col">
+        <div class="flex-1 overflow-y-auto px-3 py-4">
+          <!-- Step 1 -->
+          @if (i === 0 && !isLoading) { @for (schedule of
+          availableOrderSchedules; track schedule.id) {
+          <div class="flex justify-center mt-10">
+            <button
+              type="button"
+              (click)="selectOrderSchedule(schedule)"
+              [class]="
+                'w-full max-w-xs rounded-3xl shadow-lg border px-6 py-4 flex items-center justify-between mb-4 transition ' +
+                (selectedOrderSchedule?.id === schedule.id
+                  ? 'border-[#c68958] bg-[#f8eada]'
+                  : 'border-gray-200 bg-white hover:border-[#c68958]/60')
+              "
+            >
+              <span class="font-bold text-lg text-gray-900">
+                {{ schedule.available_date | date : "yyyy.MM.dd EEEE" }}
+              </span>
+              <span
+                class="w-5 h-5 rounded-full border-2"
+                [class]="
+                  selectedOrderSchedule?.id === schedule.id
+                    ? 'border-[#c68958] bg-[#c68958]'
+                    : 'border-gray-300 bg-white'
+                "
+              ></span>
+            </button>
+          </div>
+          } }
+
+          <!-- Step 2 -->
+          @if (i === 1 && selectedOrderSchedule) {
+          <div class="flex flex-col gap-3 items-center">
+            @for (item of selectedOrderSchedule!.products; track item.id) {
+            <div
+              class="w-full max-w-xs rounded-3xl shadow-lg border border-[#c68958] p-4 flex bg-[#f8eada]/40"
+            >
+              <div
+                class="flex-shrink-0 flex items-center justify-center w-24 h-40 rounded-2xl overflow-hidden bg-gray-200 mr-4"
+              >
+                <img
+                  [src]="item.image_url"
+                  class="object-cover w-full h-full"
+                  style="aspect-ratio: 9/16"
+                />
+              </div>
+              <div
+                class="flex flex-col items-center justify-center h-40 flex-1"
+              >
+                <span class="font-bold text-lg text-gray-900 mb-2">
+                  {{ item.product_name }}
+                </span>
+                @if (getProductRemaining(item.id) == 0) {
+                <span class="text-red-500 text-sm mb-1">
+                  Sajnos ez a termék már elfogyott!
+                </span>
+                } @else {
+                <div class="flex items-center gap-2 mb-1 mt-1">
+                  <button
+                    type="button"
+                    class="w-8 h-8 font-bold text-xl bg-[#c68958] text-white rounded-full flex items-center justify-center"
+                    (click)="decreaseQuantity(item.id)"
+                  >
+                    <span class="pi pi-minus"></span>
+                  </button>
+                  <input
+                    type="number"
+                    name="quantity"
+                    class="w-10 h-8 text-center border rounded-md appearance-none outline-none hide-spin text-lg"
+                    [value]="productQuantities[item.id]"
+                    (change)="onQuantityChange(item.id, $event)"
+                    [max]="getProductRemaining(item.id)"
+                    min="0"
+                  />
+                  <button
+                    type="button"
+                    class="w-8 h-8 font-bold text-xl bg-[#c68958] text-white rounded-full flex items-center justify-center"
+                    (click)="increaseQuantity(item.id)"
+                    [disabled]="
+                      productQuantities[item.id] >= getProductRemaining(item.id)
+                    "
+                  >
+                    <span class="pi pi-plus"></span>
+                  </button>
+                </div>
+                } @if (getProductRemaining(item.id) > 0) {
+                <span class="text-gray-500 text-sm mb-1 mt-2">
+                  Elérhető: {{ getProductRemaining(item.id) }} db
+                </span>
+                }
+              </div>
+            </div>
+            }
+          </div>
+          }
+
+          <!-- Step 3 -->
+          @if (i === 2) {
+          <div class="flex flex-col gap-4 max-w-xs mx-auto mt-10">
+            <div class="relative">
+              <input
+                autocomplete="off"
+                id="order-name"
+                name="order-name"
+                type="text"
+                class="pl-4 peer placeholder-transparent h-12 w-full border-2 border-gray-300 rounded-2xl text-gray-900 focus:outline-none focus:border-[#c68958] focus:ring-2 focus:ring-[#c68958] bg-transparent transition"
+                placeholder="Név"
+                [(ngModel)]="order!.customer_name"
+                [disabled]="this.authService.loggedInUser != null"
+              />
+              <label
+                for="order-name"
+                class="absolute left-4 -top-3.5 bg-white px-1 text-gray-600 text-sm pointer-events-none peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-3 transition-all peer-focus:-top-3.5 peer-focus:text-[#c68958] peer-focus:text-sm"
+                >Név</label
+              >
+            </div>
+            <div class="relative">
+              <input
+                autocomplete="off"
+                id="order-phone"
+                name="order-phone"
+                type="tel"
+                class="pl-4 peer placeholder-transparent h-12 w-full border-2 border-gray-300 rounded-2xl text-gray-900 focus:outline-none focus:border-[#c68958] focus:ring-2 focus:ring-[#c68958] bg-transparent transition appearance-none outline-none hide-spin"
+                placeholder="Telefonszám"
+                [(ngModel)]="order!.phone_number"
+                [disabled]="this.authService.loggedInUser != null"
+              />
+              <label
+                for="order-phone"
+                class="absolute left-4 -top-3.5 bg-white px-1 text-gray-600 text-sm pointer-events-none peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-3 transition-all peer-focus:-top-3.5 peer-focus:text-[#c68958] peer-focus:text-sm"
+                >Telefonszám (opcionális)</label
+              >
+            </div>
+            <div class="relative">
+              <textarea
+                id="order-note"
+                name="order-note"
+                type="text"
+                class="pl-4 peer placeholder-transparent h-16 w-full border-2 border-gray-300 rounded-2xl text-gray-900 focus:outline-none focus:border-[#c68958] focus:ring-2 focus:ring-[#c68958] bg-transparent transition pt-2"
+                placeholder="Megjegyzés"
+                [(ngModel)]="order!.note"
+                rows="2"
+              >
+              </textarea>
+              <label
+                for="order-note"
+                class="absolute left-4 -top-3.5 bg-white px-1 text-gray-600 text-sm pointer-events-none peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-3 transition-all peer-focus:-top-3.5 peer-focus:text-[#c68958] peer-focus:text-sm"
+                >Megjegyzés (opcionális)</label
+              >
+            </div>
+          </div>
+          }
+
+          <!-- Step 4 -->
+          @if (i === 3) {
+          <div class="flex flex-col gap-4 max-w-xs mx-auto">
+            <div
+              class="rounded-2xl shadow border p-4 mb-2 bg-[#f8eada]/40 mt-6"
+            >
+              <div class="font-semibold text-[#c68958] mb-1">Adatok</div>
+              <div class="flex gap-2 mb-1">
+                <span class="w-24 text-gray-600">Név:</span>
+                <span>{{ order!.customer_name }}</span>
+              </div>
+              @if (order?.phone_number != "") {
+              <div class="flex gap-2 mb-1">
+                <span class="w-24 text-gray-600">Telefonszám:</span>
+                <span>{{ order?.phone_number }}</span>
+              </div>
+              } @if (order?.note != "") {
+              <div class="flex gap-2 mb-1">
+                <span class="w-24 text-gray-600">Megjegyzés:</span>
+                <span>{{ order!.note }}</span>
+              </div>
+              }
+            </div>
+            <div class="bg-[#f8eada]/40 rounded-2xl shadow border p-4">
+              <div class="font-semibold text-[#c68958] mb-1">Termékek</div>
+              @for (product of order?.order_items; track product.product_id) {
+              <div class="flex justify-between">
+                <span>{{ product.product_name }}</span>
+                <span>{{ product.quantity }} db</span>
+              </div>
+              }
+              <div
+                class="flex justify-end border-t mt-2 pt-2 text-lg font-bold text-[#c68958]"
+              >
+                Összesen: {{ getOrderTotal() | number : "1.0-2" }} €
+              </div>
+            </div>
+
+            <div class="flex justify-center mt-4">
+              <button
+                class="bg-[#c68958] hover:bg-[#a96e34] text-white rounded-2xl px-6 py-3 font-bold shadow transition"
+                (click)="save()"
+              >
+                Küldés
+              </button>
+            </div>
+          </div>
+          } @else if (isLoading) {
+          <div class="w-full flex justify-center items-center mt-4">
+            <img src="loading.gif" alt="Loading..." />
+          </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Bottom navigation and step indicators -->
+  <div
+    class="flex-shrink-0 w-full flex items-center justify-between gap-2 px-2 py-3 bg-white"
+  >
+    <button
+      type="button"
+      class="rounded-full shadow bg-[#c68958] px-4 py-2 mr-4"
+      [disabled]="orderStep === 0 || isLoading"
+      (click)="prevOrderStep()"
+    >
+      <span class="pi pi-angle-left text-2xl text-white"></span>
+    </button>
+    <div class="flex-1 flex flex-col items-center min-w-0">
+      <div
+        class="flex justify-center items-center gap-2 sm:gap-4 w-full max-w-xs mx-auto"
+      >
+        <ng-container *ngFor="let i of steps; let last = last">
+          <div class="flex flex-col items-center flex-1 min-w-0">
+            <button
+              type="button"
+              class="w-9 h-9 sm:w-11 sm:h-11 rounded-full border-2 flex items-center justify-center transition-all duration-200 font-bold text-lg sm:text-xl z-10 border-[#c68958] shadow"
+              [class.bg-[#c68958]]="orderStep === i"
+              [class.text-white]="orderStep === i"
+              [class.bg-[#f8eada]]="orderStep > i"
+              [class.text-black]="orderStep !== i"
+              [class.bg-white]="orderStep < i"
+              [class.opacity-70]="orderStep < i"
+              [class.shadow-lg]="orderStep === i"
+              (click)="goToStep(i)"
+            >
+              {{ i + 1 }}
+            </button>
+
+            <div
+              *ngIf="stepTitles[i]"
+              class="text-xs sm:text-sm mt-1 text-[#c68958] font-medium whitespace-nowrap truncate max-w-[72px] text-center"
+            >
+              {{ stepTitles[i] }}
+            </div>
+          </div>
+          <div *ngIf="!last" class="flex-1 h-1 bg-[#f8eada] mx-1"></div>
+        </ng-container>
+      </div>
+    </div>
+    <button
+      type="button"
+      class="rounded-full shadow bg-[#c68958] px-4 py-2 ml-4"
+      (click)="nextOrderStep()"
+      [disabled]="orderStep === steps.length - 1 || isLoading"
+    >
+      <span class="pi pi-angle-right text-2xl text-white"></span>
+    </button>
+  </div>
+</div>
+} @else {
+<div class="flex flex-col items-center justify-center h-full">
+  <div class="text-center text-2xl font-bold text-green-600 mb-4 fade-in">
+    Rendelés sikeresen elküldve!
+  </div>
+
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    class="w-20 h-20 text-green-600"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+    stroke-width="2"
+  >
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      d="M5 13l4 4L19 7"
+      class="animate-check"
+    />
+  </svg>
+</div>
+
+}

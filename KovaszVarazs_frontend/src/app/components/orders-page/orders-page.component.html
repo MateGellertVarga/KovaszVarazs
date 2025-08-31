@@ -1,0 +1,202 @@
+<app-navbar></app-navbar>
+
+<div class="mx-auto px-2 pt-4">
+  @if (this.authService.loggedInUser && !this.isLoading && orders.length > 0) {
+  <div class="flex justify-center">
+    <h2 class="text-2xl font-bold text-[#c68958] mb-6 mt-4">
+      Aktív rendeléseim
+    </h2>
+  </div>
+  <div
+    class="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 justify-center mb-8"
+  >
+    @for (order of orders; track order.id) {
+    <div
+      class="bg-white rounded-3xl shadow-lg border border-gray-200 p-6 flex flex-col gap-2 w-xs mx-auto mb-4"
+    >
+      <div class="flex justify-center items-center mb-1">
+        <div>
+          <div class="text-lg font-bold text-gray-800 text-center">
+            {{ order.order_schedule_date | date : "yyyy.MM.dd EEEE" }}
+          </div>
+        </div>
+      </div>
+      <div class="mt-2 space-y-1">
+        @for (item of order.order_items; track item.product_id) {
+        <div class="flex justify-between text-base">
+          <span>{{ item.product_name }}</span>
+          <span class="font-semibold">{{ item.quantity }} db</span>
+        </div>
+        }
+      </div>
+      <div class="flex justify-center mt-2">
+        <span class="text-lg font-bold text-gray-900"
+          >Összesen: {{ order.total_price | number : "1.0-2" }} €</span
+        >
+      </div>
+      <div class="flex justify-center gap-20 mt-4">
+        <button
+          (click)="editOrder(order)"
+          class="rounded-full bg-[#c68958] text-white px-6 py-2 text-xl hover:bg-[#a96e34] shadow transition flex items-center justify-center"
+          aria-label="Szerkesztés"
+        >
+          <span class="pi pi-pencil"></span>
+        </button>
+        <button
+          (click)="openDelete(order)"
+          class="rounded-full bg-red-100 text-red-700 px-6 py-2 text-xl hover:bg-red-200 shadow transition flex items-center justify-center"
+          aria-label="Törlés"
+        >
+          <span class="pi pi-trash"></span>
+        </button>
+      </div>
+    </div>
+    }
+  </div>
+  } @if (!this.authService.loggedInUser && showLoginHint) {
+  <div class="flex justify-center">
+    <div
+      class="relative inline-flex items-center gap-2 rounded-xl bg-[#fff7ec] ring-1 ring-black/5 px-4 py-2 text-[#7a5334] mb-4 animate-fadeInUp"
+    >
+      <button
+        type="button"
+        (click)="dismiss('login')"
+        aria-label="Bezárás"
+        class="absolute top-1 right-1 rounded-full bg-[#fff7ec] text-[#7a5334] flex items-center justify-center"
+      >
+        <span class="pi pi-times text-xs"></span>
+      </button>
+      <span class="pi pi-lock"></span>
+      <span class="text-sm">
+        Bejelentkezve kezelheted leadott rendeléseidet.
+        <a
+          [routerLink]="['/bejelentkezes']"
+          class="text-[#c68958] underline hover:no-underline cursor-pointer mr-2"
+          >Bejelentkezés</a
+        >
+      </span>
+    </div>
+  </div>
+  } @if (showInfo) {
+  <div class="flex justify-center">
+    <div
+      class="relative inline-flex items-start gap-3 rounded-2xl bg-white ring-1 ring-[#c68958]/30 px-5 py-4 text-[#7a5334] max-w-2xl mb-6 animate-fadeInUp"
+    >
+      <button
+        type="button"
+        (click)="dismiss('info')"
+        aria-label="Bezárás"
+        class="absolute top-2 right-2 size-4 rounded-full bg-white text-[#7a5334] flex items-center justify-center"
+      >
+        <span class="pi pi-times text-xs"></span>
+      </button>
+      <span class="pi pi-info-circle mt-0.5 text-lg text-[#c68958]"></span>
+      <div class="text-sm leading-relaxed">
+        <div class="font-semibold text-[#7a5334]">Kovászvarázs</div>
+        <div>
+          Természetes kovász, valódi ízek. Frissen sütve, pár kattintással az
+          asztalodra.
+        </div>
+        <div class="mt-1 text-gray-700">
+          Kérjük, lehetőség szerint legalább <b>2 nappal előre</b> add le a
+          rendelésed.
+        </div>
+      </div>
+    </div>
+  </div>
+  }
+
+  <div class="flex justify-center mb-8">
+    <button
+      class="flex items-center gap-2 bg-gradient-to-r from-[#c68958] to-[#a96e34] hover:from-[#a96e34] hover:to-[#7a5334] text-white text-lg font-semibold rounded-full px-10 py-4 shadow-lg shadow-[#c68958]/40 transition transform hover:scale-105 active:scale-95 animate-fadeInUp"
+      (click)="newOrder()"
+    >
+      <span class="text-2xl font-bold">+</span>
+      Új rendelés
+    </button>
+  </div>
+
+  @if (isDeleteDialogOpen) {
+  <dialog
+    open
+    class="fixed inset-0 z-[1000] size-auto max-h-none max-w-none overflow-y-auto bg-transparent backdrop:bg-transparent"
+  >
+    <div class="fixed inset-0 bg-black/60"></div>
+    <div
+      tabindex="0"
+      class="flex min-h-full items-center justify-center p-4 text-center focus:outline-none sm:items-center sm:p-0"
+    >
+      <div
+        class="relative overflow-hidden rounded-lg bg-white text-left shadow-xl outline outline-gray-200 sm:my-8 sm:w-full sm:max-w-lg"
+      >
+        <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+          <div class="sm:flex sm:items-start">
+            <div
+              class="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:size-10"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                aria-hidden="true"
+                class="size-6 text-red-600"
+              >
+                <path
+                  d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </div>
+            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+              <h3 class="text-base font-semibold text-black">
+                Rendelés törlése
+              </h3>
+              <div class="mt-2">
+                <p class="text-sm text-black">
+                  Biztosan törlöd ezt a rendelést? Ez a művelet nem
+                  visszavonható.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+          <button
+            type="button"
+            class="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white hover:bg-red-500 sm:ml-3 sm:w-auto"
+            (click)="confirmDelete()"
+          >
+            Törlés
+          </button>
+          <button
+            type="button"
+            class="mt-3 inline-flex w-full justify-center rounded-md bg-[#c68958] px-3 py-2 text-sm font-semibold text-white hover:bg-[#b67948] sm:mt-0 sm:w-auto"
+            (click)="closeDelete()"
+          >
+            Mégse
+          </button>
+        </div>
+      </div>
+    </div>
+  </dialog>
+  } @if (showOrderModal) {
+  <p-dialog
+    [modal]="true"
+    [(visible)]="showOrderModal"
+    [showHeader]="true"
+    [dismissableMask]="false"
+    [closable]="true"
+    [style]="{ width: '98%', maxWidth: '460px' }"
+    [contentStyle]="{ height: '620px', padding: '0' }"
+    (onHide)="closeOrderModal()"
+  >
+    <app-order-modal
+      [order]="order"
+      (saved)="saveOrder($event)"
+      (canceled)="closeOrderModal()"
+    ></app-order-modal>
+  </p-dialog>
+  }
+</div>
