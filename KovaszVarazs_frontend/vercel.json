@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npm ci && npm run build",
-  "outputDirectory": "dist/kovasz-varazs-frontend",
+  "buildCommand": "npm i && npm run build",
+  "outputDirectory": "dist/kovasz-varazs-frontend/browser",
   "rewrites": [{ "source": "/(.*)", "destination": "/" }]
 }
