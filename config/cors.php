@@ -26,6 +26,7 @@ return [
         'capacitor://localhost',
         'ionic://localhost',
         'https://localhost',
+        'https://kovaszvarazs.vercel.app'
     ],
     'allowed_origins_patterns' => [],
     'allowed_headers' => ['*'],
