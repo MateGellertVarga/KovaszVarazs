@@ -1,5 +1,11 @@
 {
-  "buildCommand": "npm i && npm run build",
+  "buildCommand": "npm install && npm run build",
   "outputDirectory": "dist/kovasz-varazs-frontend/browser",
-  "rewrites": [{ "source": "/(.*)", "destination": "/" }]
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "https://kovaszvarazs-backend-bhsorj.laravel.cloud/api/$1"
+    },
+    { "source": "/(.*)", "destination": "/" }
+  ]
 }
