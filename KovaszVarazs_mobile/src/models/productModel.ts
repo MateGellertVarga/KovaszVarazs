@@ -5,5 +5,7 @@ export interface ProductModel {
   image_url: string;
   category: string;
   is_used: boolean;
+  allergens: string;
+  description: string;
   deleted_at?: Date;
 }

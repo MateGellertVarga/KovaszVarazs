@@ -113,6 +113,8 @@ export class Products {
       image_url: '',
       category: '',
       is_used: true,
+      allergens: '',
+      description: '',
     };
     this.modalNavbarService.openModal();
   }

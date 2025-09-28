@@ -57,6 +57,8 @@ export class ProductModalComponent implements OnInit {
       formData.append('price', this.product.price.toString());
       formData.append('category', this.product.category ?? '');
       formData.append('is_used', this.product.is_used ? '1' : '0');
+      formData.append('allergens', this.product.allergens ?? '');
+      formData.append('description', this.product.description ?? '');
       if (this.selectedFile) {
         formData.append('image', this.selectedFile);
       }
