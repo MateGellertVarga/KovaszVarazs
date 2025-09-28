@@ -2,8 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ConfigService } from './config.service';
 import { UserModel } from '../../models/userModel';
-import { Observable, firstValueFrom } from 'rxjs';
-import { switchMap, tap, map } from 'rxjs/operators';
+import { Observable, firstValueFrom, of } from 'rxjs';
+import { switchMap, tap, map, catchError } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -67,7 +67,7 @@ export class AuthService {
       const user = await firstValueFrom(
         this.http.get<UserModel>(`${this.configService.apiUrl}/auth/me`)
       );
-      this.loggedInUser = user;
+      this.loggedInUser = user ?? null;
     } catch {
       this.loggedInUser = null;
     }

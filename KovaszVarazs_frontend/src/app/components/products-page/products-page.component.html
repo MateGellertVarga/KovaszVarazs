@@ -47,6 +47,18 @@
               <p class="text-gray-900 text-lg text-center">
                 {{ product.price | number : "1.0-2" }} €/db
               </p>
+              @if (product.allergens) {
+              <p
+                class="text-gray-700 text-sm text-center mt-3.5 wrap-break-word"
+              >
+                Allergének:
+                {{ product.allergens }}
+              </p>
+              } @if (product.description) {
+              <p class="text-gray-700 text-sm text-center mt-1 wrap-break-word">
+                Megjegyzés: {{ product.description }}
+              </p>
+              }
             </div>
           </div>
         </div>
