@@ -21,6 +21,7 @@ return [
         'https://kovaszvarazs.sk',
         'https://www.kovaszvarazs.sk',
         'http://localhost',
+        'http://localhost:8100',
         'http://127.0.0.1',
         'http://10.0.2.2',
         'capacitor://localhost',

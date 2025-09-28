@@ -11,7 +11,7 @@ class Product extends Model
     /** @use HasFactory<\Database\Factories\ProductFactory> */
     use HasFactory, SoftDeletes;
     public $timestamps = false;
-    protected $fillable = ['name', 'price', 'image_url', 'category', 'is_used'];
+    protected $fillable = ['name', 'price', 'image_url', 'category', 'is_used', 'allergens', 'description'];
 
     public function orderItems()
     {

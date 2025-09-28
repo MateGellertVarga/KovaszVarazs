@@ -19,6 +19,8 @@ class UpdateProductRequest extends FormRequest
             'image' => 'sometimes|image|mimes:jpeg,png,jpg,gif,svg|max:5000',
             'category' => 'sometimes|string',
             'is_used' => 'sometimes|boolean',
+            'allergens' => 'sometimes|string|nullable',
+            'description' => 'sometimes|string|nullable',
         ];
     }
 
@@ -32,6 +34,8 @@ class UpdateProductRequest extends FormRequest
             'image.max'      => 'Kép mérete túl nagy',
             'category.string'   => 'Kategória formátuma nem megfelelő',
             'is_used.boolean'  => 'Használati állapot formátuma nem megfelelő',
+            'allergens.string'   => 'Allergének formátuma nem megfelelő',
+            'description.string'   => 'Leírás formátuma nem megfelelő',
         ];
     }
 }

@@ -30,6 +30,8 @@ class ProductController extends Controller
             'image_url' => $imageUrl,
             'category' => $request->category,
             'is_used' => $request->is_used,
+            'allergens' => $request->allergens,
+            'description' => $request->description,
         ]);
 
         return response()->json($product, 201);
@@ -68,6 +70,12 @@ class ProductController extends Controller
 
         if ($request->has('is_used')) {
             $product->is_used = $request->is_used;
+        }
+        if ($request->has('allergens')) {
+            $product->allergens = $request->allergens;
+        }
+        if ($request->has('description')) {
+            $product->description = $request->description;
         }
 
         $product->save();

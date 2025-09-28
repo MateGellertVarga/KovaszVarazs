@@ -18,6 +18,8 @@ return new class extends Migration
             $table->string('image_url')->nullable();
             $table->string('category');
             $table->boolean('is_used');
+            $table->string('allergens')->nullable();
+            $table->string('description')->nullable();
             $table->softDeletes();
         });
     }
