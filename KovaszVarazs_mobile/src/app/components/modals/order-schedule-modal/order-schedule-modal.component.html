@@ -3,8 +3,8 @@
   class="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 backdrop-blur-lg z-[9999] pointer-events-auto"
 >
   <div
-    class="p-6 bg-white border-2 border-black rounded-lg shadow-lg w-[96%] max-w-lg absolute left-1/2 transform -translate-x-1/2 overflow-y-auto max-h-[80vh]"
-    [style.top.px]="scrollY + viewportHeight / 10"
+    class="p-6 bg-white border-2 border-black rounded-lg shadow-lg w-[96%] max-w-lg absolute left-1/2 transform -translate-x-1/2 overflow-y-auto h-[90vh]"
+    [style.top.px]="scrollY + viewportHeight / 50"
   >
     <h2 class="text-2xl font-bold mb-4 text-center">
       {{
@@ -41,12 +41,12 @@
           [(ngModel)]="orderSchedule.note"
           (focus)="scrollIntoView($event)"
           placeholder="Opcionális"
-          rows="2"
+          rows="1"
         ></textarea>
       </div>
       <div>
         <label class="block font-medium mb-1 text-gray-700">Termékek</label>
-        <div class="space-y-2 max-h-48 overflow-y-auto pr-1">
+        <div class="space-y-2 h-[45vh] overflow-y-auto pr-1">
           @for (product of products; track $index) {
           <div class="flex items-center justify-between border p-2 rounded-md">
             <span>{{ product.name }}</span>

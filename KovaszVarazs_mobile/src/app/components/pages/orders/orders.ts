@@ -1,4 +1,11 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { CommonModule, DatePipe, registerLocaleData } from '@angular/common';
 import localeHu from '@angular/common/locales/hu';
 import {
@@ -21,6 +28,7 @@ import {
   IonRefresherContent,
   IonRefresher,
   IonSearchbar,
+  IonLabel,
 } from '@ionic/angular/standalone';
 import { DataService } from 'src/app/services/data.service';
 import { OrderModel } from 'src/models/orderModel';
@@ -35,6 +43,7 @@ import { ConfigService } from 'src/app/services/config.service';
   selector: 'orders',
   templateUrl: 'orders.html',
   imports: [
+    IonLabel,
     CommonModule,
     IonSearchbar,
     IonRefresher,
@@ -71,10 +80,20 @@ export default class Orders {
     registerLocaleData(localeHu);
   }
 
+  @ViewChild('orderListContainer')
+  orderListContainer!: ElementRef<HTMLDivElement>;
+  @ViewChild('nameListContainer')
+  nameListContainer!: ElementRef<HTMLDivElement>;
+
+  private observer: IntersectionObserver | null = null;
+  private isClickScrolling = false;
+
   isLoading: boolean = true;
   orderSchedules: OrderScheduleModel[] = [];
   allOrders: OrderModel[] = [];
   orders: OrderModel[] = [];
+  names: string[] = [];
+  activeName: string = '';
   currentOrderSchedule: OrderScheduleModel | null = null;
   editingOrder: OrderModel | null = null;
   orderSummary: { product_name: string; totalQuantity: number }[] = [];
@@ -126,6 +145,7 @@ export default class Orders {
 
         if (this.currentOrderSchedule) {
           this.loadOrdersForCurrentSchedule();
+          this.refreshObserver();
         } else {
           console.error('Nincs egyetlen elérhető sütési nap sem!');
           this.isLoading = false;
@@ -138,12 +158,15 @@ export default class Orders {
     });
   }
 
-  // ionViewWillLeave() {
-  //   if (this.channel) {
-  //     this.channel.stopListening('.orders.changed');
-  //     this.channel == null;
-  //   }
-  // }
+  ionViewWillLeave() {
+    if (this.observer) {
+      this.observer.disconnect();
+    }
+    //   if (this.channel) {
+    //     this.channel.stopListening('.orders.changed');
+    //     this.channel == null;
+    //   }
+  }
 
   loadOrdersForCurrentSchedule() {
     this.dataService
@@ -152,9 +175,10 @@ export default class Orders {
         next: (orders) => {
           this.allOrders = orders;
           this.orders = [...orders];
-          this.isLoading = false;
           this.sortOrders();
+          this.isLoading = false;
           this.calculateSummary();
+          this.refreshObserver();
         },
         error: (err) => {
           console.error(err);
@@ -203,14 +227,26 @@ export default class Orders {
         ? statusDiff
         : a.customer_name!.localeCompare(b.customer_name!);
     });
+    this.names = [];
+    this.orders.forEach((o) => {
+      if (o.customer_name) {
+        this.names.push(o.customer_name);
+      }
+    });
   }
 
   searchOrders(event: Event) {
     const target = event.target as HTMLIonSearchbarElement;
     const query = target.value?.toLowerCase() || '';
+
     this.orders = this.allOrders.filter((d) =>
       d.customer_name!.toLowerCase().includes(query)
     );
+    this.names = this.allOrders
+      .filter((d) => d.customer_name!.toLowerCase().includes(query))
+      .map((d) => d.customer_name!)
+      .sort((a, b) => a.localeCompare(b));
+    this.refreshObserver();
   }
 
   newOrder() {
@@ -262,6 +298,10 @@ export default class Orders {
       this.editingOrder = null;
       this.sortOrders();
       this.calculateSummary();
+      this.names = this.orders
+        .map((o) => o.customer_name!)
+        .sort((a, b) => a.localeCompare(b));
+      this.refreshObserver();
     }
   }
 
@@ -292,12 +332,98 @@ export default class Orders {
             this.orders.splice(index, 1);
             this.changeDetectorRef.detectChanges();
             this.calculateSummary();
+            this.names = this.orders
+              .map((o) => o.customer_name!)
+              .sort((a, b) => a.localeCompare(b));
+            this.refreshObserver();
           }
         },
         error: (err) => {
           console.error('Törlés sikertelen:', err);
         },
       });
+    }
+  }
+
+  private setupIntersectionObserver() {
+    if (!this.orderListContainer) return;
+
+    const options = {
+      root: this.orderListContainer.nativeElement,
+      rootMargin: '-30% 0px -50% 0px',
+      threshold: 0,
+    };
+
+    this.observer = new IntersectionObserver((entries) => {
+      if (this.isClickScrolling) return;
+
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const customerName = entry.target.getAttribute('data-customer-name');
+          if (customerName && this.activeName !== customerName) {
+            this.activeName = customerName;
+            this.changeDetectorRef.detectChanges();
+            this.scrollNameListToActive();
+          }
+        }
+      });
+    }, options);
+    this.changeDetectorRef.detectChanges();
+    setTimeout(() => {
+      const cards =
+        this.orderListContainer.nativeElement.querySelectorAll(
+          '.order-card-item'
+        );
+      cards.forEach((card) => this.observer?.observe(card));
+    }, 100);
+  }
+
+  refreshObserver() {
+    if (this.observer) {
+      this.observer.disconnect();
+      this.observer = null;
+    }
+    setTimeout(() => {
+      this.setupIntersectionObserver();
+    }, 200);
+  }
+
+  private scrollNameListToActive() {
+    if (!this.nameListContainer) return;
+    const items =
+      this.nameListContainer.nativeElement.querySelectorAll('ion-item');
+    let targetItem: HTMLElement | null = null;
+
+    items.forEach((item: any) => {
+      if (item.textContent?.trim() === this.activeName) {
+        targetItem = item;
+      }
+    });
+
+    if (targetItem) {
+      (targetItem as HTMLElement).scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+      });
+    }
+  }
+
+  scrollToOrder(customerName: string) {
+    this.activeName = customerName;
+    const targetOrder = this.orders.find(
+      (o) => o.customer_name === customerName
+    );
+
+    if (targetOrder) {
+      const element = document.getElementById('order-' + targetOrder.id);
+
+      if (element) {
+        this.isClickScrolling = true;
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setTimeout(() => {
+          this.isClickScrolling = false;
+        }, 600);
+      }
     }
   }
 
@@ -356,6 +482,9 @@ export default class Orders {
       product_name,
       totalQuantity: data.totalQuantity,
     }));
+    this.orderSummary.sort((a, b) =>
+      a.product_name.localeCompare(b.product_name)
+    );
 
     this.orders.forEach((order) => {
       if (order.status === 'completed') {

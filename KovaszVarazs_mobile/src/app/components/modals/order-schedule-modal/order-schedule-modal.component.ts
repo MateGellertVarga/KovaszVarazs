@@ -59,7 +59,7 @@ export class OrderScheduleModalComponent implements OnInit {
     this.dataService.getProducts().subscribe({
       next: (result: ProductModel[]) => {
         this.products = result.filter((product) => product.is_used);
-        this.sortProducts();
+        this.products.sort((a, b) => a.name.localeCompare(b.name));
         this.isLoading = false;
       },
       error: (err) => {
@@ -73,29 +73,29 @@ export class OrderScheduleModalComponent implements OnInit {
     this.initProductMaxQuantities();
   }
 
-  sortProducts() {
-    const categoryOrder: Record<string, number> = {
-      Kenyerek: 0,
-      'Édes kalácsok': 1,
-      'Sós kalácsok': 2,
-      Egyéb: 3,
-    };
-    this.products.sort((a, b) => {
-      if (a.is_used !== b.is_used) {
-        return a.is_used ? -1 : 1;
-      }
-      const idxA =
-        a.category && categoryOrder[a.category] !== undefined
-          ? categoryOrder[a.category]
-          : 99;
-      const idxB =
-        b.category && categoryOrder[b.category] !== undefined
-          ? categoryOrder[b.category]
-          : 99;
-      if (idxA !== idxB) return idxA - idxB;
-      return a.name.localeCompare(b.name);
-    });
-  }
+  // sortProducts() {
+  //   const categoryOrder: Record<string, number> = {
+  //     Kenyerek: 0,
+  //     'Édes kalácsok': 1,
+  //     'Sós kalácsok': 2,
+  //     Egyéb: 3,
+  //   };
+  //   this.products.sort((a, b) => {
+  //     if (a.is_used !== b.is_used) {
+  //       return a.is_used ? -1 : 1;
+  //     }
+  //     const idxA =
+  //       a.category && categoryOrder[a.category] !== undefined
+  //         ? categoryOrder[a.category]
+  //         : 99;
+  //     const idxB =
+  //       b.category && categoryOrder[b.category] !== undefined
+  //         ? categoryOrder[b.category]
+  //         : 99;
+  //     if (idxA !== idxB) return idxA - idxB;
+  //     return a.name.localeCompare(b.name);
+  //   });
+  // }
 
   scrollIntoView(event: FocusEvent) {
     const target = event.target as HTMLElement;

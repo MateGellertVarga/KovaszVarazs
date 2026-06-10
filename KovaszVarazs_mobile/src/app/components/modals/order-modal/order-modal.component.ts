@@ -42,6 +42,9 @@ export class OrderModalComponent implements OnInit {
   }
 
   initProductQuantities() {
+    this.orderSchedule?.products.sort((a, b) =>
+      a.product_name.localeCompare(b.product_name)
+    );
     if (this.order && this.order.order_items.length > 0) {
       this.order.order_items.forEach((item) => {
         this.productQuantities[item.product_name] = item.quantity;

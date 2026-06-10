@@ -72,6 +72,9 @@ export class OrderSchedules {
     this.isLoading = true;
     this.dataService.getOrderSchedules(0, 50).subscribe((data) => {
       this.orderSchedules = data;
+      this.orderSchedules.forEach((o) =>
+        o.products.sort((a, b) => a.product_name.localeCompare(b.product_name))
+      );
       this.isLoading = false;
     });
   }
