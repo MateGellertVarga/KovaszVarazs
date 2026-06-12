@@ -14,7 +14,7 @@ class StoreOrderSeedRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'day' => 'required|integer|in:1,2,3,4,5,6,7|unique',
+            'day' => 'required|integer|in:1,2,3,4,5,6,7|unique:order_seeds,day',
             'orders' => 'required|array|min:1',
             'orders.*.customer_name' => 'required|string|min:1',
             'orders.*.is_paying' => 'required|boolean',

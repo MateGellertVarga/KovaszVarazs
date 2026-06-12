@@ -9,7 +9,7 @@ class UpdateOrderSeedRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'day' => 'sometimes|integer|in:1,2,3,4,5,6,7|unique',
+            'day' => 'sometimes|integer|in:1,2,3,4,5,6,7|unique:order_seeds,day',
             'orders' => 'sometimes|array|min:1',
             'orders.*.customer_name' => 'sometimes|string|min:1',
             'orders.*.is_paying' => 'sometimes|boolean',
