@@ -8,6 +8,7 @@ use App\Http\Controllers\OrderItemController;
 use App\Http\Controllers\OrderScheduleController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CostController;
+use App\Http\Controllers\OrderSeedController;
 use App\Http\Controllers\StatisticsController;
 use App\Http\Controllers\UserController;
 
@@ -50,6 +51,11 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::post('orderSchedules', [OrderScheduleController::class, 'store']);
     Route::put('orderSchedules/{orderSchedule}', [OrderScheduleController::class, 'update']);
     Route::delete('orderSchedules/{orderSchedule}', [OrderScheduleController::class, 'destroy']);
+
+    Route::get('seeds', [OrderSeedController::class, 'index']);
+    Route::post('seeds', [OrderSeedController::class, 'store']);
+    Route::put('seeds/{seed}', [OrderSeedController::class, 'update']);
+    Route::delete('seeds/{seed}', [OrderSeedController::class, 'destroy']);
 
     Route::get('costs', [CostController::class, 'index']);
     Route::post('costs', [CostController::class, 'store']);

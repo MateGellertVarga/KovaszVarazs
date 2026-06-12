@@ -8,6 +8,9 @@ use Symfony\Component\HttpFoundation\Response;
 use App\Http\Requests\StoreOrderScheduleRequest;
 use App\Http\Requests\UpdateOrderScheduleRequest;
 use App\Http\Resources\OrderScheduleResource;
+use App\Models\Order;
+use App\Models\OrderSeed;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\DB;
 
@@ -50,28 +53,87 @@ class OrderScheduleController extends Controller
         if ($authUser->role !== 'admin') {
             return response()->json(['message' => 'Nincs jogod ehhez a művelethez'], 401);
         }
-
         $validated = $request->validated();
+        $date = Carbon::parse($validated['available_date']);
+        $dayOfWeek = $date->dayOfWeekIso;
+        $seed = OrderSeed::where('day', $dayOfWeek)->with('orders.products')->first();
 
-        $schedule = OrderSchedule::create([
-            'available_date' => $validated['available_date'],
-            'note' => $validated['note']
-        ]);
-
-        foreach ($validated['products'] as $product) {
-            $schedule->products()->attach($product['id'], [
-                'max_quantity' => $product['max_quantity'],
-                'remaining_quantity' => $product['max_quantity']
+        DB::beginTransaction();
+        try {
+            $schedule = OrderSchedule::create([
+                'available_date' => $validated['available_date'],
+                'note' => $validated['note']
             ]);
+
+            foreach ($validated['products'] as $product) {
+                $schedule->products()->attach($product['id'], [
+                    'max_quantity' => $product['max_quantity'],
+                    'remaining_quantity' => $product['max_quantity']
+                ]);
+            }
+
+            if ($seed) {
+                foreach ($seed->orders as $seedOrder) {
+
+                    $realOrder = Order::create([
+                        'customer_name' => $seedOrder->customer_name,
+                        'order_schedule_id' => $schedule->id,
+                        'status' => 'pending',
+                        'total_price' => 0,
+                        'is_paying' => $seedOrder->is_paying,
+                        'already_paid' => false,
+                    ]);
+
+                    $totalPrice = 0;
+
+                    foreach ($seedOrder->products as $product) {
+                        $quantityNeeded = $product->pivot->quantity;
+
+                        $pivotRecord = DB::table('order_schedule_products')
+                            ->where('order_schedule_id', $schedule->id)
+                            ->where('product_id', $product->id)
+                            ->first();
+
+                        if (!$pivotRecord) {
+                            throw new Exception("Nincs megadva ezen a sütési napon, de az alap rendelésekben szerepel: '{$product->name}'");
+                        }
+
+                        if ($pivotRecord->remaining_quantity < $quantityNeeded) {
+                            throw new Exception("Nincs elég szabad termék az alap rendelésekhez: '{$product->name}'");
+                        }
+
+                        DB::table('order_schedule_products')
+                            ->where('order_schedule_id', $schedule->id)
+                            ->where('product_id', $product->id)
+                            ->decrement('remaining_quantity', $quantityNeeded);
+
+                        $realOrder->orderItems()->create([
+                            'product_id' => $product->id,
+                            'quantity' => $quantityNeeded,
+                            'price' => $product->price,
+                        ]);
+
+                        $totalPrice += ($product->price * $quantityNeeded);
+                    }
+
+                    $realOrder->update(['total_price' => $totalPrice]);
+                }
+            }
+            DB::commit();
+
+            $schedule->load(['products' => function ($query) {
+                $query->where('is_used', true);
+            }]);
+
+            return (new OrderScheduleResource($schedule))
+                ->response()
+                ->setStatusCode(Response::HTTP_CREATED);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'message' => $e->getMessage()
+            ], 422);
         }
-
-        $schedule->load(['products' => function ($query) {
-            $query->where('is_used', true);
-        }]);
-
-        return (new OrderScheduleResource($schedule))
-            ->response()
-            ->setStatusCode(Response::HTTP_CREATED);
     }
 
     public function update(UpdateOrderScheduleRequest $request, $id)
