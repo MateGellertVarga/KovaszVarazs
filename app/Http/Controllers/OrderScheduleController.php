@@ -107,10 +107,11 @@ class OrderScheduleController extends Controller
                             ->where('product_id', $product->id)
                             ->decrement('remaining_quantity', $quantityNeeded);
 
-                        $realOrder->orderItems()->create([
+                        DB::table('order_items')->insert([
+                            'order_id'   => $realOrder->id,
                             'product_id' => $product->id,
-                            'quantity' => $quantityNeeded,
-                            'price' => $product->price,
+                            'quantity'   => $quantityNeeded,
+                            'unit_price' => $product->price,
                         ]);
 
                         $totalPrice += ($product->price * $quantityNeeded);

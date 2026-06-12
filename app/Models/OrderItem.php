@@ -10,6 +10,9 @@ class OrderItem extends Model
     /** @use HasFactory<\Database\Factories\OrderItemFactory> */
     use HasFactory;
     public $timestamps = false;
+    public $incrementing = false;
+    protected $primaryKey = ['order_id', 'product_id'];
+    protected $keyType = 'string';
     protected $fillable = ['order_id', 'product_id', 'quantity', 'unit_price'];
 
     public function order()
