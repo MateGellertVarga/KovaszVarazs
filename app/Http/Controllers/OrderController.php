@@ -203,7 +203,7 @@ class OrderController extends Controller
                 $order->update(['total_price' => $total_price]);
 
                 $order->load(['orderItems.product', 'orderSchedule', 'user']);
-                $this->recalculateRemainingQuantities($order->orderSchedule);
+                self::recalculateRemainingQuantities($order->orderSchedule);
                 try {
                     broadcast(new OrdersChanged($order))->toOthers();
                     Log::info('Event fired on update: ' . $order->id);
@@ -243,7 +243,7 @@ class OrderController extends Controller
         return response()->noContent();
     }
 
-    private function recalculateRemainingQuantities(OrderSchedule $orderSchedule)
+    public static function recalculateRemainingQuantities(OrderSchedule $orderSchedule)
     {
         $productIds = $orderSchedule->products()->pluck('products.id');
 

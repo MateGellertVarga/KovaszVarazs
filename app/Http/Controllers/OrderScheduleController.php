@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\OrdersChanged;
 use Illuminate\Http\Request;
 use App\Models\OrderSchedule;
 use Symfony\Component\HttpFoundation\Response;
@@ -10,6 +11,7 @@ use App\Http\Requests\UpdateOrderScheduleRequest;
 use App\Http\Resources\OrderScheduleResource;
 use App\Models\Order;
 use App\Models\OrderSeed;
+use AWS\CRT\Log;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\DB;
@@ -53,9 +55,11 @@ class OrderScheduleController extends Controller
         if ($authUser->role !== 'admin') {
             return response()->json(['message' => 'Nincs jogod ehhez a művelethez'], 401);
         }
+
         $validated = $request->validated();
         $date = Carbon::parse($validated['available_date']);
         $dayOfWeek = $date->dayOfWeekIso;
+
         $seed = OrderSeed::where('day', $dayOfWeek)->with('orders.products')->first();
 
         DB::beginTransaction();
@@ -75,53 +79,82 @@ class OrderScheduleController extends Controller
             if ($seed) {
                 foreach ($seed->orders as $seedOrder) {
 
-                    $realOrder = Order::create([
-                        'customer_name' => $seedOrder->customer_name,
+                    $orderData = [
                         'order_schedule_id' => $schedule->id,
-                        'status' => 'pending',
-                        'total_price' => 0,
-                        'is_paying' => $seedOrder->is_paying,
-                        'already_paid' => false,
-                    ]);
+                        'user_id'           => null,
+                        'customer_name'     => $seedOrder->customer_name ?: null,
+                        'phone_number'      => null,
+                        'status'            => 'pending',
+                        'is_paying'         => (bool)$seedOrder->is_paying,
+                        'already_paid'      => false,
+                        'total_price'       => 0,
+                    ];
 
-                    $totalPrice = 0;
+                    if ($orderData['customer_name'] === null) {
+                        throw new Exception("Vevő megadása kötelező az alap rendelések generálásakor!");
+                    }
+
+                    $existingOrder = Order::where('order_schedule_id', $schedule->id)
+                        ->where('customer_name', $orderData['customer_name'])
+                        ->first();
+
+                    if ($existingOrder) {
+                        throw new Exception("Erre a névre ({$orderData['customer_name']}) már létezik rendelés ezen a napon.");
+                    }
+
+                    $order = Order::create($orderData);
+                    $orderItems = [];
 
                     foreach ($seedOrder->products as $product) {
                         $quantityNeeded = $product->pivot->quantity;
+                        $unit_price = $product->price;
 
-                        $pivotRecord = DB::table('order_schedule_products')
-                            ->where('order_schedule_id', $schedule->id)
-                            ->where('product_id', $product->id)
-                            ->first();
+                        DB::table('order_items')->insert([
+                            'order_id'   => $order->id,
+                            'product_id' => $product->id,
+                            'quantity'   => $quantityNeeded,
+                            'unit_price' => $unit_price,
+                        ]);
 
-                        if (!$pivotRecord) {
-                            throw new Exception("Nincs megadva ezen a sütési napon, de az alap rendelésekben szerepel: '{$product->name}'");
-                        }
+                        $orderItems[] = (object) [
+                            'product_id' => $product->id,
+                            'quantity'   => $quantityNeeded,
+                            'unit_price' => $unit_price,
+                            'product'    => $product
+                        ];
+                    }
 
-                        if ($pivotRecord->remaining_quantity < $quantityNeeded) {
-                            throw new Exception("Nincs elég szabad termék az alap rendelésekhez: '{$product->name}'");
+                    $total_price = $order->is_paying
+                        ? collect($orderItems)->sum(fn($item) => $item->quantity * $item->unit_price)
+                        : 0;
+
+                    $order->update(['total_price' => $total_price]);
+
+                    foreach ($orderItems as $orderItem) {
+                        $remaining = DB::table('order_schedule_products')
+                            ->where('order_schedule_id', $order->order_schedule_id)
+                            ->where('product_id', $orderItem->product_id)
+                            ->value('remaining_quantity');
+
+                        if ($remaining < $orderItem->quantity) {
+                            throw new Exception("Nincs elég szabad termék az alap rendelésekhez: {$orderItem->product->name}");
                         }
 
                         DB::table('order_schedule_products')
-                            ->where('order_schedule_id', $schedule->id)
-                            ->where('product_id', $product->id)
-                            ->decrement('remaining_quantity', $quantityNeeded);
-
-                        DB::table('order_items')->insert([
-                            'order_id'   => $realOrder->id,
-                            'product_id' => $product->id,
-                            'quantity'   => $quantityNeeded,
-                            'unit_price' => $product->price,
-                        ]);
-
-                        $totalPrice += ($product->price * $quantityNeeded);
+                            ->where('order_schedule_id', $order->order_schedule_id)
+                            ->where('product_id', $orderItem->product_id)
+                            ->decrement('remaining_quantity', $orderItem->quantity);
                     }
+                    $order->load(['orderItems.product', 'orderSchedule', 'user']);
+                    OrderController::recalculateRemainingQuantities($order->orderSchedule);
 
-                    $realOrder->update(['total_price' => $totalPrice]);
+                    try {
+                        broadcast(new OrdersChanged($order))->toOthers();
+                    } catch (Exception $e) {
+                    }
                 }
             }
             DB::commit();
-
             $schedule->load(['products' => function ($query) {
                 $query->where('is_used', true);
             }]);
