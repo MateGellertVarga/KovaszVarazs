@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 class UpdateOrderSeedRequest extends FormRequest
@@ -15,7 +16,17 @@ class UpdateOrderSeedRequest extends FormRequest
                 'required',
                 'integer',
                 'in:1,2,3,4,5,6,7',
-                Rule::unique('order_seeds', 'day')->ignore($this->route('seed')?->id ?? $this->route('seed')),
+                function ($attribute, $value, $fail) {
+                    $currentSeedId = $this->input('id');
+                    $duplicateExists = DB::table('order_seeds')
+                        ->where('day', $value)
+                        ->where('id', '!=', $currentSeedId)
+                        ->exists();
+
+                    if ($duplicateExists) {
+                        $fail('Ez a nap már szerepel a rendszerben, módosítsd!');
+                    }
+                }
             ],
             'orders' => 'sometimes|array|min:1',
             'orders.*.customer_name' => 'sometimes|string|min:1',
@@ -31,10 +42,8 @@ class UpdateOrderSeedRequest extends FormRequest
     {
         return [
             'day.required' => 'A nap kiválasztása kötelező!',
-            'day.unique' => 'Ez a nap már szerepel a rendszerben, módosítsd!',
             'orders.required' => 'Legalább egy rendelést fel kell venned!',
             'orders.*.customer_name.required' => 'A vásárló neve nem maradhat üresen!',
-            'orders.*.is_paying.required' => 'A fizetési státusz megadása kötelező!',
             'orders.*.order_items.required' => 'A rendeléshez kötelező terméket adni!',
             'orders.*.order_items.*.quantity.min' => 'A mennyiség legalább 1 db kell legyen!',
         ];

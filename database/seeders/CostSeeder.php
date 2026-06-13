@@ -3,8 +3,8 @@
 namespace Database\Seeders;
 
 use App\Models\Cost;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Carbon;
 
 class CostSeeder extends Seeder
 {
@@ -13,10 +13,16 @@ class CostSeeder extends Seeder
      */
     public function run(): void
     {
-        Cost::create([
-            'month' => '2025-03-01',
-            'name' => 'Liszt',
-            'amount' => 100,
-        ]);
+        $month = Carbon::today()->startOfMonth()->toDateString();
+
+        Cost::updateOrCreate(
+            ['month' => $month, 'name' => 'Liszt'],
+            ['amount' => 100]
+        );
+
+        Cost::updateOrCreate(
+            ['month' => $month, 'name' => 'Élesztő'],
+            ['amount' => 45]
+        );
     }
 }

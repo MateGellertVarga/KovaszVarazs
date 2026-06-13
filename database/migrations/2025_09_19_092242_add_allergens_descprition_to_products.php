@@ -11,17 +11,17 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('products', function (Blueprint $table) {
-            $table->string('allergens')->nullable()->after('is_used');
-            $table->string('description')->nullable()->after('allergens');
-        });
+        // Schema::table('products', function (Blueprint $table) {
+        //     $table->string('allergens')->nullable()->after('is_used');
+        //     $table->string('description')->nullable()->after('allergens');
+        // });
     }
 
     public function down()
     {
-        Schema::table('products', function (Blueprint $table) {
-            $table->dropColumn('allergens');
-            $table->dropColumn('description');
-        });
+        // Schema::table('products', function (Blueprint $table) {
+        //     $table->dropColumn('allergens');
+        //     $table->dropColumn('description');
+        // });
     }
 };

@@ -2,24 +2,64 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 use App\Models\OrderSchedule;
-use Illuminate\Support\Facades\DB;
+use App\Models\OrderScheduleProduct;
+use App\Models\Product;
+use Carbon\Carbon;
+use Illuminate\Database\Seeder;
 
 class OrderScheduleSeeder extends Seeder
 {
-    public function run()
+    public function run(): void
     {
-        $sunday = OrderSchedule::create(['available_date' => '2025-04-30']);
-        $monday = OrderSchedule::create(['available_date' => '2025-05-01']);
-        $tuesday = OrderSchedule::create(['available_date' => '2025-05-02']);
+        $start = Carbon::today()->addDay();
 
-        DB::table('order_schedule_products')->insert([
-            ['order_schedule_id' => $sunday->id, 'product_id' => 1, 'max_quantity' => 10, 'remaining_quantity' => 10],
-            ['order_schedule_id' => $monday->id, 'product_id' => 1, 'max_quantity' => 10, 'remaining_quantity' => 10],
-            ['order_schedule_id' => $monday->id, 'product_id' => 2, 'max_quantity' => 5, 'remaining_quantity' => 5],
-            ['order_schedule_id' => $tuesday->id, 'product_id' => 1, 'max_quantity' => 10, 'remaining_quantity' => 10],
-        ]);
+        $scheduleA = OrderSchedule::updateOrCreate(
+            ['available_date' => $start->toDateString()],
+            ['note' => 'Reggeli kiszállítás']
+        );
+
+        $scheduleB = OrderSchedule::updateOrCreate(
+            ['available_date' => $start->copy()->addDay()->toDateString()],
+            ['note' => 'Nagyobb sütési nap']
+        );
+
+        $scheduleC = OrderSchedule::updateOrCreate(
+            ['available_date' => $start->copy()->addDays(2)->toDateString()],
+            ['note' => 'Normál rendelési nap']
+        );
+
+        $productIds = Product::whereIn('name', [
+            'Kenyér',
+            'Kis kenyér',
+            'Nagy kenyér',
+            'Kifli',
+        ])->pluck('id', 'name');
+
+        $rows = [
+            ['order_schedule_id' => $scheduleA->id, 'product_id' => $productIds['Kenyér'] ?? null, 'max_quantity' => 30, 'remaining_quantity' => 30],
+            ['order_schedule_id' => $scheduleA->id, 'product_id' => $productIds['Kifli'] ?? null, 'max_quantity' => 60, 'remaining_quantity' => 60],
+            ['order_schedule_id' => $scheduleB->id, 'product_id' => $productIds['Kenyér'] ?? null, 'max_quantity' => 40, 'remaining_quantity' => 40],
+            ['order_schedule_id' => $scheduleB->id, 'product_id' => $productIds['Kis kenyér'] ?? null, 'max_quantity' => 20, 'remaining_quantity' => 20],
+            ['order_schedule_id' => $scheduleB->id, 'product_id' => $productIds['Nagy kenyér'] ?? null, 'max_quantity' => 15, 'remaining_quantity' => 15],
+            ['order_schedule_id' => $scheduleC->id, 'product_id' => $productIds['Kenyér'] ?? null, 'max_quantity' => 25, 'remaining_quantity' => 25],
+        ];
+
+        foreach ($rows as $row) {
+            if (! $row['product_id']) {
+                continue;
+            }
+
+            OrderScheduleProduct::updateOrCreate(
+                [
+                    'order_schedule_id' => $row['order_schedule_id'],
+                    'product_id' => $row['product_id'],
+                ],
+                [
+                    'max_quantity' => $row['max_quantity'],
+                    'remaining_quantity' => $row['remaining_quantity'],
+                ]
+            );
+        }
     }
 }

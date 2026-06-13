@@ -47,7 +47,14 @@ return [
             'report' => false,
         ],
 
-        'images' => [
+        'images' => env('IMAGES_DISK_DRIVER', 's3') === 'local' ? [
+            'driver' => 'local',
+            'root' => storage_path('app/public/images'),
+            'url' => env('APP_URL') . '/storage/images',
+            'visibility' => 'public',
+            'throw' => false,
+            'report' => false,
+        ] : [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),
             'secret' => env('AWS_SECRET_ACCESS_KEY'),

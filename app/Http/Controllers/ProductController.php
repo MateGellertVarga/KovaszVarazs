@@ -110,7 +110,19 @@ class ProductController extends Controller
     protected function deleteImageIfExists(?string $url): void
     {
         if ($url) {
-            $filename = Str::after($url, env('AWS_URL') . '/');
+            if (env('IMAGES_DISK_DRIVER', 's3') === 'local') {
+                $filename = Str::after($url, rtrim(env('APP_URL', ''), '/') . '/storage/');
+
+                if ($filename === $url) {
+                    $filename = Str::after($url, '/storage/');
+                }
+
+                Storage::disk('images')->delete($filename);
+
+                return;
+            }
+
+            $filename = Str::after($url, rtrim(env('AWS_URL', ''), '/') . '/');
             Storage::disk('images')->delete($filename);
         }
     }

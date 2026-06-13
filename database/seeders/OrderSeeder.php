@@ -2,31 +2,56 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\OrderSchedule;
+use App\Models\OrderScheduleProduct;
+use App\Models\Product;
+use App\Models\User;
+use Illuminate\Database\Seeder;
 
 class OrderSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
-    public function run()
+    public function run(): void
     {
+        OrderItem::query()->delete();
+        Order::query()->delete();
+
+        OrderScheduleProduct::query()->each(function (OrderScheduleProduct $row) {
+            $row->update(['remaining_quantity' => $row->max_quantity]);
+        });
+
+        $bela = User::where('email', 'bela@gmail.com')->first();
+        $schedules = OrderSchedule::orderBy('available_date')->take(3)->get();
+
+        if ($schedules->count() < 3) {
+            return;
+        }
+
+        $products = Product::whereIn('name', [
+            'Kenyér',
+            'Nagy kenyér',
+            'Kis kenyér',
+            'Rozsos kenyér',
+        ])->get()->keyBy('name');
+
+        if (! isset($products['Kenyér'], $products['Nagy kenyér'], $products['Kis kenyér'], $products['Rozsos kenyér'])) {
+            return;
+        }
+
         $order1 = Order::create([
-            'user_id' => 2,
+            'user_id' => $bela?->id,
+            'customer_name' => $bela?->name,
+            'phone_number' => $bela?->phone_number,
             'note' => 'Kérlek, gyorsan készítsd el!',
             'status' => 'pending',
             'is_paying' => true,
             'already_paid' => false,
             'total_price' => 0,
-            'order_schedule_id' => 1,
-        ]);
-
-        OrderItem::insert([
-            ['order_id' => $order1->id, 'product_id' => 1, 'quantity' => 2],
-            ['order_id' => $order1->id, 'product_id' => 3, 'quantity' => 1],
+            'order_schedule_id' => $schedules[0]->id,
         ]);
 
         $order2 = Order::create([
@@ -37,25 +62,77 @@ class OrderSeeder extends Seeder
             'is_paying' => false,
             'already_paid' => false,
             'total_price' => 0,
-            'order_schedule_id' => 2,
-        ]);
-
-        OrderItem::insert([
-            ['order_id' => $order2->id, 'product_id' => 2, 'quantity' => 3],
-            ['order_id' => $order2->id, 'product_id' => 5, 'quantity' => 1],
+            'order_schedule_id' => $schedules[1]->id,
         ]);
 
         $order3 = Order::create([
-            'user_id' => 2,
-            'note' => 'Kérlek, gyorsan készítsd el!',
-            'status' => 'pending',
+            'user_id' => $bela?->id,
+            'customer_name' => $bela?->name,
+            'phone_number' => $bela?->phone_number,
+            'note' => 'Másnapi rendelés',
+            'status' => 'completed',
             'is_paying' => true,
-            'already_paid' => false,
+            'already_paid' => true,
             'total_price' => 0,
-            'order_schedule_id' => 3,
+            'order_schedule_id' => $schedules[2]->id,
         ]);
-        OrderItem::insert([
-            ['order_id' => $order3->id, 'product_id' => 1, 'quantity' => 1],
-        ]);
+
+        $items = [
+            [
+                'order' => $order1,
+                'schedule_id' => $schedules[0]->id,
+                'product' => $products['Kenyér'],
+                'quantity' => 2,
+            ],
+            [
+                'order' => $order1,
+                'schedule_id' => $schedules[0]->id,
+                'product' => $products['Nagy kenyér'],
+                'quantity' => 1,
+            ],
+            [
+                'order' => $order2,
+                'schedule_id' => $schedules[1]->id,
+                'product' => $products['Kis kenyér'],
+                'quantity' => 3,
+            ],
+            [
+                'order' => $order2,
+                'schedule_id' => $schedules[1]->id,
+                'product' => $products['Rozsos kenyér'],
+                'quantity' => 1,
+            ],
+            [
+                'order' => $order3,
+                'schedule_id' => $schedules[2]->id,
+                'product' => $products['Kenyér'],
+                'quantity' => 1,
+            ],
+        ];
+
+        foreach ($items as $item) {
+            $unitPrice = (float) $item['product']->price;
+
+            OrderItem::create([
+                'order_id' => $item['order']->id,
+                'product_id' => $item['product']->id,
+                'quantity' => $item['quantity'],
+                'unit_price' => $unitPrice,
+            ]);
+
+            $scheduleProduct = OrderScheduleProduct::where('order_schedule_id', $item['schedule_id'])
+                ->where('product_id', $item['product']->id)
+                ->first();
+
+            if ($scheduleProduct) {
+                $scheduleProduct->update([
+                    'remaining_quantity' => max(0, $scheduleProduct->remaining_quantity - $item['quantity']),
+                ]);
+            }
+        }
+
+        $order1->update(['total_price' => 2 * (float) $products['Kenyér']->price + 1 * (float) $products['Nagy kenyér']->price]);
+        $order2->update(['total_price' => 0]);
+        $order3->update(['total_price' => 1 * (float) $products['Kenyér']->price]);
     }
 }
