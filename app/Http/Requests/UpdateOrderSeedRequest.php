@@ -9,15 +9,13 @@ class UpdateOrderSeedRequest extends FormRequest
 {
     public function rules(): array
     {
-        $seedId = $this->route('id') ?? $this->route('seed') ?? $this->segment(2) ?? $this->segment(3);
-
         return [
             'day' => [
                 'sometimes',
                 'required',
                 'integer',
                 'in:1,2,3,4,5,6,7',
-                Rule::unique('order_seeds', 'day')->ignore($seedId)
+                Rule::unique('order_seeds', 'day')->ignore($this->route('seed')?->id ?? $this->route('seed')),
             ],
             'orders' => 'sometimes|array|min:1',
             'orders.*.customer_name' => 'sometimes|string|min:1',
