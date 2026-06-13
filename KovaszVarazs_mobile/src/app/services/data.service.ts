@@ -6,6 +6,8 @@ import { OrderScheduleModel } from 'src/models/orderScheduleModel';
 import { ProductModel } from 'src/models/productModel';
 import { CostModel, StatisticsModel } from 'src/models/statisticsModel';
 import { ConfigService } from './config.service';
+import { RequestModel } from 'src/models/requestModel';
+import { OrderSeedModel } from 'src/models/orderSeedModel';
 
 @Injectable({
   providedIn: 'root',
@@ -154,5 +156,35 @@ export class DataService {
 
   deleteCost(id: number): Observable<void> {
     return this.http.delete<void>(`${this.configService.apiUrl}/costs/${id}`);
+  }
+
+  getSeeds(): Observable<OrderSeedModel[]> {
+    return this.http.get<OrderSeedModel[]>(
+      `${this.configService.apiUrl}/seeds`
+    );
+  }
+
+  addSeed(seed: OrderSeedModel): Observable<OrderSeedModel> {
+    return this.http.post<OrderSeedModel>(
+      `${this.configService.apiUrl}/seeds`,
+      seed
+    );
+  }
+
+  updateSeed(id: number, seed: OrderSeedModel): Observable<OrderSeedModel> {
+    return this.http.put<OrderSeedModel>(
+      `${this.configService.apiUrl}/seeds/${id}`,
+      seed
+    );
+  }
+
+  deleteSeed(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.configService.apiUrl}/seeds/${id}`);
+  }
+
+  getRequests(): Observable<RequestModel[]> {
+    return this.http.get<RequestModel[]>(
+      `${this.configService.apiUrl}/requests`
+    );
   }
 }

@@ -21,6 +21,8 @@ import {
   IonCardContent,
   IonRefresher,
   IonRefresherContent,
+  IonButtons,
+  IonMenuButton,
 } from '@ionic/angular/standalone';
 import { DataService } from 'src/app/services/data.service';
 import { OrderScheduleModel } from 'src/models/orderScheduleModel';
@@ -32,6 +34,7 @@ import { OrderScheduleModalComponent } from '../../modals/order-schedule-modal/o
   templateUrl: 'orderSchedules.html',
   providers: [DatePipe],
   imports: [
+    IonButtons,
     IonRefresherContent,
     IonRefresher,
     IonCardContent,
@@ -51,6 +54,7 @@ import { OrderScheduleModalComponent } from '../../modals/order-schedule-modal/o
     IonContent,
     DatePipe,
     OrderScheduleModalComponent,
+    IonMenuButton,
   ],
 })
 export class OrderSchedules {

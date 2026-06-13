@@ -1,0 +1,131 @@
+<ion-header
+  [translucent]="false"
+  class="{{editingSeed != null ? 'opacity-50 pointer-events-none' : ''}}"
+>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button class="text-black"></ion-menu-button>
+    </ion-buttons>
+
+    <ion-title class="font-bold text-2xl text-center text-black">
+      Alap rendelések
+    </ion-title>
+
+    <ion-buttons slot="end" class="pe-2">
+      <ion-button
+        (click)="newSeed()"
+        class="w-10 h-10 rounded-full bg-[#D19263] text-white flex justify-center items-center font-bold shadow-md"
+      >
+        <ion-icon name="add" class="text-xl"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content
+  [fullscreen]="true"
+  [scrollY]="editingSeed != null ? 'false':'true'"
+  class="relative {{editingSeed != null ? 'pointer-events-none' : ''}}"
+>
+  <ion-refresher slot="fixed" (ionRefresh)="refresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  @if (isLoading) {
+  <div class="w-full flex justify-center items-center mt-2">
+    <img src="assets/loading.gif" alt="Loading..." />
+  </div>
+  } @else if (!isLoading && seeds.length === 0) {
+  <div class="w-full flex justify-center items-center mt-4">
+    <p class="text-muted">Nincs alap rendelés. Hozz létre!</p>
+  </div>
+  } @else {
+
+  <ion-list class="mb-20 bg-transparent">
+    @for (seed of seeds; track $index) {
+    <ion-item lines="none" class="w-full px-2">
+      <ion-card class="w-full m-2">
+        <ion-card-header>
+          <ion-card-title class="font-bold text-xl text-primary">
+            {{ ((432000000 + (seed.day -2) * 86400000) | date:
+            'EEEE')!.toLocaleUpperCase()}}
+          </ion-card-title>
+        </ion-card-header>
+
+        <ion-card-content class="space-y-4">
+          @for (order of seed.orders; track $index) {
+          <div class="border-2 rounded-xl p-3 bg-gray-50 shadow-sm">
+            <span class="font-bold text-lg text-black mb-2">
+              {{ order.customer_name ? order.customer_name : '(Nincs név
+              megadva)' }}
+            </span>
+
+            <div class="space-y-2">
+              @for (item of order.order_items; track $index) {
+              <div
+                class="w-full flex justify-between items-center py-1 border-b border-gray-200 last:border-0"
+              >
+                <span class="text-gray-500 font-semibold flex-1 text-left">
+                  {{ item.product_name }}
+                </span>
+                <span class="text-gray-500 font-semibold">
+                  {{ item.quantity }} db
+                </span>
+              </div>
+              }
+            </div>
+          </div>
+          } @empty {
+          <div class="text-center text-gray-400 py-2 text-sm">
+            Ehhez a naphoz még nincsenek rendelések hozzáadva.
+          </div>
+          }
+
+          <div class="flex justify-evenly mt-4 pt-2 border-t border-gray-100">
+            <button
+              class="p-1.5 bg-red-100 hover:bg-red-200 text-red-600 rounded-md flex items-center"
+              (click)="deleteSeed(seed)"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="28"
+                height="28"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  fill="currentColor"
+                  d="M7 21q-.825 0-1.412-.587T5 19V6q-.425 0-.712-.288T4 5t.288-.712T5 4h4q0-.425.288-.712T10 3h4q.425 0 .713.288T15 4h4q.425 0 .713.288T20 5t-.288.713T19 6v13q0 .825-.587 1.413T17 21zm3-4q.425 0 .713-.288T11 16V9q0-.425-.288-.712T10 8t-.712.288T9 9v7q0 .425.288.713T10 17m4 0q.425 0 .713-.288T15 16V9q0-.425-.288-.712T14 8t-.712.288T13 9v7q0 .425.288.713T14 17"
+                />
+              </svg>
+            </button>
+
+            <button
+              class="bg-gray-200 hover:bg-gray-300 text-gray-700 p-1.5 rounded-md flex items-center"
+              (click)="modifySeed(seed)"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="28"
+                height="28"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  fill="currentColor"
+                  d="M3 21v-4.25L17.625 2.175L21.8 6.45L7.25 21zM17.6 7.8L19 6.4L17.6 5l-1.4 1.4z"
+                />
+              </svg>
+            </button>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </ion-item>
+    }
+  </ion-list>
+  } @if (editingSeed != null) {
+  <app-seed-modal
+    [seed]="editingSeed"
+    (canceled)="editingSeed = null"
+    (saved)="saveSeed()"
+  ></app-seed-modal>
+  }
+</ion-content>

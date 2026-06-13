@@ -1,6 +1,6 @@
 <ion-header
   [translucent]="false"
-  class="{{editingProduct != null ? 'opacity-50 pointer-events-none' : ''}}"
+  class="{{editingRequest != null ? 'opacity-50 pointer-events-none' : ''}}"
 >
   <ion-toolbar>
     <ion-buttons slot="start">
@@ -8,24 +8,15 @@
     </ion-buttons>
 
     <ion-title class="font-bold text-2xl text-center text-black">
-      Termékek
+      Kérelmek
     </ion-title>
-
-    <ion-buttons slot="end" class="pe-2">
-      <ion-button
-        (click)="newProduct()"
-        class="w-10 h-10 rounded-full bg-[#D19263] text-white flex justify-center items-center font-bold shadow-md"
-      >
-        <ion-icon name="add" class="text-xl"></ion-icon>
-      </ion-button>
-    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content
   [fullscreen]="true"
-  [scrollY]="editingProduct != null ? 'false':'true'"
-  class="relative {{editingProduct != null ? 'pointer-events-none' : ''}}"
+  [scrollY]="editingRequest != null ? 'false':'true'"
+  class="relative {{editingRequest != null ? 'pointer-events-none' : ''}}"
 >
   <ion-refresher slot="fixed" (ionRefresh)="refresh($event)">
     <ion-refresher-content></ion-refresher-content>
@@ -35,34 +26,23 @@
   <div class="w-full flex justify-center items-center mt-4">
     <img src="assets/loading.gif" alt="Loading..." />
   </div>
-  } @else if (!isLoading && products.length === 0) {
+  } @else if (!isLoading && requests.length === 0) {
   <div class="w-full flex justify-center items-center mt-2">
-    <p class="text-muted">Nincs termék</p>
+    <p class="text-muted">Nincs kérelem</p>
   </div>
   } @else {
   <ion-list class="mb-16">
-    @for (product of products; track $index) {
+    @for (request of requests; track $index) {
     <ion-item>
       <ion-card class="w-10/12 mx-auto">
-        <img [src]="product.image_url" />
         <ion-card-header>
-          <div class="flex justify-between">
-            <ion-card-title class="font-bold">{{product.name}}</ion-card-title>
-            <ion-card-title
-              >{{product.price| number:'1.0-2' }} €/db</ion-card-title
-            >
-          </div>
-          <div class="flex justify-between mt-2 text-sm">
-            <span>Kategória: <b>{{ product.category }}</b></span>
-            @if (!product.is_used) {
-            <span class="text-red-500 font-bold">(inaktív)</span>
-            }
-          </div>
+          <ion-card-title class="font-bold">{{request.name}}</ion-card-title>
+          <ion-card-subtitle>{{request.email}}</ion-card-subtitle>
         </ion-card-header>
 
         <ion-card-content>
           <div class="flex justify-evenly mt-2">
-            <ion-button color="white" (click)="deleteProduct(product)">
+            <ion-button color="white" (click)="submitRequest(request, false)">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="32"
@@ -75,7 +55,7 @@
                 />
               </svg>
             </ion-button>
-            <ion-button color="white" (click)="modifyProduct(product)">
+            <ion-button color="white" (click)="submitRequest(request, true)">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="32"
@@ -94,11 +74,12 @@
     </ion-item>
     }
   </ion-list>
-  } @if (editingProduct !== null) {
-  <app-product-modal
-    [product]="editingProduct"
-    (canceled)="editingProduct = null"
-    (saved)="saveProduct($event)"
-  ></app-product-modal>
   }
+  <!-- @if (editingRequest !== null) {
+  <app-request-modal
+    [request]="editingRequest"
+    (canceled)="editingRequest = null"
+    (submitted)="submitRequest($event)"
+  ></app-request-modal>
+  } -->
 </ion-content>

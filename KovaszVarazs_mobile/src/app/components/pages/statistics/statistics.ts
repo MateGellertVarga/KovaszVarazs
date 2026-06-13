@@ -16,12 +16,12 @@ import {
   IonRefresher,
   IonRefresherContent,
   IonButtons,
+  IonMenuButton,
 } from '@ionic/angular/standalone';
 import { DataService } from 'src/app/services/data.service';
 import { CostModel, StatisticsModel } from 'src/models/statisticsModel';
 import { CostModalComponent } from '../../modals/cost-modal/cost-modal.component';
 import { ModalNavbarService } from 'src/app/services/modal-navbar.service';
-import { Router } from '@angular/router';
 @Component({
   selector: 'statistics',
   templateUrl: './statistics.html',
@@ -42,6 +42,7 @@ import { Router } from '@angular/router';
     IonTitle,
     DatePipe,
     CostModalComponent,
+    IonMenuButton,
   ],
   providers: [DatePipe],
 })
@@ -50,8 +51,7 @@ export class Statistics {
     private dataService: DataService,
     private modalNavbarService: ModalNavbarService,
     private alertController: AlertController,
-    private changeDetectorRef: ChangeDetectorRef,
-    private router: Router
+    private changeDetectorRef: ChangeDetectorRef
   ) {
     registerLocaleData(localeHU);
   }
@@ -211,9 +211,5 @@ export class Statistics {
       (sum, c) => sum + Number(c.amount || 0),
       0
     );
-  }
-
-  toLogin() {
-    this.router.navigate(['/tabs/login']);
   }
 }

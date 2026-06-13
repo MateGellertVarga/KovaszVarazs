@@ -18,6 +18,8 @@ import {
   IonItem,
   IonRefresher,
   IonRefresherContent,
+  IonButtons,
+  IonMenuButton,
 } from '@ionic/angular/standalone';
 import { DataService } from 'src/app/services/data.service';
 import { ModalNavbarService } from 'src/app/services/modal-navbar.service';
@@ -29,6 +31,7 @@ import { CommonModule } from '@angular/common';
   selector: 'products',
   templateUrl: 'products.html',
   imports: [
+    IonButtons,
     CommonModule,
     IonRefresherContent,
     IonRefresher,
@@ -47,6 +50,7 @@ import { CommonModule } from '@angular/common';
     IonTitle,
     IonContent,
     ProductModalComponent,
+    IonMenuButton,
   ],
 })
 export class Products {

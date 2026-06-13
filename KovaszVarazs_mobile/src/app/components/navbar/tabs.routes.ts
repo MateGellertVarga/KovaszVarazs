@@ -29,17 +29,25 @@ export const routes: Routes = [
           import('../pages/statistics/statistics').then((m) => m.Statistics),
       },
       {
+        path: 'seeder',
+        loadComponent: () =>
+          import('../pages/seeder/seeder').then((m) => m.Seeder),
+      },
+      {
+        path: 'recipes',
+        loadComponent: () =>
+          import('../pages/recipes/recipes').then((m) => m.Recipes),
+      },
+      {
+        path: 'requests',
+        loadComponent: () =>
+          import('../pages/requests/requests').then((m) => m.Requests),
+      },
+      {
         path: 'login',
         loadComponent: () =>
           import('../pages/login/login').then((m) => m.Login),
       },
-      // {
-      //   path: 'registration',
-      //   loadComponent: () =>
-      //     import('../pages/registration/registration').then(
-      //       (m) => m.Registration
-      //     ),
-      // },
     ],
   },
   {

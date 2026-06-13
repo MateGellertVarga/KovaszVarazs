@@ -6,7 +6,14 @@ import {
   IonTabButton,
   IonIcon,
   IonLabel,
-  IonRouterOutlet,
+  IonToolbar,
+  IonItem,
+  IonMenu,
+  IonHeader,
+  IonContent,
+  IonList,
+  IonTitle,
+  IonTab,
 } from '@ionic/angular/standalone';
 import { ModalNavbarService } from 'src/app/services/modal-navbar.service';
 
@@ -14,7 +21,21 @@ import { ModalNavbarService } from 'src/app/services/modal-navbar.service';
   selector: 'app-navbar',
   templateUrl: 'navbar.html',
   styleUrls: ['navbar.scss'],
-  imports: [IonTabs, IonTabBar, IonTabButton, IonLabel],
+  imports: [
+    IonTab,
+    IonTitle,
+    IonList,
+    IonContent,
+    IonHeader,
+    IonItem,
+    IonToolbar,
+    IonTabs,
+    IonTabBar,
+    IonTabButton,
+    IonLabel,
+    IonMenu,
+    IonIcon,
+  ],
 })
 export class Navbar {
   public environmentInjector = inject(EnvironmentInjector);

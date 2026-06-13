@@ -3,20 +3,22 @@
   class="{{editingOrderSchedule != null ? 'opacity-50 pointer-events-none' : ''}}"
 >
   <ion-toolbar>
-    <div class="flex justify-between items-center w-full">
-      <ion-title class="font-bold text-2xl text-center text-black"
-        >Sütések</ion-title
+    <ion-buttons slot="start">
+      <ion-menu-button class="text-black"></ion-menu-button>
+    </ion-buttons>
+
+    <ion-title class="font-bold text-2xl text-center text-black">
+      Sütések
+    </ion-title>
+
+    <ion-buttons slot="end" class="pe-2">
+      <ion-button
+        (click)="newOrderSchedule()"
+        class="w-10 h-10 rounded-full bg-[#D19263] text-white flex justify-center items-center font-bold shadow-md"
       >
-      <ion-fab horizontal="end">
-        <ion-fab-button
-          size="small"
-          color="primary"
-          (click)="newOrderSchedule()"
-        >
-          <ion-icon name="add"></ion-icon>
-        </ion-fab-button>
-      </ion-fab>
-    </div>
+        <ion-icon name="add" class="text-xl"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 

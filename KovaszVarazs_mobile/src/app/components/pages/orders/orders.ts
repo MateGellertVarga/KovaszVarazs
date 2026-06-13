@@ -29,6 +29,8 @@ import {
   IonRefresher,
   IonSearchbar,
   IonLabel,
+  IonButtons,
+  IonMenuButton,
 } from '@ionic/angular/standalone';
 import { DataService } from 'src/app/services/data.service';
 import { OrderModel } from 'src/models/orderModel';
@@ -43,6 +45,7 @@ import { ConfigService } from 'src/app/services/config.service';
   selector: 'orders',
   templateUrl: 'orders.html',
   imports: [
+    IonButtons,
     IonLabel,
     CommonModule,
     IonSearchbar,
@@ -65,6 +68,7 @@ import { ConfigService } from 'src/app/services/config.service';
     IonIcon,
     DatePipe,
     OrderModalComponent,
+    IonMenuButton,
   ],
   providers: [DatePipe],
 })
