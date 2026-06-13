@@ -3,13 +3,24 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateOrderSeedRequest extends FormRequest
 {
     public function rules(): array
     {
+        $routeParam = $this->route('seed');
+
         return [
-            'day' => 'sometimes|integer|in:1,2,3,4,5,6,7|unique:order_seeds,day,' . $this->route('seed')->id,
+            'day' => [
+                'sometimes',
+                'required',
+                'integer',
+                'in:1,2,3,4,5,6,7',
+                Rule::unique('order_seeds', 'day')->ignore(
+                    is_object($routeParam) ? $routeParam->id : $routeParam
+                )
+            ],
             'orders' => 'sometimes|array|min:1',
             'orders.*.customer_name' => 'sometimes|string|min:1',
             'orders.*.is_paying' => 'sometimes|boolean',
