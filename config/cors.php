@@ -18,8 +18,8 @@ return [
     'paths' => ['api/*'],
     'allowed_methods' => ['*'],
     'allowed_origins' => [
-        'https://kovaszvarazs.sk',
-        'https://www.kovaszvarazs.sk',
+        'https://kovaszvarazs.com',
+        'https://www.kovaszvarazs.com',
         'http://localhost',
         'http://localhost:8100',
         'http://127.0.0.1',
