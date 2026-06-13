@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Events\OrdersChanged;
+use App\Events\OrderSchedulesChanged;
 use Illuminate\Http\Request;
 use App\Models\OrderSchedule;
 use Symfony\Component\HttpFoundation\Response;
@@ -159,6 +160,11 @@ class OrderScheduleController extends Controller
                 $query->where('is_used', true);
             }]);
 
+            try {
+                broadcast(new OrderSchedulesChanged($schedule))->toOthers();
+            } catch (Exception $e) {
+            }
+
             return (new OrderScheduleResource($schedule))
                 ->response()
                 ->setStatusCode(Response::HTTP_CREATED);
@@ -225,6 +231,11 @@ class OrderScheduleController extends Controller
                     $query->where('is_used', true);
                 }]);
 
+                try {
+                    broadcast(new OrderSchedulesChanged($orderSchedule))->toOthers();
+                } catch (Exception $e) {
+                }
+
                 return new OrderScheduleResource($orderSchedule);
             });
         } catch (Exception $e) {
@@ -238,6 +249,10 @@ class OrderScheduleController extends Controller
             return response()->json(['message' => 'Nincs jogod ehhez a művelethez'], 401);
         }
         OrderSchedule::destroy($id);
+        try {
+            broadcast(new OrderSchedulesChanged(null, $id))->toOthers();
+        } catch (Exception $e) {
+        }
         return response()->noContent();
     }
 }

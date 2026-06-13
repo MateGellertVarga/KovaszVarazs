@@ -29,7 +29,7 @@ class OrdersChanged implements ShouldBroadcastNow
 
     public function broadcastOn(): Channel
     {
-        return new Channel('orders');
+        return new PrivateChannel('orders');
     }
 
     public function broadcastAs(): string
