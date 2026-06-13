@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreOrderSeedRequest;
+use App\Http\Requests\UpdateOrderSeedRequest;
 use App\Http\Resources\OrderSeedResource;
 use App\Models\OrderSeed;
 use Exception;
@@ -47,7 +48,7 @@ class OrderSeedController extends Controller
         }
     }
 
-    public function update(StoreOrderSeedRequest $request, $id)
+    public function update(UpdateOrderSeedRequest $request, $id)
     {
         DB::beginTransaction();
         try {

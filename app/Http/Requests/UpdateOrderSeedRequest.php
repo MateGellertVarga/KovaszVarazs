@@ -16,17 +16,7 @@ class UpdateOrderSeedRequest extends FormRequest
                 'required',
                 'integer',
                 'in:1,2,3,4,5,6,7',
-                function ($attribute, $value, $fail) {
-                    $currentSeedId = $this->input('id');
-                    $duplicateExists = DB::table('order_seeds')
-                        ->where('day', $value)
-                        ->where('id', '!=', $currentSeedId)
-                        ->exists();
-
-                    if ($duplicateExists) {
-                        $fail('Ez a nap már szerepel a rendszerben, módosítsd!');
-                    }
-                }
+                Rule::unique('order_seeds', 'day')->ignore($this->route('seed')?->id ?? $this->route('seed')),
             ],
             'orders' => 'sometimes|array|min:1',
             'orders.*.customer_name' => 'sometimes|string|min:1',
