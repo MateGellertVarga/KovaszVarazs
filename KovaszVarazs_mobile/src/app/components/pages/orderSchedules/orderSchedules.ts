@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy } from '@angular/core';
 import { DatePipe, registerLocaleData } from '@angular/common';
 import localeHu from '@angular/common/locales/hu';
 import {
@@ -7,8 +7,6 @@ import {
   IonToolbar,
   IonTitle,
   IonContent,
-  IonFab,
-  IonFabButton,
   IonIcon,
   IonButton,
   IonItem,
@@ -28,6 +26,7 @@ import { DataService } from 'src/app/services/data.service';
 import { OrderScheduleModel } from 'src/models/orderScheduleModel';
 import { ModalNavbarService } from 'src/app/services/modal-navbar.service';
 import { OrderScheduleModalComponent } from '../../modals/order-schedule-modal/order-schedule-modal.component';
+import { WebsocketService } from 'src/app/services/websocket.service';
 
 @Component({
   selector: 'orderSchedules',
@@ -46,8 +45,6 @@ import { OrderScheduleModalComponent } from '../../modals/order-schedule-modal/o
     IonItem,
     IonButton,
     IonIcon,
-    IonFabButton,
-    IonFab,
     IonHeader,
     IonToolbar,
     IonTitle,
@@ -57,13 +54,14 @@ import { OrderScheduleModalComponent } from '../../modals/order-schedule-modal/o
     IonMenuButton,
   ],
 })
-export class OrderSchedules {
+export class OrderSchedules implements OnDestroy {
   constructor(
     private dataService: DataService,
     private datePipe: DatePipe,
     private modalNavbarService: ModalNavbarService,
     private alertController: AlertController,
-    private changeDetectorRef: ChangeDetectorRef
+    private changeDetectorRef: ChangeDetectorRef,
+    private websocketService: WebsocketService
   ) {
     registerLocaleData(localeHu);
   }
@@ -71,8 +69,23 @@ export class OrderSchedules {
   isLoading: boolean = true;
   orderSchedules: OrderScheduleModel[] = [];
   editingOrderSchedule: OrderScheduleModel | null = null;
+  private websocketCleanup: (() => void) | null = null;
+  private websocketInitialized = false;
 
   ionViewWillEnter() {
+    void this.initializeWebsocketSubscription();
+    this.loadOrderSchedules();
+  }
+
+  ionViewWillLeave() {
+    this.cleanupWebsocketSubscription();
+  }
+
+  ngOnDestroy() {
+    this.cleanupWebsocketSubscription();
+  }
+
+  private loadOrderSchedules() {
     this.isLoading = true;
     this.dataService.getOrderSchedules(0, 50).subscribe((data) => {
       this.orderSchedules = data;
@@ -150,5 +163,32 @@ export class OrderSchedules {
     });
 
     await alert.present();
+  }
+
+  private async initializeWebsocketSubscription() {
+    if (this.websocketInitialized) {
+      return;
+    }
+
+    try {
+      this.websocketCleanup =
+        await this.websocketService.listenToPrivateChannel(
+          'order-schedules',
+          '.order-schedules.changed',
+          () => {
+            this.loadOrderSchedules();
+          }
+        );
+
+      this.websocketInitialized = true;
+    } catch (error) {
+      console.error('Nem sikerült csatlakozni a websocket csatornához:', error);
+    }
+  }
+
+  private cleanupWebsocketSubscription() {
+    this.websocketCleanup?.();
+    this.websocketCleanup = null;
+    this.websocketInitialized = false;
   }
 }

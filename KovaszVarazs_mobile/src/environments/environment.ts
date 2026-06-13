@@ -3,7 +3,14 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  reverb: {
+    appKey: 'ntAiR5UJsMMvWop08FL2',
+    host: 'ws-a2039bc3-b01c-4883-8bc6-8a9d62be8305-reverb.laravel.cloud',
+    port: '443',
+    scheme: 'https',
+    cluster: 'mt1',
+  },
 };
 
 /*

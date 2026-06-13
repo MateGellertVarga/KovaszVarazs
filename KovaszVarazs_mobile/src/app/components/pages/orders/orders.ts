@@ -3,7 +3,6 @@ import {
   Component,
   ElementRef,
   OnDestroy,
-  OnInit,
   ViewChild,
 } from '@angular/core';
 import { CommonModule, DatePipe, registerLocaleData } from '@angular/common';
@@ -23,8 +22,6 @@ import {
   IonCardContent,
   IonCardSubtitle,
   IonCardTitle,
-  IonFab,
-  IonFabButton,
   IonRefresherContent,
   IonRefresher,
   IonSearchbar,
@@ -37,9 +34,7 @@ import { OrderModel } from 'src/models/orderModel';
 import { OrderScheduleModel } from 'src/models/orderScheduleModel';
 import { OrderModalComponent } from '../../modals/order-modal/order-modal.component';
 import { ModalNavbarService } from 'src/app/services/modal-navbar.service';
-import Pusher from 'pusher-js';
-import { AuthService } from 'src/app/services/auth.service';
-import { ConfigService } from 'src/app/services/config.service';
+import { WebsocketService } from 'src/app/services/websocket.service';
 
 @Component({
   selector: 'orders',
@@ -51,8 +46,6 @@ import { ConfigService } from 'src/app/services/config.service';
     IonSearchbar,
     IonRefresher,
     IonRefresherContent,
-    IonFabButton,
-    IonFab,
     IonCardTitle,
     IonCardSubtitle,
     IonCardHeader,
@@ -78,8 +71,7 @@ export default class Orders {
     private modalNavbarService: ModalNavbarService,
     private alertController: AlertController,
     private changeDetectorRef: ChangeDetectorRef,
-    private authService: AuthService,
-    private configService: ConfigService
+    private websocketService: WebsocketService
   ) {
     registerLocaleData(localeHu);
   }
@@ -102,11 +94,16 @@ export default class Orders {
   editingOrder: OrderModel | null = null;
   orderSummary: { product_name: string; totalQuantity: number }[] = [];
   totalIncome: number = 0;
-  pusher: any;
-  channel: any;
+  private orderChangesCleanup: (() => void) | null = null;
+  private orderScheduleChangesCleanup: (() => void) | null = null;
+  private websocketInitialized = false;
 
   ionViewWillEnter() {
-    //this.subscribeToOrdersChannel();
+    void this.initializeWebsocketSubscriptions();
+    this.loadOrdersViewData();
+  }
+
+  private loadOrdersViewData() {
     this.isLoading = true;
 
     this.dataService.getOrderSchedules(50, 50).subscribe({
@@ -163,13 +160,17 @@ export default class Orders {
   }
 
   ionViewWillLeave() {
+    this.cleanupWebsocketSubscriptions();
     if (this.observer) {
       this.observer.disconnect();
     }
-    //   if (this.channel) {
-    //     this.channel.stopListening('.orders.changed');
-    //     this.channel == null;
-    //   }
+  }
+
+  ngOnDestroy() {
+    this.cleanupWebsocketSubscriptions();
+    if (this.observer) {
+      this.observer.disconnect();
+    }
   }
 
   loadOrdersForCurrentSchedule() {
@@ -497,32 +498,46 @@ export default class Orders {
     });
   }
 
-  //   subscribeToOrdersChannel() {
-  //     Pusher.logToConsole = true;
-  //     this.pusher = new Pusher('ecdd4099f54ec246d3ae', {
-  //       cluster: 'eu',
-  //       authEndpoint: `${this.configService.apiUrl}/broadcasting/auth`,
-  //       auth: {
-  //         headers: {
-  //           Authorization: `Bearer ${this.authService.loggedInUser?.token}`,
-  //         },
-  //       },
-  //     });
+  private async initializeWebsocketSubscriptions() {
+    if (this.websocketInitialized) {
+      return;
+    }
 
-  //     this.channel = this.pusher.subscribe('orders');
-  //     this.channel.bind('.orders.changed', (data: any) => {
-  //       console.log('Data received:', data);
+    try {
+      this.orderChangesCleanup =
+        await this.websocketService.listenToPrivateChannel(
+          'orders',
+          '.orders.changed',
+          () => {
+            this.loadOrdersViewData();
+          }
+        );
 
-  //       const existingIndex = this.orders.findIndex(
-  //         (o) => o.id === data.order.id
-  //       );
-  //       if (existingIndex !== -1) {
-  //         this.orders[existingIndex] = data.order;
-  //       } else {
-  //         this.orders.push(data.order);
-  //       }
-  //       this.sortOrders();
-  //       this.calculateSummary();
-  //     });
-  //   }
+      this.orderScheduleChangesCleanup =
+        await this.websocketService.listenToPrivateChannel(
+          'order-schedules',
+          '.order-schedules.changed',
+          () => {
+            this.loadOrdersViewData();
+          }
+        );
+
+      this.websocketInitialized = true;
+    } catch (error) {
+      console.error(
+        'Nem sikerült csatlakozni a websocket csatornákhoz:',
+        error
+      );
+    }
+  }
+
+  private cleanupWebsocketSubscriptions() {
+    this.orderChangesCleanup?.();
+    this.orderChangesCleanup = null;
+
+    this.orderScheduleChangesCleanup?.();
+    this.orderScheduleChangesCleanup = null;
+
+    this.websocketInitialized = false;
+  }
 }
