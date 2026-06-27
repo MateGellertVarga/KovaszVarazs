@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Events\OrdersChanged;
+use App\Events\OrderSchedulesChanged;
 use App\Http\Requests\StoreOrderRequest;
 use App\Http\Requests\UpdateOrderRequest;
 use App\Http\Resources\OrderResource;
@@ -122,9 +123,10 @@ class OrderController extends Controller
 
                 $order->load(['orderItems.product', 'orderSchedule', 'user']);
                 $this->recalculateRemainingQuantities($order->orderSchedule);
+                $order->orderSchedule->refresh();
                 try {
                     broadcast(new OrdersChanged($order))->toOthers();
-                    Log::info('Event fired on store: ' . $order->id);
+                    broadcast(new OrderSchedulesChanged($order->orderSchedule))->toOthers();
                 } catch (Exception $e) {
                     Log::error('Broadcast error on store: ' . $e->getMessage());
                 }
@@ -204,9 +206,10 @@ class OrderController extends Controller
 
                 $order->load(['orderItems.product', 'orderSchedule', 'user']);
                 self::recalculateRemainingQuantities($order->orderSchedule);
+                $order->orderSchedule->refresh();
                 try {
                     broadcast(new OrdersChanged($order))->toOthers();
-                    Log::info('Event fired on update: ' . $order->id);
+                    broadcast(new OrderSchedulesChanged($order->orderSchedule))->toOthers();
                 } catch (Exception $e) {
                     Log::error('Broadcast error on update: ' . $e->getMessage());
                 }
@@ -236,7 +239,7 @@ class OrderController extends Controller
         $order->delete();
         try {
             broadcast(new OrdersChanged($order))->toOthers();
-            Log::info('Event fired on delete: ' . $order->id);
+            broadcast(new OrderSchedulesChanged($order->orderSchedule))->toOthers();
         } catch (Exception $e) {
             Log::error('Broadcast error on delete: ' . $e->getMessage());
         }
