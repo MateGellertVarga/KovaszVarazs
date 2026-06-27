@@ -27,8 +27,17 @@
   [scrollY]="editingOrder != null ? 'false':'true'"
   class="relative {{editingOrder != null ? 'pointer-events-none' : ''}}"
 >
-  <ion-refresher slot="fixed" (ionRefresh)="refresh($event)">
-    <ion-refresher-content></ion-refresher-content>
+  <ion-refresher
+    slot="fixed"
+    (ionRefresh)="refresh($event)"
+    pullMin="100"
+    pullMax="200"
+    snapbackDuration="300ms"
+  >
+    <ion-refresher-content
+      pullingIcon="chevron-down-circle-outline"
+      refreshingSpinner="circles"
+    ></ion-refresher-content>
   </ion-refresher>
 
   <div class="w-[95%] mx-auto flex justify-between items-center mt-2">
@@ -64,7 +73,7 @@
   <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 w-[95%] mx-auto mt-4">
     <div
       #nameListContainer
-      class="hidden sm:block bg-white rounded-xl p-3 max-h-[70vh] overflow-y-auto custom-scrollbar border-2 border-stone-200"
+      class="hidden sm:block bg-white rounded-xl p-3 max-h-[70vh] overflow-y-auto overscroll-contain custom-scrollbar border-2 border-stone-200"
     >
       <ion-list lines="none" class="bg-transparent">
         @for (name of names; track name) {
@@ -81,7 +90,7 @@
 
     <div
       #orderListContainer
-      class="col-span-1 sm:col-span-2 max-h-[70vh] overflow-y-auto"
+      class="col-span-1 sm:col-span-2 max-h-[70vh] overflow-y-auto overscroll-contain"
     >
       <ion-list class="bg-transparent">
         @for (order of orders; track order.id) {

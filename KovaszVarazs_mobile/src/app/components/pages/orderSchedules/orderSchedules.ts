@@ -69,6 +69,7 @@ export class OrderSchedules implements OnDestroy {
   isLoading: boolean = true;
   orderSchedules: OrderScheduleModel[] = [];
   editingOrderSchedule: OrderScheduleModel | null = null;
+  isProcessing: boolean = false;
   private websocketCleanup: (() => void) | null = null;
   private websocketInitialized = false;
 
@@ -117,6 +118,10 @@ export class OrderSchedules implements OnDestroy {
   }
 
   saveOrderSchedule(orderSchedule: OrderScheduleModel) {
+    if (this.isProcessing) {
+      return;
+    }
+    this.isProcessing = true;
     if (this.editingOrderSchedule) {
       const index = this.orderSchedules.findIndex(
         (os) => os.id === this.editingOrderSchedule!.id
@@ -128,6 +133,7 @@ export class OrderSchedules implements OnDestroy {
       }
       this.editingOrderSchedule = null;
     }
+    this.isProcessing = false;
   }
 
   async deleteOrderSchedule(orderSchedule: OrderScheduleModel) {

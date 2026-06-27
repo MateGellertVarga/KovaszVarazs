@@ -39,6 +39,11 @@ export const routes: Routes = [
           import('../pages/recipes/recipes').then((m) => m.Recipes),
       },
       {
+        path: 'market',
+        loadComponent: () =>
+          import('../pages/market/market').then((m) => m.Market),
+      },
+      {
         path: 'requests',
         loadComponent: () =>
           import('../pages/requests/requests').then((m) => m.Requests),

@@ -94,6 +94,7 @@ export default class Orders {
   editingOrder: OrderModel | null = null;
   orderSummary: { product_name: string; totalQuantity: number }[] = [];
   totalIncome: number = 0;
+  isProcessing: boolean = false;
   private orderChangesCleanup: (() => void) | null = null;
   private orderScheduleChangesCleanup: (() => void) | null = null;
   private websocketInitialized = false;
@@ -291,6 +292,10 @@ export default class Orders {
   }
 
   saveOrder(order: OrderModel) {
+    if (this.isProcessing) {
+      return;
+    }
+    this.isProcessing = true;
     if (this.editingOrder) {
       const index = this.orders.findIndex(
         (o) => o.id === this.editingOrder!.id
@@ -308,6 +313,7 @@ export default class Orders {
         .sort((a, b) => a.localeCompare(b));
       this.refreshObserver();
     }
+    this.isProcessing = false;
   }
 
   async deleteOrder(order: OrderModel) {
