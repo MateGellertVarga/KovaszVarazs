@@ -119,7 +119,7 @@ class StatisticsController extends Controller
             ->get();
 
         $costs = DB::table('costs')
-            ->select('name', DB::raw('SUM(amount) as total_amount'))
+            ->select('name', DB::raw('SUM(amount) as amount'))
             ->where('month', 'like', "$year%")
             ->groupBy('name')
             ->orderBy('name')
