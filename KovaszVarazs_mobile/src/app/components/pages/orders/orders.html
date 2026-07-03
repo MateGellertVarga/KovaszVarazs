@@ -30,14 +30,11 @@
   <ion-refresher
     slot="fixed"
     (ionRefresh)="refresh($event)"
-    pullMin="100"
-    pullMax="200"
+    pullMin="800"
+    pullMax="1000"
     snapbackDuration="300ms"
   >
-    <ion-refresher-content
-      pullingIcon="chevron-down-circle-outline"
-      refreshingSpinner="circles"
-    ></ion-refresher-content>
+    <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
 
   <div class="w-[95%] mx-auto flex justify-between items-center mt-2">

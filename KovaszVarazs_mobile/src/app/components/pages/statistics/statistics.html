@@ -1,6 +1,5 @@
 <ion-header
   [translucent]="true"
-  [translucent]="true"
   class="{{editingCost != null ? 'opacity-50 pointer-events-none' : ''}}"
 >
   <ion-toolbar>
@@ -10,6 +9,19 @@
     <ion-title class="font-bold text-2xl text-center text-black">
       Statisztika
     </ion-title>
+
+    <ion-buttons slot="end" class="pe-2">
+      <ion-select
+        [(ngModel)]="type"
+        (ionChange)="onTypeChange()"
+        interface="popover"
+        toggleIcon="chevron-down-outline"
+        class="font-semibold text-stone-700 bg-stone-100 rounded-full px-3 py-1 text-sm shadow-sm"
+      >
+        <ion-select-option value="monthly">Havi</ion-select-option>
+        <ion-select-option value="yearly">Éves</ion-select-option>
+      </ion-select>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -23,13 +35,14 @@
   </ion-refresher>
 
   <div class="mx-auto flex justify-between items-center mt-2">
-    <ion-button fill="clear" (click)="previousMonth()">
+    <ion-button fill="clear" (click)="previousPeriod()">
       <ion-icon name="chevron-back-outline"></ion-icon>
     </ion-button>
     <h2 class="text-xl font-semibold">
-      {{currentMonth | date: 'yyyy MMMM' : undefined : 'hu' }}
+      @if (type === 'monthly') { {{ currentDate | date: 'yyyy MMMM' : undefined
+      : 'hu' }} } @else { {{ currentDate | date: 'yyyy' }} }
     </h2>
-    <ion-button fill="clear" (click)="nextMonth()">
+    <ion-button fill="clear" (click)="nextPeriod()">
       <ion-icon name="chevron-forward-outline"></ion-icon>
     </ion-button>
   </div>
@@ -73,6 +86,7 @@
 
     <div class="flex justify-between items-center w-full mt-10">
       <ion-title class="text-xl font-semibold">Kiadások</ion-title>
+      @if (type === 'monthly') {
       <ion-button
         shape="round"
         color="primary"
@@ -82,16 +96,19 @@
       >
         <ion-icon name="add" slot="icon-only"></ion-icon>
       </ion-button>
+      }
     </div>
+
     <ion-list class="mt-4 px-1">
       @for (cost of statistics.costs; track $index) {
       <ion-item class="mb-1">
         <div class="w-full">
           <div class="flex justify-between items-center w-full">
             <h3>{{cost.name}}</h3>
-            <h3>{{cost.amount| number:'1.0-2' }} €</h3>
+            <h3>{{ (cost.amount ) |number:'1.0-2' }} €</h3>
           </div>
 
+          @if (type === 'monthly') {
           <div class="flex justify-evenly w-full mt-2">
             <ion-button color="white" (click)="deleteCost(cost)">
               <svg
@@ -121,13 +138,14 @@
               </svg>
             </ion-button>
           </div>
+          }
         </div>
       </ion-item>
       } @if (statistics.costs.length > 0) {
       <ion-item class="mt-2">
         <div class="flex justify-between items-center w-full font-bold">
           <h2 class="font-bold">Összesen:</h2>
-          <h2 class="font-bold">{{totalCosts| number:'1.0-2' }} €</h2>
+          <h2 class="font-bold">{{totalCosts | number:'1.0-2' }} €</h2>
         </div>
       </ion-item>
       }
@@ -136,7 +154,7 @@
   } @if (editingCost !== null) {
   <app-cost-modal
     [cost]="editingCost"
-    [month]="currentMonth"
+    [month]="currentDate"
     (canceled)="editingCost = null"
     (saved)="saveCost($event)"
   ></app-cost-modal>

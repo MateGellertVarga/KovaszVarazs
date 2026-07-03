@@ -128,10 +128,22 @@ export class DataService {
     );
   }
 
-  getStatistics(month: string): Observable<StatisticsModel> {
+  getStatisticsMonth(month: string): Observable<StatisticsModel> {
     return this.http
       .get<StatisticsModel>(
-        `${this.configService.apiUrl}/statistics?month=${month}`
+        `${this.configService.apiUrl}/statistics/monthly?month=${month}`
+      )
+      .pipe(
+        map((statistics) => ({
+          ...statistics,
+        }))
+      );
+  }
+
+  getStatisticsYear(year: string): Observable<StatisticsModel> {
+    return this.http
+      .get<StatisticsModel>(
+        `${this.configService.apiUrl}/statistics/yearly?year=${year}`
       )
       .pipe(
         map((statistics) => ({
