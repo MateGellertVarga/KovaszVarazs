@@ -63,5 +63,6 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::put('costs/{cost}', [CostController::class, 'update']);
     Route::delete('costs/{cost}', [CostController::class, 'destroy']);
 
-    Route::get('statistics', [StatisticsController::class, 'monthly']);
+    Route::get('statistics/monthly', [StatisticsController::class, 'monthly']);
+    Route::get('statistics/yearly', [StatisticsController::class, 'yearly']);
 });

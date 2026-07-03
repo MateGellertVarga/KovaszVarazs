@@ -58,6 +58,71 @@ class StatisticsController extends Controller
         $costs = DB::table('costs')
             ->select('id', 'name', 'amount', 'month')
             ->where('month', 'like', "$month%")
+            ->orderBy('name', 'asc')
+            ->get();
+
+        return response()->json([
+            'sales' => [
+                'all' => $all,
+                'paid' => $paid,
+            ],
+            'costs' => $costs,
+        ]);
+    }
+
+    public function yearly(Request $request)
+    {
+        $authUser = $request->user();
+        if (!$authUser || $authUser->role !== 'admin') {
+            return response()->json(['message' => 'Nincs jogod ehhez a művelethez'], 401);
+        }
+
+        $year = $request->query('year');
+        if (!$year) {
+            return response()->json([
+                'message' => 'Year parameter is required in the format YYYY.'
+            ], 400);
+        }
+
+        if (!preg_match('/^\d{4}$/', $year)) {
+            return response()->json(['message' => 'Invalid year format. Use YYYY.'], 400);
+        }
+
+        $all = DB::table('order_items')
+            ->join('orders', 'order_items.order_id', '=', 'orders.id')
+            ->join('order_schedules', 'orders.order_schedule_id', '=', 'order_schedules.id')
+            ->join('products', 'order_items.product_id', '=', 'products.id')
+            ->select(
+                'products.id as product_id',
+                'products.name as product_name',
+                DB::raw('SUM(order_items.quantity) as quantity')
+            )
+            ->where('orders.status', 'completed')
+            ->where('order_schedules.available_date', 'like', "$year%")
+            ->groupBy('products.id', 'products.name')
+            ->get();
+
+        $paid = DB::table('order_items')
+            ->join('orders', 'order_items.order_id', '=', 'orders.id')
+            ->join('order_schedules', 'orders.order_schedule_id', '=', 'order_schedules.id')
+            ->join('products', 'order_items.product_id', '=', 'products.id')
+            ->select(
+                'products.id as product_id',
+                'products.name as product_name',
+                DB::raw('SUM(order_items.quantity) as quantity'),
+                DB::raw('SUM(order_items.quantity * order_items.unit_price) as income')
+            )
+            ->where('orders.status', 'completed')
+            ->where('orders.is_paying', true)
+            ->where('order_schedules.available_date', 'like', "$year%")
+            ->groupBy('products.id', 'products.name')
+            ->get();
+
+        $costs = DB::table('costs')
+            ->select('name', DB::raw('SUM(amount) as total_amount'))
+            ->where('month', 'like', "$year%")
+            ->groupBy('name')
+            ->orderBy('name')
             ->get();
 
         return response()->json([
