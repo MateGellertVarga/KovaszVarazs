@@ -66,3 +66,7 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::get('statistics/monthly', [StatisticsController::class, 'monthly']);
     Route::get('statistics/yearly', [StatisticsController::class, 'yearly']);
 });
+
+Route::middleware(['auth:sanctum', 'admin'])->prefix('auth')->group(function () {
+    Route::post('/fcm-token', [AuthController::class, 'updateFcmToken']);
+});

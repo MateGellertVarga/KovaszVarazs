@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('phone_number')->nullable();
             $table->string('password');
             $table->string('role')->default('user');
+            $table->string('fcm_token')->nullable();
         });
     }
 

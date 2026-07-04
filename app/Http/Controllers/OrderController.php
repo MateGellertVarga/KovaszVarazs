@@ -10,6 +10,9 @@ use App\Http\Resources\OrderResource;
 use App\Models\Order;
 use App\Models\OrderSchedule;
 use App\Models\Product;
+use App\Models\User;
+use App\Services\FcmService;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -119,6 +122,32 @@ class OrderController extends Controller
                         ->where('order_schedule_id', $order->order_schedule_id)
                         ->where('product_id', $orderItem->product_id)
                         ->decrement('remaining_quantity', $orderItem->quantity);
+
+                    if (($remaining - $orderItem->quantity) === 0) {
+                        $admin = User::where('id', $order->orderSchedule->user_id)
+                            ->whereNotNull('fcm_token')
+                            ->first();
+
+                        if ($admin) {
+                            try {
+                                $dateFormatted = Carbon::parse($order->orderSchedule->available_date)
+                                    ->locale('hu')
+                                    ->isoFormat('YYYY-MM-DD dddd');
+
+                                FcmService::sendPushNotification(
+                                    $admin->fcm_token,
+                                    'Vigyázat!',
+                                    "{$dateFormatted} napon {$orderItem->product->name} termék elfogyott!",
+                                    [
+                                        'product_id' => $orderItem->product_id,
+                                        'schedule_id' => $order->order_schedule_id
+                                    ]
+                                );
+                            } catch (Exception $e) {
+                                Log::error('Push error on store: ' . $e->getMessage());
+                            }
+                        }
+                    }
                 }
 
                 $order->load(['orderItems.product', 'orderSchedule', 'user']);
@@ -207,6 +236,47 @@ class OrderController extends Controller
                 $order->load(['orderItems.product', 'orderSchedule', 'user']);
                 self::recalculateRemainingQuantities($order->orderSchedule);
                 $order->orderSchedule->refresh();
+
+                if ($request->has('order_items')) {
+                    foreach ($orderItemsData as $item) {
+                        if ($item['quantity'] > 0) {
+                            $currentRemaining = DB::table('order_schedule_products')
+                                ->where('order_schedule_id', $order->order_schedule_id)
+                                ->where('product_id', $item['product_id'])
+                                ->value('remaining_quantity');
+
+                            $oldQty = $oldOrderItems->firstWhere('product_id', $item['product_id'])->quantity ?? 0;
+
+                            if ($currentRemaining === 0 && $item['quantity'] > $oldQty) {
+                                $product = Product::find($item['product_id']);
+                                $admin = User::where('id', $order->orderSchedule->user_id)
+                                    ->whereNotNull('fcm_token')
+                                    ->first();
+
+                                if ($admin) {
+                                    try {
+                                        $dateFormatted = Carbon::parse($order->orderSchedule->available_date)
+                                            ->locale('hu')
+                                            ->isoFormat('YYYY-MM-DD dddd');
+
+                                        FcmService::sendPushNotification(
+                                            $admin->fcm_token,
+                                            'Vigyázat!',
+                                            "{$dateFormatted} napon {$product->name} termék elfogyott!",
+                                            [
+                                                'product_id' => $product->id,
+                                                'schedule_id' => $order->order_schedule_id
+                                            ]
+                                        );
+                                    } catch (Exception $e) {
+                                        Log::error('Push error on update: ' . $e->getMessage());
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
                 try {
                     broadcast(new OrdersChanged($order))->toOthers();
                     broadcast(new OrderSchedulesChanged($order->orderSchedule))->toOthers();

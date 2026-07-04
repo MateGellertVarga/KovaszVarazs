@@ -53,10 +53,26 @@ class AuthController extends Controller
     {
         $user = $request->user();
         $user?->tokens()->where('name', 'token')->delete();
+        $user->update(['fcm_token' => null]);
 
         return response()
             ->json(['message' => 'Sikeres kijelentkezés'])
             ->header('Set-Cookie', "auth_token=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=None; Partitioned");
+    }
+
+    public function updateFcmToken(Request $request)
+    {
+        $request->validate([
+            'fcm_token' => 'required|string',
+        ]);
+
+        $request->user()->update([
+            'fcm_token' => $request->fcm_token
+        ]);
+
+        return response()->json([
+            'message' => 'FCM token sikeresen frissítve.'
+        ], 200);
     }
 
 
