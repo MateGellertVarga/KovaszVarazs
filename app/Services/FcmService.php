@@ -11,20 +11,27 @@ class FcmService
     public static function sendPushNotification($fcmToken, $title, $body, $data = [])
     {
         try {
-            $credentialsPath = storage_path('app/firebase.json');
+            $credentials = null;
+            if (env('FIREBASE_CREDENTIALS')) {
+                $credentials = json_decode(env('FIREBASE_CREDENTIALS'), true);
+            } else {
+                $credentialsPath = storage_path('app/firebase_credentials.json');
+                if (file_exists($credentialsPath)) {
+                    $credentials = json_decode(file_get_contents($credentialsPath), true);
+                }
+            }
 
-            if (!file_exists($credentialsPath)) {
-                Log::error('Firebase credentials file missing at: ' . $credentialsPath);
+            if (!$credentials) {
+                Log::error('Firebase credentials missing both from .env and storage.');
                 return false;
             }
 
             $client = new GoogleClient();
-            $client->setAuthConfig($credentialsPath);
+            $client->setAuthConfig($credentials);
             $client->addScope('https://www.googleapis.com/auth/firebase.messaging');
             $client->fetchAccessTokenWithAssertion();
             $accessToken = $client->getAccessToken()['access_token'];
 
-            $credentials = json_decode(file_get_contents($credentialsPath), true);
             $projectId = $credentials['project_id'];
 
             $payload = [
