@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class OrderSchedule extends Model
 {
     public $timestamps = false;
-    protected $fillable = ['available_date', 'note'];
+    protected $fillable = ['user_id', 'available_date', 'note'];
 
     public function products()
     {

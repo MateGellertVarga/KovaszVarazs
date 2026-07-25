@@ -14,6 +14,7 @@ class StoreOrderScheduleRequest extends FormRequest
     public function rules()
     {
         return [
+            'user_id' => 'required|exists:users,id',
             'available_date' => 'required|date|unique:order_schedules,available_date',
             'note' => 'nullable|string',
             'products' => 'required|array',
@@ -25,6 +26,8 @@ class StoreOrderScheduleRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'user_id.required' => 'Felhasználó hiányzik',
+            'user_id.exists'   => 'Felhasználó nem létezik',
             'available_date.required' => 'Dátum hiányzik',
             'available_date.date'     => 'Dátum formátuma nem megfelelő',
             'available_date.unique'   => 'Ez a dátum már foglalt',

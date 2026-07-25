@@ -66,6 +66,7 @@ class OrderScheduleController extends Controller
         DB::beginTransaction();
         try {
             $schedule = OrderSchedule::create([
+                'user_id' => $validated['user_id'],
                 'available_date' => $validated['available_date'],
                 'note' => $validated['note']
             ]);
