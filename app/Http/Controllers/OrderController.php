@@ -128,6 +128,13 @@ class OrderController extends Controller
                             ->whereNotNull('fcm_token')
                             ->first();
 
+                        Log::info('Push trigger lefutott:', [
+                            'schedule_id' => $order->order_schedule_id,
+                            'schedule_owner_id' => $order->orderSchedule->user_id,
+                            'found_admin_id' => $admin ? $admin->id : 'NINCS ADMIN TOKENNEL!',
+                            'fcm_token' => $admin ? $admin->fcm_token : null
+                        ]);
+
                         if ($admin) {
                             try {
                                 $dateFormatted = Carbon::parse($order->orderSchedule->available_date)
