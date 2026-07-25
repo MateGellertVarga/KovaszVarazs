@@ -5,6 +5,7 @@ import { Capacitor } from '@capacitor/core';
 import { SecureStorage } from '@aparajita/capacitor-secure-storage';
 import { map, Observable, of, firstValueFrom } from 'rxjs';
 import { ConfigService } from './config.service';
+import { PushNotificationService } from './push-notification.service';
 
 type LoginResponseA = { user: UserModel; token: string };
 type LoginResponseB = UserModel & { token: string };
@@ -13,7 +14,11 @@ type LoginResponseB = UserModel & { token: string };
   providedIn: 'root',
 })
 export class AuthService {
-  constructor(private http: HttpClient, private configService: ConfigService) {
+  constructor(
+    private http: HttpClient,
+    private configService: ConfigService,
+    private pushNotificationService: PushNotificationService
+  ) {
     this.loadUserData();
   }
 
@@ -42,6 +47,8 @@ export class AuthService {
           this.loggedInUser = user;
           this.storeUserData(user);
           this.setToken(token);
+          this.pushNotificationService.initPush();
+
           return true;
         })
       );
@@ -119,6 +126,12 @@ export class AuthService {
       const stored = localStorage.getItem('loggedInUser');
       return stored ? JSON.parse(stored) : null;
     }
+  }
+
+  saveFcmToken(token: string): Observable<any> {
+    return this.http.post(`${this.configService.apiUrl}/auth/fcm-token`, {
+      fcm_token: token,
+    });
   }
 
   async removeStoredUser() {

@@ -27,6 +27,7 @@ import { OrderScheduleModel } from 'src/models/orderScheduleModel';
 import { ModalNavbarService } from 'src/app/services/modal-navbar.service';
 import { OrderScheduleModalComponent } from '../../modals/order-schedule-modal/order-schedule-modal.component';
 import { WebsocketService } from 'src/app/services/websocket.service';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'orderSchedules',
@@ -56,6 +57,7 @@ import { WebsocketService } from 'src/app/services/websocket.service';
 })
 export class OrderSchedules implements OnDestroy {
   constructor(
+    private authService: AuthService,
     private dataService: DataService,
     private datePipe: DatePipe,
     private modalNavbarService: ModalNavbarService,
@@ -105,6 +107,7 @@ export class OrderSchedules implements OnDestroy {
   newOrderSchedule() {
     this.editingOrderSchedule = {
       id: 0,
+      user_id: this.authService.loggedInUser!.id!,
       available_date: new Date(),
       note: '',
       products: [],

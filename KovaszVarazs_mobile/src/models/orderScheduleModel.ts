@@ -1,5 +1,6 @@
 export interface OrderScheduleModel {
   id: number;
+  user_id: number;
   available_date: Date;
   note?: string;
   products: Product[];
