@@ -196,7 +196,17 @@ export class DataService {
 
   getRequests(): Observable<RequestModel[]> {
     return this.http.get<RequestModel[]>(
-      `${this.configService.apiUrl}/requests`
+      `${this.configService.apiUrl}/registration-requests`
+    );
+  }
+
+  handleRegistrationRequest(
+    id: number,
+    action: 'approve' | 'reject'
+  ): Observable<any> {
+    return this.http.post<any>(
+      `${this.configService.apiUrl}/registration-requests/${id}/${action}`,
+      {}
     );
   }
 }

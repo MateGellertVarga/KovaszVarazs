@@ -1,73 +1,91 @@
 <ion-header
   [translucent]="false"
-  class="{{editingRequest != null ? 'opacity-50 pointer-events-none' : ''}}"
+  class="{{ editingRequest != null ? 'opacity-50 pointer-events-none' : '' }}"
 >
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-menu-button class="text-black"></ion-menu-button>
     </ion-buttons>
-
     <ion-title class="font-bold text-2xl text-center text-black">
-      Kérelmek
+      Felhasználók
     </ion-title>
+  </ion-toolbar>
+
+  <ion-toolbar>
+    <ion-segment [value]="currentSegment" (ionChange)="segmentChanged($event)">
+      <ion-segment-button value="pending">
+        <ion-label>Függő</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="approved">
+        <ion-label>Elfogadva</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="rejected">
+        <ion-label>Elutasítva</ion-label>
+      </ion-segment-button>
+    </ion-segment>
   </ion-toolbar>
 </ion-header>
 
 <ion-content
   [fullscreen]="true"
   [scrollY]="editingRequest != null ? 'false':'true'"
-  class="relative {{editingRequest != null ? 'pointer-events-none' : ''}}"
+  class="relative bg-gray-50 {{ editingRequest != null ? 'pointer-events-none' : '' }}"
 >
   <ion-refresher slot="fixed" (ionRefresh)="refresh($event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
 
   @if (isLoading) {
-  <div class="w-full flex justify-center items-center mt-4">
-    <img src="assets/loading.gif" alt="Loading..." />
+  <div class="w-full h-full flex justify-center items-center mt-10">
+    <ion-spinner name="crescent" color="primary"></ion-spinner>
   </div>
-  } @else if (!isLoading && requests.length === 0) {
-  <div class="w-full flex justify-center items-center mt-2">
-    <p class="text-muted">Nincs kérelem</p>
+  } @else if (!isLoading && filteredRequests.length === 0) {
+  <div class="w-full flex justify-center items-center mt-10">
+    <p class="text-gray-500 italic text-center">
+      Nincs megjeleníthető kérelem ebben a kategóriában.
+    </p>
   </div>
   } @else {
-  <ion-list class="mb-16">
-    @for (request of requests; track $index) {
-    <ion-item>
-      <ion-card class="w-10/12 mx-auto">
-        <ion-card-header>
-          <ion-card-title class="font-bold">{{request.name}}</ion-card-title>
-          <ion-card-subtitle>{{request.email}}</ion-card-subtitle>
+  <ion-list class="mb-16 bg-transparent">
+    @for (request of filteredRequests; track request.id) {
+    <ion-item lines="none" class="mb-2">
+      <ion-card class="w-full mx-auto shadow-sm ring-1 ring-black/5 rounded-xl">
+        <ion-card-header class="pb-2">
+          <ion-card-title class="font-bold text-xl">
+            {{ request.name }}
+          </ion-card-title>
+          <ion-card-subtitle class="flex flex-col gap-1 mt-1 text-gray-600">
+            <span class="flex items-center gap-2">
+              <ion-icon name="mail-outline"></ion-icon> {{ request.email }}
+            </span>
+            <span class="flex items-center gap-2">
+              <ion-icon name="call-outline"></ion-icon> {{ request.phone_number
+              }}
+            </span>
+          </ion-card-subtitle>
         </ion-card-header>
 
         <ion-card-content>
-          <div class="flex justify-evenly mt-2">
-            <ion-button color="white" (click)="submitRequest(request, false)">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="32"
-                height="32"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  fill="red"
-                  d="M7 21q-.825 0-1.412-.587T5 19V6q-.425 0-.712-.288T4 5t.288-.712T5 4h4q0-.425.288-.712T10 3h4q.425 0 .713.288T15 4h4q.425 0 .713.288T20 5t-.288.713T19 6v13q0 .825-.587 1.413T17 21zm3-4q.425 0 .713-.288T11 16V9q0-.425-.288-.712T10 8t-.712.288T9 9v7q0 .425.288.713T10 17m4 0q.425 0 .713-.288T15 16V9q0-.425-.288-.712T14 8t-.712.288T13 9v7q0 .425.288.713T14 17"
-                />
-              </svg>
+          <div class="flex justify-end gap-3 mt-2 border-t pt-3">
+            @if (request.status !== 'approved') {
+            <ion-button
+              fill="clear"
+              color="success"
+              (click)="submitRequest(request, 'approve')"
+            >
+              <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon>
+              Engedélyez
             </ion-button>
-            <ion-button color="white" (click)="submitRequest(request, true)">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="32"
-                height="32"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  fill="grey"
-                  d="M3 21v-4.25L17.625 2.175L21.8 6.45L7.25 21zM17.6 7.8L19 6.4L17.6 5l-1.4 1.4z"
-                />
-              </svg>
+            } @if (request.status !== 'rejected') {
+            <ion-button
+              fill="clear"
+              color="danger"
+              (click)="submitRequest(request, 'reject')"
+            >
+              <ion-icon slot="start" name="close-circle-outline"></ion-icon>
+              {{ request.status === 'approved' ? 'Letiltás' : 'Elutasít' }}
             </ion-button>
+            }
           </div>
         </ion-card-content>
       </ion-card>
@@ -75,11 +93,4 @@
     }
   </ion-list>
   }
-  <!-- @if (editingRequest !== null) {
-  <app-request-modal
-    [request]="editingRequest"
-    (canceled)="editingRequest = null"
-    (submitted)="submitRequest($event)"
-  ></app-request-modal>
-  } -->
 </ion-content>
