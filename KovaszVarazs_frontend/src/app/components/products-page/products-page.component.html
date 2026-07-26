@@ -1,71 +1,78 @@
 <app-navbar></app-navbar>
 
 @if (isLoading) {
-<div class="w-full flex justify-center items-center mt-4">
-  <img src="loading.gif" alt="Loading..." />
-</div>
+  <div class="w-full flex justify-center items-center mt-4">
+    <img src="loading.gif" alt="Loading..." />
+  </div>
 } @else if (!isLoading && products.length === 0) {
-<div class="w-full flex justify-center items-center mt-2">
-  <p class="text-muted">Nincs termék</p>
-</div>
-} @else { @for (category of categoryOrder; track $index) {
-<div>
-  @if (groupedProducts[category].length) {
-  <ng-container>
-    <div class="flex justify-center">
-      <h2
-        class="inline-block px-5 py-2 mb-2 mt-8 rounded-full border-2 border-[#c68958] text-[#c68958] bg-white font-bold text-xl shadow transition"
-      >
-        {{ category }}
-      </h2>
-    </div>
-    <div
-      class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 justify-center"
-    >
-      @for (product of groupedProducts[category]; track $index) {
-      <ng-container>
-        <div class="flex px-3 py-3">
-          <div
-            class="w-56 bg-white rounded-2xl overflow-hidden shadow-lg border border-gray-200 flex flex-col"
-          >
-            <div
-              class="w-full aspect-[9/16] bg-gray-200 flex items-center justify-center"
+  <div class="w-full flex justify-center items-center mt-2">
+    <p class="text-muted">Nincs termék</p>
+  </div>
+} @else {
+  @for (category of categoryOrder; track $index) {
+    <div>
+      @if (groupedProducts[category].length) {
+        <ng-container>
+          <div class="flex justify-center">
+            <h2
+              class="inline-block px-5 py-2 mb-2 mt-8 rounded-full border-2 border-[#c68958] text-[#c68958] bg-white font-bold text-xl shadow transition"
             >
-              <img
-                [src]="product.image_url"
-                class="w-full h-full object-cover"
-                alt="{{ product.name }}"
-              />
-            </div>
-
-            <div
-              class="px-4 py-3 flex flex-col items-center justify-center flex-1"
-            >
-              <div class="font-bold text-xl mb-2 text-center">
-                {{ product.name }}
-              </div>
-              <p class="text-gray-900 text-lg text-center">
-                {{ product.price | number : "1.0-2" }} €/db
-              </p>
-              @if (product.allergens) {
-              <p
-                class="text-gray-700 text-sm text-center mt-3.5 wrap-break-word"
-              >
-                Allergének:
-                {{ product.allergens }}
-              </p>
-              } @if (product.description) {
-              <p class="text-gray-700 text-sm text-center mt-1 wrap-break-word">
-                Megjegyzés: {{ product.description }}
-              </p>
-              }
-            </div>
+              {{ category }}
+            </h2>
           </div>
-        </div>
-      </ng-container>
+          <div
+            class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 justify-center"
+          >
+            @for (product of groupedProducts[category]; track $index) {
+              <ng-container>
+                <div class="flex px-3 py-3">
+                  <div
+                    class="w-56 bg-white rounded-2xl overflow-hidden shadow-lg border border-gray-200 flex flex-col"
+                  >
+                    <div
+                      class="w-full aspect-[9/16] bg-gray-200 flex items-center justify-center"
+                    >
+                      <img
+                        [src]="product.image_url"
+                        class="w-full h-full object-cover"
+                        alt="{{ product.name }}"
+                      />
+                    </div>
+
+                    <div
+                      class="px-4 py-3 flex flex-col items-center justify-center flex-1"
+                    >
+                      <div class="font-bold text-xl mb-2 text-center">
+                        {{ product.name }}
+                      </div>
+                      @if (this.authService.loggedInUser) {
+                        <p class="text-gray-900 text-lg text-center">
+                          {{ product.price | number: "1.0-2" }} €/db
+                        </p>
+                        @if (product.allergens) {
+                          <p
+                            class="text-gray-700 text-sm text-center mt-3.5 wrap-break-word"
+                          >
+                            Allergének:
+                            {{ product.allergens }}
+                          </p>
+                        }
+                        @if (product.description) {
+                          <p
+                            class="text-gray-700 text-sm text-center mt-1 wrap-break-word"
+                          >
+                            Megjegyzés: {{ product.description }}
+                          </p>
+                        }
+                      }
+                    </div>
+                  </div>
+                </div>
+              </ng-container>
+            }
+          </div>
+        </ng-container>
       }
     </div>
-  </ng-container>
   }
-</div>
-} }
+}

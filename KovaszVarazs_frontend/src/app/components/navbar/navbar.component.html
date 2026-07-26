@@ -38,14 +38,36 @@
         </div>
         <div class="hidden sm:ml-6 sm:block">
           <div class="flex space-x-4">
-            @for (item of menuItems; track $index) {
             <a
-              routerLink="{{ item.path }}"
+              routerLink="/fooldal"
               routerLinkActive="bg-yellow-900"
               aria-current="page"
               class="rounded-md bg-brown px-3 py-2 font-medium text-white hover:bg-yellow-900"
-              >{{ item.label }}</a
+              >Főoldal</a
             >
+            @if (this.authService.loggedInUser) {
+              <a
+                routerLink="/termekek"
+                routerLinkActive="bg-yellow-900"
+                aria-current="page"
+                class="rounded-md bg-brown px-3 py-2 font-medium text-white hover:bg-yellow-900"
+                >Termékek</a
+              >
+              <a
+                routerLink="/rendeles"
+                routerLinkActive="bg-yellow-900"
+                aria-current="page"
+                class="rounded-md bg-brown px-3 py-2 font-medium text-white hover:bg-yellow-900"
+                >Rendelés</a
+              >
+            } @else {
+              <a
+                routerLink="/termekek"
+                routerLinkActive="bg-yellow-900"
+                aria-current="page"
+                class="rounded-md bg-brown px-3 py-2 font-medium text-white hover:bg-yellow-900"
+                >Galéria</a
+              >
             }
           </div>
         </div>
@@ -72,41 +94,42 @@
           </div>
 
           @if (this.dropDownOpen) {
-          <div
-            role="menu"
-            tabindex="-1"
-            aria-labelledby="user-menu-button"
-            aria-orientation="vertical"
-            class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black/5 focus:outline-hidden"
-          >
-            @if (this.authService.loggedInUser) {
-            <a
-              id="user-menu-item-0"
-              role="menuitem"
-              routerLink="/user"
+            <div
+              role="menu"
               tabindex="-1"
-              class="block px-4 py-2 text-sm text-gray-700"
-              >{{ this.authService.loggedInUser.name }}</a
+              aria-labelledby="user-menu-button"
+              aria-orientation="vertical"
+              class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black/5 focus:outline-hidden"
             >
+              @if (this.authService.loggedInUser) {
+                <a
+                  id="user-menu-item-0"
+                  role="menuitem"
+                  routerLink="/user"
+                  tabindex="-1"
+                  class="block px-4 py-2 text-sm text-gray-700"
+                  >{{ this.authService.loggedInUser.name }}</a
+                >
 
-            <a
-              id="user-menu-item-1"
-              role="menuitem"
-              tabindex="-1"
-              class="block px-4 py-2 text-sm text-gray-700"
-              (click)="logout()"
-              >Kijelentkezés</a
-            >
-            } @else {<a
-              id="user-menu-item-0"
-              role="menuitem"
-              tabindex="-1"
-              class="block px-4 py-2 text-sm text-gray-700"
-              routerLink="/bejelentkezes"
-              >Bejelentkezés</a
-            >
-            }
-          </div>
+                <a
+                  id="user-menu-item-1"
+                  role="menuitem"
+                  tabindex="-1"
+                  class="block px-4 py-2 text-sm text-gray-700"
+                  (click)="logout()"
+                  >Kijelentkezés</a
+                >
+              } @else {
+                <a
+                  id="user-menu-item-0"
+                  role="menuitem"
+                  tabindex="-1"
+                  class="block px-4 py-2 text-sm text-gray-700"
+                  routerLink="/bejelentkezes"
+                  >Bejelentkezés</a
+                >
+              }
+            </div>
           }
         </div>
       </div>
@@ -115,18 +138,40 @@
 
   <!-- Mobile menu -->
   @if (mobileMenuOpen) {
-  <div id="mobile-menu" class="sm:hidden" #mobileWrap>
-    <div class="space-y-1 px-2 pt-2 pb-3">
-      @for (item of menuItems; track $index) {
-      <a
-        routerLink="{{ item.path }}"
-        routerLinkActive="bg-yellow-900"
-        aria-current="page"
-        class="block rounded-md bg-brown px-3 py-2 text-base font-medium text-white"
-        >{{ item.label }}</a
-      >
-      }
+    <div id="mobile-menu" class="sm:hidden" #mobileWrap>
+      <div class="space-y-1 px-2 pt-2 pb-3">
+        <a
+          routerLink="/fooldal"
+          routerLinkActive="bg-yellow-900"
+          aria-current="page"
+          class="block rounded-md bg-brown px-3 py-2 text-base font-medium text-white"
+          >Főoldal</a
+        >
+        @if (this.authService.loggedInUser) {
+          <a
+            routerLink="/termekek"
+            routerLinkActive="bg-yellow-900"
+            aria-current="page"
+            class="block rounded-md bg-brown px-3 py-2 text-base font-medium text-white"
+            >Termékek</a
+          >
+          <a
+            routerLink="/rendeles"
+            routerLinkActive="bg-yellow-900"
+            aria-current="page"
+            class="rounded-md bg-brown px-3 py-2 font-medium text-white hover:bg-yellow-900"
+            >Rendelés</a
+          >
+        } @else {
+          <a
+            routerLink="/termekek"
+            routerLinkActive="bg-yellow-900"
+            aria-current="page"
+            class="block rounded-md bg-brown px-3 py-2 text-base font-medium text-white"
+            >Galéria</a
+          >
+        }
+      </div>
     </div>
-  </div>
   }
 </nav>

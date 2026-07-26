@@ -12,7 +12,10 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './registration-page.component.css',
 })
 export class RegistrationPageComponent {
-  constructor(private authservice: AuthService, private router: Router) {}
+  constructor(
+    private authservice: AuthService,
+    private router: Router,
+  ) {}
 
   newUser: UserModel = {
     name: '',
@@ -25,12 +28,15 @@ export class RegistrationPageComponent {
   errorMessage: string = '';
   showPassword: boolean = false;
   showPasswordAgain: boolean = false;
+  isRegisteredSuccessfully = false;
+  successMessage = '';
 
   register() {
     if (this.validation()) {
       this.authservice.register(this.newUser).subscribe({
-        next: () => {
-          this.router.navigate(['/bejelentkezes']);
+        next: (res: any) => {
+          this.isRegisteredSuccessfully = true;
+          this.successMessage = res.message;
         },
         error: (error: any) => {
           this.errorMessage = error.error.message;
@@ -45,8 +51,7 @@ export class RegistrationPageComponent {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const phoneRegex =
       /^\+?\d{1,3}?[-.\s]?\(?\d{1,4}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,9}$/;
-    const passwordRegex =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+={}\[\]:;"'<>,.?/~`\\|-])[A-Za-z\d!@#$%^&*()_+={}\[\]:;"'<>,.?/~`\\|-]{8,}$/;
+    const passwordRegex = /\d/;
 
     if (!this.newUser!.name.trim()) {
       this.errorMessage += 'Név kötelező!\n';
@@ -67,12 +72,11 @@ export class RegistrationPageComponent {
     }
     if (!this.newUser!.password!.trim()) {
       this.errorMessage += 'Jelszó kötelező!\n';
-    } else if (this.newUser.password!.length < 8) {
+    } else if (this.newUser.password!.length < 6) {
       this.errorMessage +=
-        'Jelszónak legalább 8 karakter hosszúnak kell lennie!\n';
+        'Jelszónak legalább 6 karakter hosszúnak kell lennie!\n';
     } else if (!passwordRegex.test(this.newUser!.password!)) {
-      this.errorMessage +=
-        'Jelszónak tartalmaznia kell legalább egy kisbetűt, egy nagybetűt, egy számot és egy speciális karaktert!\n';
+      this.errorMessage += 'Jelszónak tartalmaznia kell legalább egy számot!\n';
     }
     if (!this.passwordAgain.trim()) {
       this.errorMessage += 'Jelszó újra kötelező!\n';

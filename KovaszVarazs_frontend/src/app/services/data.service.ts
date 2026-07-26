@@ -10,7 +10,10 @@ import { ProductModel } from '../../models/productModel';
   providedIn: 'root',
 })
 export class DataService {
-  constructor(private http: HttpClient, private configService: ConfigService) {}
+  constructor(
+    private http: HttpClient,
+    private configService: ConfigService,
+  ) {}
 
   getOrdersByOrderScheduleId(scheduleId: number): Observable<OrderModel[]> {
     return this.http
@@ -20,13 +23,13 @@ export class DataService {
           orders.map((order) => ({
             ...order,
             order_schedule_date: new Date(order.order_schedule_date),
-          }))
-        )
+          })),
+        ),
       );
   }
 
   getActiveOrdersByUserId(
-    userId: number | undefined //nagyon csúnyaaaaa, but works
+    userId: number | undefined, //nagyon csúnyaaaaa, but works
   ): Observable<OrderModel[]> {
     return this.http
       .get<OrderModel[]>(`${this.configService.apiUrl}/orders`)
@@ -35,22 +38,22 @@ export class DataService {
           orders.map((order) => ({
             ...order,
             order_schedule_date: new Date(order.order_schedule_date),
-          }))
-        )
+          })),
+        ),
       );
   }
 
   addOrder(order: OrderModel): Observable<OrderModel> {
     return this.http.post<OrderModel>(
       `${this.configService.apiUrl}/orders`,
-      order
+      order,
     );
   }
 
   updateOrder(id: number, order: OrderModel): Observable<OrderModel> {
     return this.http.put<OrderModel>(
       `${this.configService.apiUrl}/orders/${id}`,
-      order
+      order,
     );
   }
 
@@ -60,38 +63,38 @@ export class DataService {
 
   getOrderSchedules(
     before: number,
-    after: number
+    after: number,
   ): Observable<OrderScheduleModel[]> {
     return this.http
-      .get<OrderScheduleModel[]>(
-        `${this.configService.apiUrl}/orderSchedules?before=${before}&after=${after}`
-      )
+      .get<
+        OrderScheduleModel[]
+      >(`${this.configService.apiUrl}/orderSchedules?before=${before}&after=${after}`)
       .pipe(
         map((schedules) =>
           schedules.map((schedule) => ({
             ...schedule,
             available_date: new Date(schedule.available_date),
-          }))
-        )
+          })),
+        ),
       );
   }
 
   getOrderSchedule(id: number): Observable<OrderScheduleModel> {
     return this.http
       .get<OrderScheduleModel>(
-        `${this.configService.apiUrl}/orderSchedules/${id}`
+        `${this.configService.apiUrl}/orderSchedules/${id}`,
       )
       .pipe(
         map((schedule) => ({
           ...schedule,
           available_date: new Date(schedule.available_date),
-        }))
+        })),
       );
   }
 
   getProducts(): Observable<ProductModel[]> {
     return this.http.get<ProductModel[]>(
-      `${this.configService.apiUrl}/products`
+      `${this.configService.apiUrl}/products`,
     );
   }
 }

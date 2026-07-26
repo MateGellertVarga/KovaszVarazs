@@ -1,4 +1,10 @@
-import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  HostListener,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { MenubarModule } from 'primeng/menubar';
 import { TieredMenuModule } from 'primeng/tieredmenu';
@@ -18,16 +24,13 @@ import { Router, RouterLink, RouterLinkActive } from '@angular/router';
   styleUrl: './navbar.component.css',
 })
 export class NavbarComponent {
-  constructor(public authService: AuthService, private router: Router) {}
+  constructor(
+    public authService: AuthService,
+    private router: Router,
+  ) {}
 
   @ViewChild('profileWrap') profileWrap?: ElementRef<HTMLElement>;
   @ViewChild('mobileWrap') mobileWrap?: ElementRef<HTMLElement>;
-
-  menuItems = [
-    { label: 'Főoldal', path: '/fooldal' },
-    { label: 'Termékek', path: '/termekek' },
-    { label: 'Rendelés', path: '/rendeles' },
-  ];
 
   dropDownOpen = false;
   mobileMenuOpen = false;
@@ -68,7 +71,7 @@ export class NavbarComponent {
   }
 
   @HostListener('document:keydown.escape', ['$event'])
-  onEsc(e: KeyboardEvent) {
+  onEsc(e: Event) {
     if (this.dropDownOpen) this.dropDownOpen = false;
     if (this.mobileMenuOpen) this.mobileMenuOpen = false;
   }

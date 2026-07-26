@@ -4,6 +4,7 @@ import { DataService } from '../../services/data.service';
 import { NavbarComponent } from '../navbar/navbar.component';
 import { CommonModule, registerLocaleData } from '@angular/common';
 import localeHu from '@angular/common/locales/hu';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-products-page',
@@ -12,7 +13,10 @@ import localeHu from '@angular/common/locales/hu';
   styleUrl: './products-page.component.css',
 })
 export class ProductsPageComponent implements OnInit {
-  constructor(private dataService: DataService) {
+  constructor(
+    private dataService: DataService,
+    public authService: AuthService,
+  ) {
     registerLocaleData(localeHu);
   }
 
