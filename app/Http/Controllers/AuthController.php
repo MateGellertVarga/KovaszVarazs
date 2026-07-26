@@ -8,22 +8,44 @@ use App\Models\User;
 use Illuminate\Http\Response;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\LoginRequest;
+use App\Models\RegistrationRequest;
+use App\Services\FcmService;
+use Illuminate\Support\Facades\Log;
 use Laravel\Sanctum\PersonalAccessToken;
 
 class AuthController extends Controller
 {
     public function register(RegisterRequest $request)
     {
-        $user = User::create([
+        $registrationRequest = RegistrationRequest::create([
             'name'         => $request->name,
             'email'        => $request->email,
             'phone_number' => $request->phone_number,
             'password'     => Hash::make($request->password),
-            'role'         => $request->role
+            'role'         => $request->role,
+            'status'       => 'pending'
         ]);
 
+        $admins = User::where('role', 'admin')->whereNotNull('fcm_token')->get();
+
+        foreach ($admins as $admin) {
+            try {
+                FcmService::sendPushNotification(
+                    $admin->fcm_token,
+                    'Új csatlakozási kérelem! 🥖',
+                    "{$registrationRequest->name} szeretne csatlakozni a vevőidhez.",
+                    [
+                        'registration_request_id' => $registrationRequest->id,
+                        'type' => 'new_registration'
+                    ]
+                );
+            } catch (\Exception $e) {
+                Log::error('Push értesítés hiba regisztrációnál: ' . $e->getMessage());
+            }
+        }
+
         return response()->json([
-            'message' => 'Registration successful.',
+            'message' => 'A csatlakozási kérelmedet rögzítettük! Az adminisztrátor jóváhagyása után tudsz majd belépni.',
         ], Response::HTTP_CREATED);
     }
 

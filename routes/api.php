@@ -9,6 +9,7 @@ use App\Http\Controllers\OrderScheduleController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CostController;
 use App\Http\Controllers\OrderSeedController;
+use App\Http\Controllers\RegistrationRequestController;
 use App\Http\Controllers\StatisticsController;
 use App\Http\Controllers\UserController;
 
@@ -65,6 +66,10 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
 
     Route::get('statistics/monthly', [StatisticsController::class, 'monthly']);
     Route::get('statistics/yearly', [StatisticsController::class, 'yearly']);
+
+    Route::get('/registration-requests', [RegistrationRequestController::class, 'index']);
+    Route::post('/registration-requests/{id}/approve', [RegistrationRequestController::class, 'approve']);
+    Route::post('/registration-requests/{id}/reject', [RegistrationRequestController::class, 'reject']);
 });
 
 Route::middleware(['auth:sanctum', 'admin'])->prefix('auth')->group(function () {
