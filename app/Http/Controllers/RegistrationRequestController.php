@@ -28,24 +28,25 @@ class RegistrationRequestController extends Controller
 
         $registrationRequest = RegistrationRequest::findOrFail($id);
 
-        if ($registrationRequest->status === 'approved') {
-            return response()->json(['message' => 'Ez a kérelem már jóvá lett hagyva.'], 400);
-        }
-
         try {
             DB::transaction(function () use ($registrationRequest) {
-                User::create([
-                    'name'         => $registrationRequest->name,
-                    'email'        => $registrationRequest->email,
-                    'phone_number' => $registrationRequest->phone_number,
-                    'password'     => $registrationRequest->password,
-                    'role'         => $registrationRequest->role,
-                ]);
-
+                $existingUser = User::where('email', $registrationRequest->email)->first();
+                if ($existingUser) {
+                    $existingUser->update(['is_active' => true]);
+                } else {
+                    User::create([
+                        'name'         => $registrationRequest->name,
+                        'email'        => $registrationRequest->email,
+                        'phone_number' => $registrationRequest->phone_number,
+                        'password'     => $registrationRequest->password,
+                        'role'         => $registrationRequest->role,
+                        'is_active'    => true,
+                    ]);
+                }
                 $registrationRequest->update(['status' => 'approved']);
             });
 
-            return response()->json(['message' => 'A felhasználó sikeresen jóváhagyva és a fiók létrejött!']);
+            return response()->json(['message' => 'A felhasználó sikeresen engedélyezve!']);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Hiba történt a jóváhagyás során.',
@@ -62,12 +63,21 @@ class RegistrationRequestController extends Controller
 
         $registrationRequest = RegistrationRequest::findOrFail($id);
 
-        if ($registrationRequest->status === 'approved' || $registrationRequest->status === 'rejected') {
-            return response()->json(['message' => 'Ez a kérelem már el lett bírálva.'], 400);
+        try {
+            DB::transaction(function () use ($registrationRequest) {
+                $registrationRequest->update(['status' => 'rejected']);
+                $user = User::where('email', $registrationRequest->email)->first();
+                if ($user) {
+                    $user->update(['is_active' => false]);
+                    $user->tokens()->delete();
+                }
+            });
+            return response()->json(['message' => 'A felhasználót letiltottuk.']);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Hiba történt a letiltás során.',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        $registrationRequest->update(['status' => 'rejected']);
-
-        return response()->json(['message' => 'A csatlakozási kérelem elutasítva.']);
     }
 }

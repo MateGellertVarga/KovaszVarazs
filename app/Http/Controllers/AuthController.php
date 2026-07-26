@@ -53,6 +53,10 @@ class AuthController extends Controller
     {
         $user = User::where('email', $request->email)->first();
 
+        if (!$user->is_active) {
+            return response()->json(['message' => 'Ezt a fiókot az adminisztrátor letiltotta.'], 403);
+        }
+
         if (!$user || !Hash::check($request->password, $user->password)) {
             return response()->json(['message' => 'Helytelen email cím vagy jelszó'], 400);
         }
