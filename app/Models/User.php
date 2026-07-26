@@ -25,6 +25,7 @@ class User extends Authenticatable
         'password',
         'role',
         'fcm_token',
+        'is_active',
     ];
 
     /**
