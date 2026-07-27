@@ -128,11 +128,6 @@ class AuthController extends Controller
         if ($request->user()->role !== 'admin') {
             return response()->json(['message' => 'Nincs jogod ehhez a művelethez'], 403);
         }
-        DB::transaction(function () {
-            RegistrationRequest::where('id', 3)->delete();
-            RegistrationRequest::where('id', 4)->delete();
-            RegistrationRequest::where('id', 9)->delete();
-        });
         $users = User::all()->makeHidden(['password']);
         return response()->json($users, 200);
     }
