@@ -70,6 +70,9 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::get('/registration-requests', [RegistrationRequestController::class, 'index']);
     Route::post('/registration-requests/{id}/approve', [RegistrationRequestController::class, 'approve']);
     Route::post('/registration-requests/{id}/reject', [RegistrationRequestController::class, 'reject']);
+
+    Route::get('/users', [AuthController::class, 'index']);
+    Route::delete('/users/{id}', [AuthController::class, 'destroy']);
 });
 
 Route::middleware(['auth:sanctum', 'admin'])->prefix('auth')->group(function () {

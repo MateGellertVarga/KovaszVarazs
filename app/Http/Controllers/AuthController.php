@@ -10,6 +10,7 @@ use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\LoginRequest;
 use App\Models\RegistrationRequest;
 use App\Services\FcmService;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Laravel\Sanctum\PersonalAccessToken;
 
@@ -45,7 +46,7 @@ class AuthController extends Controller
         }
 
         return response()->json([
-            'message' => 'A csatlakozási kérelmedet rögzítettük! Az adminisztrátor jóváhagyása után tudsz majd belépni.',
+            'message' => 'A csatlakozási kérelmet rögzítettük! Az adminisztrátor jóváhagyása után tudsz majd belépni.',
         ], Response::HTTP_CREATED);
     }
 
@@ -53,13 +54,33 @@ class AuthController extends Controller
     {
         $user = User::where('email', $request->email)->first();
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
+        if (!$user) {
+            $registrationRequest = RegistrationRequest::where('email', $request->email)
+                ->orderBy('id', 'desc')
+                ->first();
+
+            if ($registrationRequest) {
+                if ($registrationRequest->status === 'pending') {
+                    return response()->json([
+                        'message' => 'Az adott email címhez már tartozik regisztráció, várd meg az admin jóváhagyását, vagy keresd fel üzenetben!'
+                    ], 403);
+                } elseif ($registrationRequest->status === 'rejected') {
+                    return response()->json([
+                        'message' => 'Ezzel az email címmel már elutasították a regisztrációt'
+                    ], 403);
+                }
+            }
+
             return response()->json(['message' => 'Helytelen email cím vagy jelszó'], 400);
         }
+
+        if (!Hash::check($request->password, $user->password)) {
+            return response()->json(['message' => 'Helytelen email cím vagy jelszó'], 400);
+        }
+
         if (!$user->is_active) {
             return response()->json(['message' => 'Ezt a fiókot az adminisztrátor letiltotta.'], 403);
         }
-
 
         $token = $user->createToken('token')->plainTextToken;
 
@@ -79,7 +100,7 @@ class AuthController extends Controller
     {
         $user = $request->user();
         $user?->tokens()->where('name', 'token')->delete();
-        $user->update(['fcm_token' => null]);
+        $user?->update(['fcm_token' => null]);
 
         return response()
             ->json(['message' => 'Sikeres kijelentkezés'])
@@ -101,51 +122,51 @@ class AuthController extends Controller
         ], 200);
     }
 
+    public function index(Request $request)
+    {
+        if ($request->user()->role !== 'admin') {
+            return response()->json(['message' => 'Nincs jogod ehhez a művelethez'], 403);
+        }
+        $users = User::all()->makeHidden(['password']);
+        return response()->json($users, 200);
+    }
 
-    // public function login(LoginRequest $request)
-    // {
-    //     $user = User::where('email', $request->email)->first();
+    public function destroy(Request $request, $id)
+    {
+        if ($request->user()->role !== 'admin') {
+            return response()->json(['message' => 'Nincs jogod ehhez a művelethez'], 403);
+        }
+        $user = User::find($id);
+        if (!$user) {
+            return response()->json(['message' => 'A felhasználó nem található.'], 404);
+        }
+        $hasOrders = false;
+        if (method_exists($user, 'orders') && $user->orders()->exists()) {
+            $hasOrders = true;
+        } elseif (class_exists(\App\Models\Order::class) && \App\Models\Order::where('user_id', $id)->exists()) {
+            $hasOrders = true;
+        }
 
-    //     if (!$user || !Hash::check($request->password, $user->password)) {
-    //         return response()->json(['message' => 'Helytelen email cím vagy jelszó'], 400);
-    //     }
+        if ($hasOrders) {
+            return response()->json([
+                'message' => 'A felhasználó nem törölhető, mert kapcsolódó rendelései vannak az adatbázisban!'
+            ], 400);
+        }
 
-    //     $token = $user->createToken('token')->plainTextToken;
+        try {
+            DB::transaction(function () use ($user) {
+                RegistrationRequest::where('email', $user->email)->delete();
+                $user->delete();
+            });
 
-    //     $cookie = cookie(
-    //         'auth_token',
-    //         $token,
-    //         60 * 24 * 30, // 30 nap
-    //         '/',
-    //         null,
-    //         true,   // Secure (HTTPS kell)
-    //         true,   // HttpOnly
-    //         false,  // raw
-    //         'none'  // SameSite
-    //     );
-
-    //     return response()
-    //         ->json([
-    //             'id' => $user->id,
-    //             'name' => $user->name,
-    //             'email' => $user->email,
-    //             'phone_number' => $user->phone_number,
-    //             'role' => $user->role,
-    //             'token' => $token // mobil
-    //         ], 200)
-    //         ->cookie($cookie);
-    // }
-
-
-    // public function logout(Request $request)
-    // {
-    //     $user = $request->user();
-    //     $user->tokens()->where('name', 'token')->delete();
-
-    //     $cookie = cookie('auth_token', '', -1, '/', null, true, true, false, 'none');
-
-    //     return response()
-    //         ->json(['message' => 'Sikeres kijelentkezés'])
-    //         ->cookie($cookie);
-    // }
+            return response()->json([
+                'message' => 'A felhasználó és a hozzá tartozó regisztrációs kérelem sikeresen törölve lett.'
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Hiba történt a törlés során.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }
