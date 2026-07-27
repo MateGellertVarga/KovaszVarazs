@@ -23,6 +23,7 @@ export class RegistrationPageComponent {
     phone_number: '',
     password: '',
     role: 'user',
+    is_active: true,
   };
   passwordAgain: string = '';
   errorMessage: string = '';

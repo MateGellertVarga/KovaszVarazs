@@ -9,7 +9,10 @@ import { switchMap, tap, map, catchError } from 'rxjs/operators';
   providedIn: 'root',
 })
 export class AuthService {
-  constructor(private http: HttpClient, private configService: ConfigService) {
+  constructor(
+    private http: HttpClient,
+    private configService: ConfigService,
+  ) {
     this.loadUserData();
   }
 
@@ -29,9 +32,10 @@ export class AuthService {
             email: res.email,
             phone_number: res.phone_number ?? '',
             role: (res as any).role ?? '',
+            is_active: (res as any).is_active ?? true,
           } as UserModel;
         }),
-        map(() => true)
+        map(() => true),
       );
   }
 
@@ -57,19 +61,23 @@ export class AuthService {
             email: res.email,
             phone_number: res.phone_number ?? '',
             role: (res as any).role ?? '',
+            is_active: (res as any).is_active ?? true,
           } as UserModel;
-        })
+        }),
       );
   }
 
-  async loadUserData(): Promise<void> {
-    try {
-      const user = await firstValueFrom(
-        this.http.get<UserModel>(`${this.configService.apiUrl}/auth/me`)
+  loadUserData(): Observable<UserModel | null> {
+    return this.http
+      .get<UserModel>(`${this.configService.apiUrl}/auth/me`)
+      .pipe(
+        tap((user) => {
+          this.loggedInUser = user ?? null;
+        }),
+        catchError(() => {
+          this.loggedInUser = null;
+          return of(null);
+        }),
       );
-      this.loggedInUser = user ?? null;
-    } catch {
-      this.loggedInUser = null;
-    }
   }
 }

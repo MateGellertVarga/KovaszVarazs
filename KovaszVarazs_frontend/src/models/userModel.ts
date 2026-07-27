@@ -5,5 +5,6 @@ export interface UserModel {
   phone_number: string;
   password?: string;
   role: string;
+  is_active: boolean;
   token?: string;
 }
