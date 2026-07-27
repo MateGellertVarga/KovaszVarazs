@@ -131,6 +131,7 @@ class AuthController extends Controller
         DB::transaction(function () {
             RegistrationRequest::where('id', 3)->delete();
             RegistrationRequest::where('id', 4)->delete();
+            RegistrationRequest::where('id', 9)->delete();
         });
         $users = User::all()->makeHidden(['password']);
         return response()->json($users, 200);
