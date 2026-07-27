@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Http\Response;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\LoginRequest;
+use App\Models\Order;
 use App\Models\RegistrationRequest;
 use App\Services\FcmService;
 use Illuminate\Support\Facades\DB;
@@ -127,6 +128,10 @@ class AuthController extends Controller
         if ($request->user()->role !== 'admin') {
             return response()->json(['message' => 'Nincs jogod ehhez a művelethez'], 403);
         }
+        DB::transaction(function () {
+            RegistrationRequest::where('id', 3)->delete();
+            RegistrationRequest::where('id', 4)->delete();
+        });
         $users = User::all()->makeHidden(['password']);
         return response()->json($users, 200);
     }
@@ -143,7 +148,7 @@ class AuthController extends Controller
         $hasOrders = false;
         if (method_exists($user, 'orders') && $user->orders()->exists()) {
             $hasOrders = true;
-        } elseif (class_exists(\App\Models\Order::class) && \App\Models\Order::where('user_id', $id)->exists()) {
+        } elseif (class_exists(Order::class) && Order::where('user_id', $id)->exists()) {
             $hasOrders = true;
         }
 
