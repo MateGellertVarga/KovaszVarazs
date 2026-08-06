@@ -20,6 +20,16 @@ use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
 {
+    private function canModifyOrder($user, OrderSchedule $schedule): bool
+    {
+        if ($user->role === 'admin') {
+            return true;
+        }
+
+        $deadline = Carbon::parse($schedule->available_date)->subDay()->setTime(6, 0, 0);
+        return Carbon::now()->lessThanOrEqualTo($deadline);
+    }
+
     public function index(Request $request)
     {
         $user = $request->user();
@@ -29,6 +39,9 @@ class OrderController extends Controller
             $orders = Order::with(['orderItems.product', 'orderSchedule', 'user'])
                 ->where('user_id', $user->id)
                 ->where('status', '!=', 'completed')
+                ->whereHas('orderSchedule', function ($query) {
+                    $query->whereDate('available_date', '>=', Carbon::today());
+                })
                 ->get();
         }
         return OrderResource::collection($orders);
@@ -56,6 +69,12 @@ class OrderController extends Controller
             return response()->json(['message' => 'Nem található a sütési időpont'], 400);
         }
 
+        if (!$this->canModifyOrder($request->user(), $orderSchedule)) {
+            return response()->json([
+                'message' => 'A rendelés leadási határideje (sütés előtti nap 6:00) már lejárt!'
+            ], 403);
+        }
+
         $data = $request->validated();
 
         if ($request->user()) {
@@ -80,7 +99,7 @@ class OrderController extends Controller
         }
 
         try {
-            return DB::transaction(function () use ($data, $request) {
+            return DB::transaction(function () use ($data, $request, $orderSchedule) {
                 $order = Order::create($data);
 
                 $orderItems = [];
@@ -109,41 +128,35 @@ class OrderController extends Controller
                 $order->update(['total_price' => $total_price]);
 
                 foreach ($orderItems as $orderItem) {
+                    $affected = DB::table('order_schedule_products')
+                        ->where('order_schedule_id', $order->order_schedule_id)
+                        ->where('product_id', $orderItem->product_id)
+                        ->where('remaining_quantity', '>=', $orderItem->quantity)
+                        ->decrement('remaining_quantity', $orderItem->quantity);
+
+                    if ($affected === 0) {
+                        throw new Exception("Nincs elég szabad készlet a következő termékből: {$orderItem->product->name}");
+                    }
+
                     $remaining = DB::table('order_schedule_products')
                         ->where('order_schedule_id', $order->order_schedule_id)
                         ->where('product_id', $orderItem->product_id)
                         ->value('remaining_quantity');
 
-                    if ($remaining < $orderItem->quantity) {
-                        throw new Exception("Nincs elég szabad termék: {$orderItem->product->name}");
-                    }
-
-                    DB::table('order_schedule_products')
-                        ->where('order_schedule_id', $order->order_schedule_id)
-                        ->where('product_id', $orderItem->product_id)
-                        ->decrement('remaining_quantity', $orderItem->quantity);
-
-                    if (($remaining - $orderItem->quantity) === 0) {
-                        $admin = User::where('id', $order->orderSchedule->user_id)
+                    if ($remaining === 0) {
+                        $admin = User::where('id', $orderSchedule->user_id)
                             ->whereNotNull('fcm_token')
                             ->first();
 
-                        Log::info('Push trigger lefutott:', [
-                            'schedule_id' => $order->order_schedule_id,
-                            'schedule_owner_id' => $order->orderSchedule->user_id,
-                            'found_admin_id' => $admin ? $admin->id : 'NINCS ADMIN TOKENNEL!',
-                            'fcm_token' => $admin ? $admin->fcm_token : null
-                        ]);
-
                         if ($admin) {
                             try {
-                                $dateFormatted = Carbon::parse($order->orderSchedule->available_date)
+                                $dateFormatted = Carbon::parse($orderSchedule->available_date)
                                     ->locale('hu')
                                     ->isoFormat('YYYY-MM-DD dddd');
 
                                 FcmService::sendPushNotification(
                                     $admin->fcm_token,
-                                    'Vigyázat!',
+                                    'Vigyázat! 🚨',
                                     "{$dateFormatted} napon {$orderItem->product->name} termék elfogyott!",
                                     [
                                         'product_id' => $orderItem->product_id,
@@ -160,12 +173,14 @@ class OrderController extends Controller
                 $order->load(['orderItems.product', 'orderSchedule', 'user']);
                 $this->recalculateRemainingQuantities($order->orderSchedule);
                 $order->orderSchedule->refresh();
+
                 try {
                     broadcast(new OrdersChanged($order))->toOthers();
                     broadcast(new OrderSchedulesChanged($order->orderSchedule))->toOthers();
                 } catch (Exception $e) {
                     Log::error('Broadcast error on store: ' . $e->getMessage());
                 }
+
                 return new OrderResource($order);
             });
         } catch (Exception $e) {
@@ -177,9 +192,17 @@ class OrderController extends Controller
     {
         $order = Order::with(['orderItems.product', 'orderSchedule', 'user'])->findOrFail($id);
         $user = $request->user();
-        if ($user->role !== 'admin' && $order->user_id !== $user->id) { //TODO
-            return response()->json(['message' => 'Nincs jogod ehhez a művelethez'], 401);
+
+        if ($user->role !== 'admin') {
+            if ($order->user_id !== $user->id) {
+                return response()->json(['message' => 'Nincs jogod ehhez a művelethez'], 403);
+            }
+
+            if (Carbon::parse($order->orderSchedule->available_date)->startOfDay()->lessThan(Carbon::today())) {
+                return response()->json(['message' => 'Ez a rendelés már lezárult, nem megtekinthető.'], 403);
+            }
         }
+
         return new OrderResource($order);
     }
 
@@ -189,7 +212,13 @@ class OrderController extends Controller
         $authUser = $request->user();
 
         if ($authUser->role !== 'admin' && $order->user_id !== $authUser->id) {
-            return response()->json(['message' => 'Nincs jogod ehhez a művelethez'], 401);
+            return response()->json(['message' => 'Nincs jogod ehhez a művelethez'], 403);
+        }
+
+        if (!$this->canModifyOrder($authUser, $order->orderSchedule)) {
+            return response()->json([
+                'message' => 'A módosítási határidő (sütés előtti nap 6:00) már lejárt!'
+            ], 403);
         }
 
         try {
@@ -213,13 +242,14 @@ class OrderController extends Controller
                             $product = Product::findOrFail($item['product_id']);
                             $unit_price = $product->price;
 
-                            $remaining = DB::table('order_schedule_products')
+                            $affected = DB::table('order_schedule_products')
                                 ->where('order_schedule_id', $order->order_schedule_id)
                                 ->where('product_id', $item['product_id'])
-                                ->value('remaining_quantity');
+                                ->where('remaining_quantity', '>=', $item['quantity'])
+                                ->decrement('remaining_quantity', $item['quantity']);
 
-                            if ($remaining < $item['quantity']) {
-                                throw new Exception("Nincs elég szabad termék: {$product->name}");
+                            if ($affected === 0) {
+                                throw new Exception("Nincs elég szabad készlet a módosításhoz: {$product->name}");
                             }
 
                             DB::table('order_items')->insert([
@@ -268,7 +298,7 @@ class OrderController extends Controller
 
                                         FcmService::sendPushNotification(
                                             $admin->fcm_token,
-                                            'Vigyázat!',
+                                            'Vigyázat! 🚨',
                                             "{$dateFormatted} napon {$product->name} termék elfogyott!",
                                             [
                                                 'product_id' => $product->id,
@@ -290,6 +320,7 @@ class OrderController extends Controller
                 } catch (Exception $e) {
                     Log::error('Broadcast error on update: ' . $e->getMessage());
                 }
+
                 return new OrderResource($order);
             });
         } catch (Exception $e) {
@@ -303,7 +334,13 @@ class OrderController extends Controller
         $authUser = $request->user();
 
         if ($authUser->role !== 'admin' && $order->user_id !== $authUser->id) {
-            return response()->json(['message' => 'Nincs jogod ehhez a művelethez'], 401);
+            return response()->json(['message' => 'Nincs jogod ehhez a művelethez'], 403);
+        }
+
+        if (!$this->canModifyOrder($authUser, $order->orderSchedule)) {
+            return response()->json([
+                'message' => 'A rendelés törlési határideje (sütés előtti nap 6:00) már lejárt!'
+            ], 403);
         }
 
         foreach ($order->orderItems as $orderItem) {

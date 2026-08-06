@@ -43,6 +43,7 @@ class FcmService
                     ],
                     'data' => array_map('strval', $data),
                     'android' => [
+                        'priority' => 'high',
                         'notification' => [
                             'sound' => 'default',
                         ]
