@@ -86,14 +86,23 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('auth')->group(function () 
 });
 
 Route::get('/test-email-trigger', function () {
-    $schedule = OrderSchedule::first();
+    $schedule = OrderSchedule::last();
     if (!$schedule) {
         return "Nincs egyetlen sütési időpont sem az adatbázisban a teszthez!";
     }
-    $user = User::where('is_active', true)->first();
+    $user = User::where('is_active', true)
+        ->where('role', '!=', 'admin')
+        ->first();
     if (!$user) {
         return "Nincs aktív user a rendszerben!";
     }
     Mail::to($user->email)->send(new OrderReminderEmail($user, $schedule));
     return "Teszt e-mail elküldve ide: {$user->email} a következő sütési naphoz: {$schedule->available_date}";
 });
+
+// local testing route for email preview
+// Route::get('/mail-preview', function () {
+//     $schedule = new OrderSchedule(['available_date' => '2026-06-10']);
+//     $user = new User(['name' => 'Teszt Elek']);
+//     return (new OrderReminderEmail($user, $schedule))->render();
+// });
