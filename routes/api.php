@@ -77,6 +77,7 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
 
     Route::get('/users', [UserController::class, 'index']);
     Route::post('/users/{id}/deactivate', [UserController::class, 'deactivate']);
+    Route::patch('/users/{id}/reminder', [UserController::class, 'toggleReminder']);
     Route::delete('/users/{id}', [AuthController::class, 'destroy']);
 });
 
