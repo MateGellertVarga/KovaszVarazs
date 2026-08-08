@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
 {
-    private function canModifyOrder($user, OrderSchedule $schedule): bool
+    private function canModifyOrder(User $user, OrderSchedule $schedule): bool
     {
         if ($user->role === 'admin') {
             return true;

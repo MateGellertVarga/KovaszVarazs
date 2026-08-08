@@ -23,10 +23,6 @@ Route::prefix('auth')->group(function () {
 Route::get('products', [ProductController::class, 'index']);
 Route::get('products/{product}', [ProductController::class, 'show']);
 
-Route::get('orderSchedules', [OrderScheduleController::class, 'index']);
-Route::get('orderSchedules/{orderSchedule}', [OrderScheduleController::class, 'show']);
-
-Route::post('orders', [OrderController::class, 'store']);
 
 /* Authenticated user endpoints */
 
@@ -35,7 +31,11 @@ Route::middleware('auth:sanctum')->prefix('auth')->group(function () {
     Route::get('me', [UserController::class, 'show']);
     Route::put('me', [UserController::class, 'update']);
 });
+
 Route::middleware('auth:sanctum')->group(function () {
+    Route::get('orderSchedules', [OrderScheduleController::class, 'index']);
+    Route::get('orderSchedules/{orderSchedule}', [OrderScheduleController::class, 'show']);
+    Route::post('orders', [OrderController::class, 'store']);
     Route::get('orders', [OrderController::class, 'index']);
     Route::get('orders/{orderSchedule}', [OrderController::class, 'getOrdersByOrderSchedule']);
     Route::get('orders/{order}', [OrderController::class, 'show']);
