@@ -69,7 +69,9 @@ class OrderController extends Controller
             return response()->json(['message' => 'Nem található a sütési időpont'], 400);
         }
 
-        if (!$this->canModifyOrder($request->user(), $orderSchedule)) {
+        $user = $request->user('sanctum');
+
+        if (!$this->canModifyOrder($user, $orderSchedule)) {
             return response()->json([
                 'message' => 'A rendelés leadási határideje (sütés előtti nap 6:00) már lejárt!'
             ], 403);
@@ -77,25 +79,36 @@ class OrderController extends Controller
 
         $data = $request->validated();
 
-        if ($request->user()) {
-            $data['user_id'] = $request->user()->id;
-            $data['customer_name'] = $data['customer_name'] ?? null;
-            $data['phone_number'] = $data['phone_number'] ?? null;
+        if ($user) {
+            if ($user->role === 'admin') {
+                $data['user_id'] = $data['user_id'] ?? null;
+            } else {
+                $data['user_id'] = $user->id;
+                $data['customer_name'] = $data['customer_name'] ?? $user->name;
+                $data['phone_number']  = $data['phone_number'] ?? $user->phone_number;
+            }
+        } else {
+            $data['user_id'] = null;
         }
 
-        if (($data['user_id'] ?? null) === null && ($data['customer_name'] ?? null) === null) {
+        if (empty($data['user_id']) && empty($data['customer_name'])) {
             return response()->json(['message' => 'Vevő megadása kötelező'], 400);
         }
 
-        $existingOrder = Order::where('order_schedule_id', $data['order_schedule_id'])
-            ->when($data['user_id'] ?? null, fn($query) => $query->where('user_id', $data['user_id']))
-            ->when(($data['user_id'] ?? null) === null && ($data['customer_name'] ?? null), fn($query) => $query->where('customer_name', $data['customer_name']))
-            ->first();
+        $existingOrderQuery = Order::where('order_schedule_id', $data['order_schedule_id']);
 
-        if ($existingOrder) {
-            return response()->json([
-                'message' => 'Erre a névre már létezik rendelés ezen a napon.'
-            ], 400);
+        if (!empty($data['user_id'])) {
+            $existingOrderQuery->where('user_id', $data['user_id']);
+        } else {
+            $existingOrderQuery->where('customer_name', $data['customer_name']);
+        }
+
+        if ($existingOrderQuery->exists()) {
+            $errorMessage = !empty($data['user_id'])
+                ? 'Már leadtál egy rendelést erre a napra!'
+                : 'Erre a névre már létezik rendelés ezen a napon.';
+
+            return response()->json(['message' => $errorMessage], 400);
         }
 
         try {
