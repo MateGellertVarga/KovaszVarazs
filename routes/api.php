@@ -12,6 +12,10 @@ use App\Http\Controllers\OrderSeedController;
 use App\Http\Controllers\RegistrationRequestController;
 use App\Http\Controllers\StatisticsController;
 use App\Http\Controllers\UserController;
+use App\Mail\OrderReminderEmail;
+use App\Models\OrderSchedule;
+use App\Models\User;
+use Illuminate\Support\Facades\Mail;
 
 /* Public endpoints */
 
@@ -71,10 +75,24 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::post('/registration-requests/{id}/approve', [RegistrationRequestController::class, 'approve']);
     Route::post('/registration-requests/{id}/reject', [RegistrationRequestController::class, 'reject']);
 
-    Route::get('/users', [AuthController::class, 'index']);
+    Route::get('/users', [UserController::class, 'index']);
+    Route::post('/users/{id}/deactivate', [UserController::class, 'deactivate']);
     Route::delete('/users/{id}', [AuthController::class, 'destroy']);
 });
 
 Route::middleware(['auth:sanctum', 'admin'])->prefix('auth')->group(function () {
     Route::post('/fcm-token', [AuthController::class, 'updateFcmToken']);
+});
+
+Route::get('/test-email-trigger', function () {
+    $schedule = OrderSchedule::first();
+    if (!$schedule) {
+        return "Nincs egyetlen sütési időpont sem az adatbázisban a teszthez!";
+    }
+    $user = User::where('is_active', true)->first();
+    if (!$user) {
+        return "Nincs aktív user a rendszerben!";
+    }
+    Mail::to($user->email)->send(new OrderReminderEmail($user, $schedule));
+    return "Teszt e-mail elküldve ide: {$user->email} a következő sütési naphoz: {$schedule->available_date}";
 });

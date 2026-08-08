@@ -26,6 +26,7 @@ class User extends Authenticatable
         'role',
         'fcm_token',
         'is_active',
+        'wants_reminder',
     ];
 
     /**

@@ -23,7 +23,12 @@ class UpdateUserRequest extends FormRequest
                 Rule::unique('users', 'email')->ignore($this->user()->id)
             ],
             'phone_number' => 'sometimes|nullable|phone:SK,HU,RO,PL,CZ,AT,DE,INTERNATIONAL',
-            'password'     => 'sometimes|required|string|min:8|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/',
+            'password'     => [
+                'required',
+                'string',
+                'min:6',
+                'regex:/[0-9]/',
+            ],
         ];
     }
 
@@ -38,8 +43,8 @@ class UpdateUserRequest extends FormRequest
             'phone_number.phone' => 'Telefonszám formátuma nem megfelelő',
             'password.required' => 'Jelszó hiányzik',
             'password.string'   => 'Jelszó formátuma nem megfelelő',
-            'password.min'      => 'Jelszónak legalább 8 karakternek kell lennie',
-            'password.regex'    => 'Jelszónak legalább 1 nagybetűt, 1 kisbetűt, 1 számot és 1 speciális karaktert kell tartalmaznia',
+            'password.min'          => 'A jelszónak minimum 6 karakter hosszúnak kell lennie',
+            'password.regex'        => 'A jelszónak legalább egy számot tartalmaznia kell',
         ];
     }
 }

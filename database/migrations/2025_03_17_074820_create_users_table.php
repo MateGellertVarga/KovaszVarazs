@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('role')->default('user');
             $table->string('fcm_token')->nullable();
             $table->boolean('is_active')->default(true);
+            $table->boolean('wants_reminder')->default(false);
         });
     }
 
