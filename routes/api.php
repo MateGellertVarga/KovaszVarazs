@@ -86,7 +86,7 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('auth')->group(function () 
 });
 
 Route::get('/test-email-trigger', function () {
-    $schedule = OrderSchedule::last();
+    $schedule = OrderSchedule::first();
     if (!$schedule) {
         return "Nincs egyetlen sütési időpont sem az adatbázisban a teszthez!";
     }
