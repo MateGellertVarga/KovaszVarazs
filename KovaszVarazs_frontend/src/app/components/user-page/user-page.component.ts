@@ -12,7 +12,10 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './user-page.component.css',
 })
 export class UserPageComponent implements OnInit {
-  constructor(public authservice: AuthService, private router: Router) {}
+  constructor(
+    public authservice: AuthService,
+    private router: Router,
+  ) {}
 
   user: UserModel | null = null;
   passwordAgain: string = '';
@@ -47,17 +50,18 @@ export class UserPageComponent implements OnInit {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const phoneRegex =
       /^\+?\d{1,3}?[-.\s]?\(?\d{1,4}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,9}$/;
-    const passwordRegex =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+={}\[\]:;"'<>,.?/~`\\|-])[A-Za-z\d!@#$%^&*()_+={}\[\]:;"'<>,.?/~`\\|-]{8,}$/;
+    const passwordRegex = /\d/;
 
     if (!this.user!.name.trim()) {
       this.errorMessage += 'Név kötelező!\n';
-    } else if (this.user!.name.trim().length < 3) {
+    }
+    if (this.user!.name.trim().length < 3) {
       this.errorMessage += 'Név túl rövid!\n';
     }
     if (!this.user!.email.trim()) {
       this.errorMessage += 'Email cím kötelező!\n';
-    } else if (!emailRegex.test(this.user!.email)) {
+    }
+    if (!emailRegex.test(this.user!.email)) {
       this.errorMessage += 'Email cím formátuma nem megfelelő!\n';
     }
     if (!this.user!.phone_number.trim()) {
@@ -65,22 +69,19 @@ export class UserPageComponent implements OnInit {
     } else if (!phoneRegex.test(this.user!.phone_number)) {
       this.errorMessage += 'Telefonszám formátuma nem megfelelő!\n';
     }
-    if (!!this.user!.password?.trim() || !!this.passwordAgain.trim()) {
-      if (!this.user!.password!.trim()) {
-        this.errorMessage += 'Jelszó kötelező!\n';
-      } else if (this.user!.password!.length < 8) {
-        this.errorMessage +=
-          'Jelszónak legalább 8 karakter hosszúnak kell lennie!\n';
-      } else if (!passwordRegex.test(this.user!.password!)) {
-        this.errorMessage +=
-          'Jelszónak tartalmaznia kell legalább egy kisbetűt, egy nagybetűt, egy számot és egy speciális karaktert!\n';
-      }
-      if (!this.passwordAgain.trim()) {
-        this.errorMessage += 'Jelszó újra kötelező!\n';
-      }
-      if (this.user!.password !== this.passwordAgain) {
-        this.errorMessage += 'Jelszó nem egyezik!\n';
-      }
+    if (!this.user!.password!.trim()) {
+      this.errorMessage += 'Jelszó kötelező!\n';
+    } else if (this.user!.password!.length < 6) {
+      this.errorMessage +=
+        'Jelszónak legalább 6 karakter hosszúnak kell lennie!\n';
+    } else if (!passwordRegex.test(this.user!.password!)) {
+      this.errorMessage += 'Jelszónak tartalmaznia kell legalább egy számot!\n';
+    }
+    if (!this.passwordAgain.trim()) {
+      this.errorMessage += 'Jelszó újra kötelező!\n';
+    }
+    if (this.user!.password !== this.passwordAgain) {
+      this.errorMessage += 'Jelszó nem egyezik!\n';
     }
 
     return !this.errorMessage;
