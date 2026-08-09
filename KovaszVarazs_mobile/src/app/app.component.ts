@@ -7,6 +7,7 @@ import { StatusBar, Style } from '@capacitor/status-bar';
 import { Keyboard } from '@capacitor/keyboard';
 import { Capacitor } from '@capacitor/core';
 import { App } from '@capacitor/app';
+import { PushNotificationService } from './services/push-notification.service';
 
 @Component({
   selector: 'app-root',
@@ -20,7 +21,8 @@ export class AppComponent implements OnInit {
     private authService: AuthService,
     private router: Router,
     private platform: Platform,
-    private toastController: ToastController
+    private toastController: ToastController,
+    private pushNotificationService: PushNotificationService
   ) {
     this.platform.ready().then(() => {
       this.exitAppOnDoubleTap();
@@ -44,6 +46,7 @@ export class AppComponent implements OnInit {
       ) {
         this.router.navigate(['/tabs/login']);
       }
+      this.pushNotificationService.initPush();
     } catch {
       this.router.navigate(['/tabs/login']);
     }

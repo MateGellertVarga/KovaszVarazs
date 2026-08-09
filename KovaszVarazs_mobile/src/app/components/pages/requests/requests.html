@@ -1,7 +1,4 @@
-<ion-header
-  [translucent]="false"
-  class="{{ editingRequest != null ? 'opacity-50 pointer-events-none' : '' }}"
->
+<ion-header [translucent]="false">
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-menu-button class="text-black"></ion-menu-button>
@@ -26,11 +23,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content
-  [fullscreen]="true"
-  [scrollY]="editingRequest != null ? 'false':'true'"
-  class="relative bg-gray-50 {{ editingRequest != null ? 'pointer-events-none' : '' }}"
->
+<ion-content [fullscreen]="true" class="relative bg-gray-50">
   <ion-refresher slot="fixed" (ionRefresh)="refresh($event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
@@ -39,54 +32,87 @@
   <div class="w-full h-full flex justify-center items-center mt-10">
     <ion-spinner name="crescent" color="primary"></ion-spinner>
   </div>
-  } @else if (!isLoading && filteredRequests.length === 0) {
+  } @else if (displayedItems.length === 0) {
   <div class="w-full flex justify-center items-center mt-10">
     <p class="text-gray-500 italic text-center">
-      Nincs megjeleníthető kérelem ebben a kategóriában.
+      Nincs megjeleníthető elem ebben a kategóriában.
     </p>
   </div>
   } @else {
   <ion-list class="mb-16 bg-transparent">
-    @for (request of filteredRequests; track request.id) {
+    @for (item of displayedItems; track item.id) {
     <ion-item lines="none" class="mb-2">
       <ion-card class="w-full mx-auto shadow-sm ring-1 ring-black/5 rounded-xl">
         <ion-card-header class="pb-2">
           <ion-card-title class="font-bold text-xl">
-            {{ request.name }}
+            {{ item.name }}
           </ion-card-title>
           <ion-card-subtitle class="flex flex-col gap-1 mt-1 text-gray-600">
             <span class="flex items-center gap-2">
-              <ion-icon name="mail-outline"></ion-icon> {{ request.email }}
+              <ion-icon name="mail-outline"></ion-icon> {{ item.email }}
             </span>
             <span class="flex items-center gap-2">
-              <ion-icon name="call-outline"></ion-icon> {{ request.phone_number
-              }}
+              <ion-icon name="call-outline"></ion-icon> {{ item.phone_number }}
             </span>
           </ion-card-subtitle>
         </ion-card-header>
 
         <ion-card-content>
+          @if (currentSegment === 'approved') {
+          <div
+            class="flex items-center justify-between gap-2 mt-2 pt-3 border-t"
+          >
+            <span class="text-sm text-gray-600 font-medium"
+              >Emlékeztető e-mailek</span
+            >
+            <ion-toggle
+              [(ngModel)]="item.wants_reminder"
+              (ionChange)="toggleReminder(item)"
+            >
+            </ion-toggle>
+          </div>
+
+          <div class="flex justify-end gap-3 pt-3">
+            <ion-button
+              fill="clear"
+              color="danger"
+              (click)="deactivateUser(item)"
+            >
+              <ion-icon slot="start" name="close-circle-outline"></ion-icon>
+              Letiltás
+            </ion-button>
+          </div>
+          } @else {
           <div class="flex justify-end gap-3 mt-2 border-t pt-3">
-            @if (request.status !== 'approved') {
+            @if (currentSegment === 'pending') {
             <ion-button
               fill="clear"
               color="success"
-              (click)="submitRequest(request, 'approve')"
+              (click)="submitRequest(item, 'approve')"
             >
               <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon>
               Engedélyez
             </ion-button>
-            } @if (request.status !== 'rejected') {
             <ion-button
               fill="clear"
               color="danger"
-              (click)="submitRequest(request, 'reject')"
+              (click)="submitRequest(item, 'reject')"
             >
               <ion-icon slot="start" name="close-circle-outline"></ion-icon>
-              {{ request.status === 'approved' ? 'Letiltás' : 'Elutasít' }}
+              Elutasít
+            </ion-button>
+            } @else {
+            <ion-button
+              fill="clear"
+              color="success"
+              (click)="submitRequest(item, 'approve')"
+            >
+              <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon>
+              Újraengedélyez
             </ion-button>
             }
           </div>
+          }
         </ion-card-content>
       </ion-card>
     </ion-item>

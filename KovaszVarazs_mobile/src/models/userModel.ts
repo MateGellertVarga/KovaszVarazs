@@ -6,6 +6,8 @@ export interface UserModel {
   password?: string;
   role: string;
   token?: string;
+  is_active: boolean;
+  wants_reminder: boolean;
 }
 
 export interface LoginResponse {

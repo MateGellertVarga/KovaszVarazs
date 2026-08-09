@@ -8,6 +8,7 @@ import { CostModel, StatisticsModel } from 'src/models/statisticsModel';
 import { ConfigService } from './config.service';
 import { RequestModel } from 'src/models/requestModel';
 import { OrderSeedModel } from 'src/models/orderSeedModel';
+import { UserModel } from 'src/models/userModel';
 
 @Injectable({
   providedIn: 'root',
@@ -200,12 +201,30 @@ export class DataService {
     );
   }
 
+  getUsers(): Observable<UserModel[]> {
+    return this.http.get<UserModel[]>(`${this.configService.apiUrl}/users`);
+  }
+
   handleRegistrationRequest(
     id: number,
     action: 'approve' | 'reject'
   ): Observable<any> {
     return this.http.post<any>(
       `${this.configService.apiUrl}/registration-requests/${id}/${action}`,
+      {}
+    );
+  }
+
+  toggleReminder(userId: number): Observable<any> {
+    return this.http.patch(
+      `${this.configService.apiUrl}/users/${userId}/reminder`,
+      {}
+    );
+  }
+
+  deactivateUser(userId: number): Observable<any> {
+    return this.http.post<any>(
+      `${this.configService.apiUrl}/users/${userId}/deactivate`,
       {}
     );
   }
