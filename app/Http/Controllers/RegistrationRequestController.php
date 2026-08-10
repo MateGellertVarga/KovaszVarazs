@@ -44,7 +44,7 @@ class RegistrationRequestController extends Controller
                         'role'         => $registrationRequest->role,
                         'is_active'    => true,
                     ]);
-                    Mail::to($registrationRequest->email)->send(new RegistrationAcceptedEmail($registrationRequest->name))->afterCommit();
+                    Mail::to($registrationRequest->email)->send(new RegistrationAcceptedEmail($registrationRequest->name));
                 }
                 $registrationRequest->update(['status' => 'approved']);
             });
