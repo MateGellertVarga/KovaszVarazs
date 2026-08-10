@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\RegistrationAcceptedEmail;
 use App\Models\RegistrationRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Symfony\Component\HttpFoundation\Response;
 
 class RegistrationRequestController extends Controller
@@ -42,6 +44,7 @@ class RegistrationRequestController extends Controller
                         'role'         => $registrationRequest->role,
                         'is_active'    => true,
                     ]);
+                    Mail::to($registrationRequest->email)->send(new RegistrationAcceptedEmail($registrationRequest->name))->afterCommit();
                 }
                 $registrationRequest->update(['status' => 'approved']);
             });

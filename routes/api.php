@@ -13,6 +13,7 @@ use App\Http\Controllers\RegistrationRequestController;
 use App\Http\Controllers\StatisticsController;
 use App\Http\Controllers\UserController;
 use App\Mail\OrderReminderEmail;
+use App\Mail\RegistrationAcceptedEmail;
 use App\Models\OrderSchedule;
 use App\Models\User;
 use Illuminate\Support\Facades\Mail;
@@ -105,4 +106,9 @@ Route::get('/test-email-trigger', function () {
 //     $schedule = new OrderSchedule(['available_date' => '2026-06-10']);
 //     $user = new User(['name' => 'Teszt Elek']);
 //     return (new OrderReminderEmail($user, $schedule))->render();
+// });
+
+// Route::get('/mail-preview', function () {
+//     $user = new User(['name' => 'Teszt Elek']);
+//     return (new RegistrationAcceptedEmail($user))->render();
 // });
