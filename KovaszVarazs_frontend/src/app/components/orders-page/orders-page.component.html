@@ -34,22 +34,25 @@
           >Összesen: {{ order.total_price | number : "1.0-2" }} €</span
         >
       </div>
-      <div class="flex justify-center gap-20 mt-4">
-        <button
-          (click)="editOrder(order)"
-          class="rounded-full bg-[#c68958] text-white px-6 py-2 text-xl hover:bg-[#a96e34] shadow transition flex items-center justify-center"
-          aria-label="Szerkesztés"
-        >
-          <span class="pi pi-pencil"></span>
-        </button>
-        <button
-          (click)="openDelete(order)"
-          class="rounded-full bg-red-100 text-red-700 px-6 py-2 text-xl hover:bg-red-200 shadow transition flex items-center justify-center"
-          aria-label="Törlés"
-        >
-          <span class="pi pi-trash"></span>
-        </button>
-      </div>
+      
+      @if (!isPastDeadline(order.order_schedule_date)) {
+        <div class="flex justify-center gap-20 mt-4">
+          <button
+            (click)="editOrder(order)"
+            class="rounded-full bg-[#c68958] text-white px-6 py-2 text-xl hover:bg-[#a96e34] shadow transition flex items-center justify-center"
+            aria-label="Szerkesztés"
+          >
+            <span class="pi pi-pencil"></span>
+          </button>
+          <button
+            (click)="openDelete(order)"
+            class="rounded-full bg-red-100 text-red-700 px-6 py-2 text-xl hover:bg-red-200 shadow transition flex items-center justify-center"
+            aria-label="Törlés"
+          >
+            <span class="pi pi-trash"></span>
+          </button>
+        </div>
+      }
     </div>
     }
   </div>
