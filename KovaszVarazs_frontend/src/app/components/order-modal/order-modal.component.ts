@@ -44,6 +44,19 @@ export class OrderModalComponent implements OnChanges {
   successfullySent = false;
   errorMessage = '';
 
+  get isSelectedScheduleExpired(): boolean {
+    if (!this.selectedOrderSchedule) return false;
+    const availableDate = new Date(this.selectedOrderSchedule.available_date);
+    const deadline = new Date(availableDate);
+    deadline.setDate(deadline.getDate() - 1);
+    deadline.setHours(6, 0, 0, 0);
+    return new Date() > deadline;
+  }
+
+  get currentSteps(): number[] {
+    return this.isSelectedScheduleExpired ? [0, 1] : [0, 1, 2, 3];
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['visible'] || changes['order']) {
       this.isLoading = true;
@@ -85,6 +98,9 @@ export class OrderModalComponent implements OnChanges {
       return;
     }
     if (this.orderStep === 1) {
+      if (this.isSelectedScheduleExpired) {
+        return;
+      }
       const sum = Object.values(this.productQuantities).reduce(
         (a, b) => a + (b ?? 0),
         0
@@ -106,7 +122,7 @@ export class OrderModalComponent implements OnChanges {
       this.syncOrderItemsFromQuantities();
     }
 
-    if (this.orderStep < 3) {
+    if (this.orderStep < this.currentSteps.length - 1) {
       this.slideDirection = 'right';
       this.displayedStep = this.orderStep + 1;
       setTimeout(() => {
@@ -139,6 +155,8 @@ export class OrderModalComponent implements OnChanges {
         return;
       }
       if (this.orderStep === 1) {
+        if (this.isSelectedScheduleExpired) return;
+        
         const sum = Object.values(this.productQuantities).reduce(
           (a, b) => a + (b ?? 0),
           0
@@ -179,6 +197,11 @@ export class OrderModalComponent implements OnChanges {
 
   selectOrderSchedule(schedule: OrderScheduleModel) {
     this.selectedOrderSchedule = schedule;
+    if (this.order) {
+      this.order.order_schedule_id = schedule.id;
+      this.order.order_schedule_date = new Date(schedule.available_date);
+    }
+    this.initProductQuantities();
   }
 
   initProductQuantities() {
@@ -265,6 +288,10 @@ export class OrderModalComponent implements OnChanges {
 
   save() {
     if (this.order) {
+      if (this.selectedOrderSchedule) {
+        this.order.order_schedule_id = this.selectedOrderSchedule.id;
+        this.order.order_schedule_date = new Date(this.selectedOrderSchedule.available_date);
+      }
       this.syncOrderItemsFromQuantities();
       const saveObservable =
         this.order.id != 0
