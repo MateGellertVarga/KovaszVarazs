@@ -62,6 +62,12 @@
             <!-- Step 2 -->
             @if (i === 1 && selectedOrderSchedule) {
               <div class="flex flex-col gap-3 items-center">
+                @if (isSelectedScheduleExpired) {
+                  <div class="w-full max-w-xs mb-2 text-center bg-[#fff7ec] border border-[#c68958]/50 text-[#7a5334] font-semibold rounded-2xl py-2 px-4 shadow-sm text-sm">
+                    Rendelés már csak üzenetben
+                  </div>
+                }
+
                 @for (item of selectedOrderSchedule!.products; track item.id) {
                   <div
                     class="w-full max-w-xs rounded-3xl shadow-lg border border-[#c68958] p-3 sm:p-4 flex bg-[#f8eada]/40"
@@ -90,35 +96,37 @@
                           Sajnos ez a termék már elfogyott!
                         </span>
                       } @else {
-                        <div class="flex items-center gap-2 mb-1 mt-1">
-                          <button
-                            type="button"
-                            class="w-7 h-7 sm:w-8 sm:h-8 font-bold text-lg sm:text-xl bg-[#c68958] text-white rounded-full flex items-center justify-center"
-                            (click)="decreaseQuantity(item.id)"
-                          >
-                            <span class="pi pi-minus"></span>
-                          </button>
-                          <input
-                            type="number"
-                            name="quantity"
-                            class="w-9 h-7 sm:w-10 sm:h-8 text-center border rounded-md appearance-none outline-none hide-spin text-base sm:text-lg"
-                            [value]="productQuantities[item.id]"
-                            (change)="onQuantityChange(item.id, $event)"
-                            [max]="getProductRemaining(item.id)"
-                            min="0"
-                          />
-                          <button
-                            type="button"
-                            class="w-7 h-7 sm:w-8 sm:h-8 font-bold text-lg sm:text-xl bg-[#c68958] text-white rounded-full flex items-center justify-center"
-                            (click)="increaseQuantity(item.id)"
-                            [disabled]="
-                              productQuantities[item.id] >=
-                              getProductRemaining(item.id)
-                            "
-                          >
-                            <span class="pi pi-plus"></span>
-                          </button>
-                        </div>
+                        @if (!isSelectedScheduleExpired) {
+                          <div class="flex items-center gap-2 mb-1 mt-1">
+                            <button
+                              type="button"
+                              class="w-7 h-7 sm:w-8 sm:h-8 font-bold text-lg sm:text-xl bg-[#c68958] text-white rounded-full flex items-center justify-center"
+                              (click)="decreaseQuantity(item.id)"
+                            >
+                              <span class="pi pi-minus"></span>
+                            </button>
+                            <input
+                              type="number"
+                              name="quantity"
+                              class="w-9 h-7 sm:w-10 sm:h-8 text-center border rounded-md appearance-none outline-none hide-spin text-base sm:text-lg"
+                              [value]="productQuantities[item.id]"
+                              (change)="onQuantityChange(item.id, $event)"
+                              [max]="getProductRemaining(item.id)"
+                              min="0"
+                            />
+                            <button
+                              type="button"
+                              class="w-7 h-7 sm:w-8 sm:h-8 font-bold text-lg sm:text-xl bg-[#c68958] text-white rounded-full flex items-center justify-center"
+                              (click)="increaseQuantity(item.id)"
+                              [disabled]="
+                                productQuantities[item.id] >=
+                                getProductRemaining(item.id)
+                              "
+                            >
+                              <span class="pi pi-plus"></span>
+                            </button>
+                          </div>
+                        }
                       }
                       @if (getProductRemaining(item.id) > 0) {
                         <span
@@ -217,6 +225,10 @@
                       <span>{{ order!.note }}</span>
                     </div>
                   }
+                  <div class="flex gap-2 mb-1 border-t border-[#c68958]/30 pt-1 mt-1">
+                    <span class="w-20 sm:w-24 text-gray-600">Dátum:</span>
+                    <span class="font-medium text-[#c68958]">{{ selectedOrderSchedule?.available_date | date: "yyyy.MM.dd EEEE" }}</span>
+                  </div>
                 </div>
                 <div
                   class="bg-[#f8eada]/40 rounded-2xl shadow border p-3 sm:p-4 text-sm sm:text-base"
@@ -278,7 +290,7 @@
         <div
           class="flex justify-center items-center gap-1 sm:gap-3 w-full max-w-xs mx-auto"
         >
-          <ng-container *ngFor="let i of steps; let last = last">
+          <ng-container *ngFor="let i of currentSteps; let last = last">
             <div class="flex flex-col items-center flex-1 min-w-0">
               <button
                 type="button"
@@ -314,7 +326,7 @@
         type="button"
         class="rounded-full shadow bg-[#c68958] px-2.5 py-1.5 sm:px-4 sm:py-2 flex-shrink-0 disabled:opacity-40"
         (click)="nextOrderStep()"
-        [disabled]="orderStep === steps.length - 1 || isLoading"
+        [disabled]="orderStep === currentSteps.length - 1 || isLoading"
       >
         <span class="pi pi-angle-right text-lg sm:text-2xl text-white"></span>
       </button>
