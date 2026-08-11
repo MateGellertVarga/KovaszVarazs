@@ -7,9 +7,8 @@ import { CommonModule, DatePipe, registerLocaleData } from '@angular/common';
 import localeHu from '@angular/common/locales/hu';
 import { DialogModule } from 'primeng/dialog';
 import { FormsModule } from '@angular/forms';
-import { OrderScheduleModel } from '../../../models/orderScheduleModel';
 import { OrderModalComponent } from '../order-modal/order-modal.component';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-orders-page',
@@ -62,6 +61,15 @@ export class OrdersPageComponent {
     } else {
       this.isLoading = false;
     }
+  }
+
+  isPastDeadline(dateString: string | Date | undefined): boolean {
+    if (!dateString) return false;
+    const availableDate = new Date(dateString);
+    const deadline = new Date(availableDate);
+    deadline.setDate(deadline.getDate() - 1);
+    deadline.setHours(6, 0, 0, 0);
+    return new Date() > deadline;
   }
 
   newOrder() {
