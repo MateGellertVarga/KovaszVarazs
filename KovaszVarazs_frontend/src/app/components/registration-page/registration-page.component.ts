@@ -25,6 +25,9 @@ export class RegistrationPageComponent {
     role: 'user',
     is_active: true,
   };
+
+  lastName: string = '';
+  firstName: string = '';
   passwordAgain: string = '';
   errorMessage: string = '';
   showPassword: boolean = false;
@@ -54,23 +57,28 @@ export class RegistrationPageComponent {
       /^\+?\d{1,3}?[-.\s]?\(?\d{1,4}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,9}$/;
     const passwordRegex = /\d/;
 
-    if (!this.newUser!.name.trim()) {
-      this.errorMessage += 'Név kötelező!\n';
+    if (!this.lastName.trim() || !this.firstName.trim()) {
+      this.errorMessage += 'Vezetéknév és keresztnév megadása is kötelező!\n';
+    } else {
+      this.newUser.name = `${this.lastName.trim()} ${this.firstName.trim()}`;
+
+      if (this.newUser.name.length < 5) {
+        this.errorMessage += 'A megadott név túl rövid!\n';
+      }
     }
-    if (this.newUser!.name.trim().length < 3) {
-      this.errorMessage += 'Név túl rövid!\n';
-    }
+
     if (!this.newUser!.email.trim()) {
       this.errorMessage += 'Email cím kötelező!\n';
-    }
-    if (!emailRegex.test(this.newUser!.email)) {
+    } else if (!emailRegex.test(this.newUser!.email)) {
       this.errorMessage += 'Email cím formátuma nem megfelelő!\n';
     }
+
     if (!this.newUser!.phone_number.trim()) {
       this.errorMessage += 'Telefonszám kötelező!\n';
     } else if (!phoneRegex.test(this.newUser!.phone_number)) {
       this.errorMessage += 'Telefonszám formátuma nem megfelelő!\n';
     }
+
     if (!this.newUser!.password!.trim()) {
       this.errorMessage += 'Jelszó kötelező!\n';
     } else if (this.newUser.password!.length < 6) {
@@ -79,10 +87,10 @@ export class RegistrationPageComponent {
     } else if (!passwordRegex.test(this.newUser!.password!)) {
       this.errorMessage += 'Jelszónak tartalmaznia kell legalább egy számot!\n';
     }
+
     if (!this.passwordAgain.trim()) {
       this.errorMessage += 'Jelszó újra kötelező!\n';
-    }
-    if (this.newUser!.password !== this.passwordAgain) {
+    } else if (this.newUser!.password !== this.passwordAgain) {
       this.errorMessage += 'Jelszó nem egyezik!\n';
     }
 

@@ -8,23 +8,44 @@
       @if (!isRegisteredSuccessfully) {
         <h1 class="text-3xl font-semibold text-center mb-6">Regisztráció</h1>
         <form autocomplete="off" (ngSubmit)="register()" class="space-y-6">
-          <div class="relative">
-            <input
-              autocomplete="off"
-              id="name"
-              name="name"
-              type="text"
-              class="pl-4 peer placeholder-transparent h-12 w-full border-2 border-gray-300 rounded-2xl text-gray-900 focus:outline-none focus:border-[#c68958] focus:ring-2 focus:ring-[#c68958] bg-transparent transition"
-              placeholder="Név"
-              [(ngModel)]="newUser.name"
-              [formNoValidate]="true"
-            />
-            <label
-              for="email"
-              class="absolute left-4 -top-3.5 bg-white px-1 text-gray-600 text-sm pointer-events-none peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-3 transition-all peer-focus:-top-3.5 peer-focus:text-[#c68958] peer-focus:text-sm"
-              >Név</label
-            >
+          <!-- Név mezők (Vezetéknév és Keresztnév egymás mellett) -->
+          <div class="grid grid-cols-2 gap-4">
+            <div class="relative">
+              <input
+                autocomplete="off"
+                id="lastName"
+                name="lastName"
+                type="text"
+                class="pl-4 peer placeholder-transparent h-12 w-full border-2 border-gray-300 rounded-2xl text-gray-900 focus:outline-none focus:border-[#c68958] focus:ring-2 focus:ring-[#c68958] bg-transparent transition"
+                placeholder="Vezetéknév"
+                [(ngModel)]="lastName"
+                [formNoValidate]="true"
+              />
+              <label
+                for="lastName"
+                class="absolute left-4 -top-3.5 bg-white px-1 text-gray-600 text-sm pointer-events-none peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-3 transition-all peer-focus:-top-3.5 peer-focus:text-[#c68958] peer-focus:text-sm"
+                >Vezetéknév</label
+              >
+            </div>
+            <div class="relative">
+              <input
+                autocomplete="off"
+                id="firstName"
+                name="firstName"
+                type="text"
+                class="pl-4 peer placeholder-transparent h-12 w-full border-2 border-gray-300 rounded-2xl text-gray-900 focus:outline-none focus:border-[#c68958] focus:ring-2 focus:ring-[#c68958] bg-transparent transition"
+                placeholder="Keresztnév"
+                [(ngModel)]="firstName"
+                [formNoValidate]="true"
+              />
+              <label
+                for="firstName"
+                class="absolute left-4 -top-3.5 bg-white px-1 text-gray-600 text-sm pointer-events-none peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-3 transition-all peer-focus:-top-3.5 peer-focus:text-[#c68958] peer-focus:text-sm"
+                >Keresztnév</label
+              >
+            </div>
           </div>
+
           <div class="relative">
             <input
               autocomplete="off"
@@ -42,6 +63,7 @@
               >Email cím</label
             >
           </div>
+
           <div class="relative">
             <input
               autocomplete="off"
@@ -59,6 +81,7 @@
               >Telefonszám</label
             >
           </div>
+
           <div class="relative">
             <input
               autocomplete="off"
@@ -85,6 +108,7 @@
               <i class="pi {{ showPassword ? 'pi-eye-slash' : 'pi-eye' }}"></i>
             </button>
           </div>
+
           <div class="relative">
             <input
               autocomplete="off"
@@ -113,6 +137,7 @@
               ></i>
             </button>
           </div>
+
           <div class="flex justify-center mt-2">
             <button
               type="submit"
@@ -121,6 +146,7 @@
               Regisztráció
             </button>
           </div>
+
           <div class="flex justify-center gap-4 mt-2">
             <a
               routerLink="/bejelentkezes"
@@ -128,6 +154,7 @@
               >Bejelentkezés</a
             >
           </div>
+
           @if (errorMessage) {
             <div
               class="text-center text-red-500 text-lg font-bold min-h-[1.5rem] break-keep"
