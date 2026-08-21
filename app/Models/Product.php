@@ -22,4 +22,9 @@ class Product extends Model
     {
         return $this->belongsToMany(Order::class, 'order_items')->withPivot('quantity');
     }
+
+    public function recipes()
+    {
+        return $this->belongsToMany(Recipe::class, 'product_recipe')->withPivot('quantity');
+    }
 }

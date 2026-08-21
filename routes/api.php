@@ -58,6 +58,11 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::put('orderSchedules/{orderSchedule}', [OrderScheduleController::class, 'update']);
     Route::delete('orderSchedules/{orderSchedule}', [OrderScheduleController::class, 'destroy']);
 
+    Route::get('recipes', [\App\Http\Controllers\RecipeController::class, 'index']);
+    Route::post('recipes', [\App\Http\Controllers\RecipeController::class, 'store']);
+    Route::put('recipes/{recipe}', [\App\Http\Controllers\RecipeController::class, 'update']);
+    Route::delete('recipes/{recipe}', [\App\Http\Controllers\RecipeController::class, 'destroy']);
+
     Route::get('seeds', [OrderSeedController::class, 'index']);
     Route::post('seeds', [OrderSeedController::class, 'store']);
     Route::put('seeds/{seed}', [OrderSeedController::class, 'update']);

@@ -12,7 +12,7 @@ class ProductController extends Controller
 {
     public function index()
     {
-        return Product::all();
+        return Product::with('recipes')->all();
     }
 
     public function store(StoreProductRequest $request)
@@ -33,6 +33,18 @@ class ProductController extends Controller
             'allergens' => $request->allergens,
             'description' => $request->description,
         ]);
+
+        if ($request->has('recipes')) {
+            $recipesData = json_decode($request->recipes, true);
+            $syncData = [];
+
+            if (is_array($recipesData)) {
+                foreach ($recipesData as $recipe) {
+                    $syncData[$recipe['recipe_id']] = ['quantity' => $recipe['quantity']];
+                }
+            }
+            $product->recipes()->sync($syncData);
+        }
 
         return response()->json($product, 201);
     }
@@ -80,6 +92,17 @@ class ProductController extends Controller
 
         $product->save();
 
+        if ($request->has('recipes')) {
+            $recipesData = json_decode($request->recipes, true);
+            $syncData = [];
+
+            if (is_array($recipesData)) {
+                foreach ($recipesData as $recipe) {
+                    $syncData[$recipe['recipe_id']] = ['quantity' => $recipe['quantity']];
+                }
+            }
+            $product->recipes()->sync($syncData);
+        }
         return response()->json($product);
     }
 
