@@ -12,7 +12,7 @@ class ProductController extends Controller
 {
     public function index()
     {
-        return Product::with('recipes')->all();
+        return Product::with('recipes')->get();
     }
 
     public function store(StoreProductRequest $request)
@@ -51,7 +51,7 @@ class ProductController extends Controller
 
     public function show($id)
     {
-        return Product::findOrFail($id);
+        return Product::with('recipes')->findOrFail($id);
     }
 
     public function update(UpdateProductRequest $request, $id)
@@ -61,7 +61,7 @@ class ProductController extends Controller
             return response()->json(['message' => 'Nincs jogod ehhez a művelethez'], 401);
         }
 
-        $product = Product::findOrFail($id);
+        $product = Product::with('recipes')->findOrFail($id);
 
         if ($request->hasFile('image')) {
             $this->deleteImageIfExists($product->image_url);
@@ -113,7 +113,7 @@ class ProductController extends Controller
             return response()->json(['message' => 'Nincs jogod ehhez a művelethez'], 401);
         }
 
-        $product = Product::findOrFail($id);
+        $product = Product::with('recipes')->findOrFail($id);
 
         $this->deleteImageIfExists($product->image_url);
         $product->delete();
