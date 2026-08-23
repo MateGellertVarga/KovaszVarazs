@@ -9,6 +9,7 @@ class Ingredient extends Model
 {
     use HasFactory;
 
+    public $timestamps = false;
     protected $fillable = ['recipe_id', 'name', 'amount'];
 
     public function recipe()
