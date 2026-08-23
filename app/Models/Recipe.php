@@ -10,6 +10,7 @@ class Recipe extends Model
 {
     use HasFactory, SoftDeletes;
 
+    public $timestamps = false;
     protected $fillable = ['name', 'total_dough_amount'];
 
     public function ingredients()
