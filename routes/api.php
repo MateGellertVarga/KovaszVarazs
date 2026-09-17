@@ -24,6 +24,8 @@ use Illuminate\Support\Facades\Mail;
 Route::prefix('auth')->group(function () {
     Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login']);
+    Route::post('send-password-reset-email', [UserController::class, 'sendPasswordResetEmail']);
+    Route::post('reset-password', [UserController::class, 'resetPassword']);
 });
 
 Route::get('products', [ProductController::class, 'index']);
