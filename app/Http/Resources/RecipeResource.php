@@ -27,8 +27,8 @@ class RecipeResource extends JsonResource
             'products' => $this->whenLoaded('products', function () {
                 return $this->products->map(function ($product) {
                     return [
-                        'id' => $product->id,
-                        'name' => $product->name,
+                        'product_id' => $product->id,
+                        'product_name' => $product->name,
                         'quantity' => (int) $product->pivot->quantity,
                     ];
                 });

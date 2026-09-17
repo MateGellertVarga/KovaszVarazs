@@ -9,6 +9,7 @@ use App\Http\Controllers\OrderScheduleController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CostController;
 use App\Http\Controllers\OrderSeedController;
+use App\Http\Controllers\RecipeController;
 use App\Http\Controllers\RegistrationRequestController;
 use App\Http\Controllers\StatisticsController;
 use App\Http\Controllers\UserController;
@@ -58,10 +59,11 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::put('orderSchedules/{orderSchedule}', [OrderScheduleController::class, 'update']);
     Route::delete('orderSchedules/{orderSchedule}', [OrderScheduleController::class, 'destroy']);
 
-    Route::get('recipes', [\App\Http\Controllers\RecipeController::class, 'index']);
-    Route::post('recipes', [\App\Http\Controllers\RecipeController::class, 'store']);
-    Route::put('recipes/{recipe}', [\App\Http\Controllers\RecipeController::class, 'update']);
-    Route::delete('recipes/{recipe}', [\App\Http\Controllers\RecipeController::class, 'destroy']);
+    Route::get('recipes', [RecipeController::class, 'index']);
+    Route::post('recipes', [RecipeController::class, 'store']);
+    Route::put('recipes/{recipe}', [RecipeController::class, 'update']);
+    Route::delete('recipes/{recipe}', [RecipeController::class, 'destroy']);
+    Route::get('recipes/calculate-schedule/{id}', [RecipeController::class, 'calculateForSchedule']);
 
     Route::get('seeds', [OrderSeedController::class, 'index']);
     Route::post('seeds', [OrderSeedController::class, 'store']);
