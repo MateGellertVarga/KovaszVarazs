@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\PasswordResetEmail;
+use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
@@ -98,7 +99,7 @@ class UserController extends Controller
             return response()->json(['message' => 'A felhasználó nem található.'], 404);
         }
 
-        $token = String::random(60);
+        $token = Str::random(60);
 
         DB::table('password_reset_tokens')->updateOrInsert(
             ['email' => $user->email],
