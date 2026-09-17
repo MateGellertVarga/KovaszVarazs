@@ -9,6 +9,10 @@ import { ConfigService } from './config.service';
 import { RequestModel } from 'src/models/requestModel';
 import { OrderSeedModel } from 'src/models/orderSeedModel';
 import { UserModel } from 'src/models/userModel';
+import {
+  RecipeModel,
+  ScheduleRecipeCalculationModel,
+} from 'src/models/recipeModel';
 
 @Injectable({
   providedIn: 'root',
@@ -126,6 +130,36 @@ export class DataService {
   deleteProduct(id: number): Observable<void> {
     return this.http.delete<void>(
       `${this.configService.apiUrl}/products/${id}`
+    );
+  }
+
+  getRecipes(): Observable<RecipeModel[]> {
+    return this.http.get<RecipeModel[]>(`${this.configService.apiUrl}/recipes`);
+  }
+
+  addRecipe(recipe: RecipeModel): Observable<RecipeModel> {
+    return this.http.post<RecipeModel>(
+      `${this.configService.apiUrl}/recipes`,
+      recipe
+    );
+  }
+
+  updateRecipe(id: number, recipe: RecipeModel): Observable<RecipeModel> {
+    return this.http.put<RecipeModel>(
+      `${this.configService.apiUrl}/recipes/${id}`,
+      recipe
+    );
+  }
+
+  deleteRecipe(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.configService.apiUrl}/recipes/${id}`);
+  }
+
+  getScheduleRecipeCalculation(
+    scheduleId: number
+  ): Observable<ScheduleRecipeCalculationModel> {
+    return this.http.get<any>(
+      `${this.configService.apiUrl}/recipes/calculate-schedule/${scheduleId}`
     );
   }
 

@@ -1,16 +1,14 @@
 <ion-header
-  [translucent]="false"
+  [translucent]="true"
   class="{{editingRecipe != null ? 'opacity-50 pointer-events-none' : ''}}"
 >
   <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-menu-button class="text-black"></ion-menu-button>
-    </ion-buttons>
-
-    <ion-title class="font-bold text-2xl text-center text-black">
-      Receptek
-    </ion-title>
-
+    <ion-buttons slot="start"
+      ><ion-menu-button class="text-black"></ion-menu-button
+    ></ion-buttons>
+    <ion-title class="font-bold text-2xl text-center text-black"
+      >Receptek</ion-title
+    >
     <ion-buttons slot="end" class="pe-2">
       <ion-button
         (click)="newRecipe()"
@@ -21,3 +19,95 @@
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
+
+<ion-content
+  [fullscreen]="true"
+  [scrollY]="editingRecipe != null ? 'false':'true'"
+>
+  <ion-list class="mb-16">
+    @for (recipe of recipes; track recipe.id) {
+    <ion-item>
+      <ion-card class="w-10/12 mx-auto">
+        <ion-card-header>
+          <ion-card-title class="!font-bold">{{recipe.name}}</ion-card-title>
+          <!-- <ion-card-subtitle
+            >Össz tészta: {{recipe.total_dough_amount}}g</ion-card-subtitle
+          > -->
+        </ion-card-header>
+        <ion-card-content>
+          <div class="mb-3">
+            <h3 class="!font-bold text-gray-700 text-md border-b pb-1 mb-1">
+              Alapanyagok ({{recipe.ingredients.length}})
+            </h3>
+            <ul class="text-md space-y-1">
+              @for (ing of recipe.ingredients; track ing.name) {
+              <li class="flex justify-between">
+                <span>{{ ing.name }}</span>
+                <span class="!font-bold">{{ ing.amount }}g</span>
+              </li>
+              } @if (recipe.ingredients.length === 0) {
+              <li class="text-gray-400 italic">Nincs összetevő</li>
+              }
+            </ul>
+          </div>
+
+          <div class="mb-4">
+            <h3 class="!font-bold text-gray-700 text-md border-b pb-1 mb-1">
+              Termékek ({{recipe.products.length}})
+            </h3>
+            <ul class="text-md space-y-1">
+              @for (prod of recipe.products; track prod.product_id) {
+              <li class="flex justify-between">
+                <span>{{ prod.product_name }}</span>
+                <span class="font-bold text-gray-500"
+                  >{{ prod.quantity }}g / db</span
+                >
+              </li>
+              } @if (recipe.products.length === 0) {
+              <li class="text-gray-400 italic">Nincs kapcsolt termék</li>
+              }
+            </ul>
+          </div>
+
+          <div class="flex justify-evenly mt-2 pt-2 border-t">
+            <ion-button color="white" (click)="deleteRecipe(recipe)">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="28"
+                height="28"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  fill="red"
+                  d="M7 21q-.825 0-1.412-.587T5 19V6q-.425 0-.712-.288T4 5t.288-.712T5 4h4q0-.425.288-.712T10 3h4q.425 0 .713.288T15 4h4q.425 0 .713.288T20 5t-.288.713T19 6v13q0 .825-.587 1.413T17 21zm3-4q.425 0 .713-.288T11 16V9q0-.425-.288-.712T10 8t-.712.288T9 9v7q0 .425.288.713T10 17m4 0q.425 0 .713-.288T15 16V9q0-.425-.288-.712T14 8t-.712.288T13 9v7q0 .425.288.713T14 17"
+                />
+              </svg>
+            </ion-button>
+            <ion-button color="white" (click)="modifyRecipe(recipe)">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="28"
+                height="28"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  fill="grey"
+                  d="M3 21v-4.25L17.625 2.175L21.8 6.45L7.25 21zM17.6 7.8L19 6.4L17.6 5l-1.4 1.4z"
+                />
+              </svg>
+            </ion-button>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </ion-item>
+    }
+  </ion-list>
+  @if (editingRecipe) {
+  <app-recipe-modal
+    [recipe]="editingRecipe"
+    (canceled)="editingRecipe = null"
+    (saved)="saveRecipe($event)"
+    [products]="products"
+  ></app-recipe-modal>
+  }
+</ion-content>

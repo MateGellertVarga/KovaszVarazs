@@ -1,5 +1,10 @@
 import { ChangeDetectorRef, Component, OnDestroy } from '@angular/core';
-import { DatePipe, registerLocaleData } from '@angular/common';
+import {
+  DatePipe,
+  DecimalPipe,
+  KeyValuePipe,
+  registerLocaleData,
+} from '@angular/common';
 import localeHu from '@angular/common/locales/hu';
 import {
   AlertController,
@@ -28,6 +33,10 @@ import { ModalNavbarService } from 'src/app/services/modal-navbar.service';
 import { OrderScheduleModalComponent } from '../../modals/order-schedule-modal/order-schedule-modal.component';
 import { WebsocketService } from 'src/app/services/websocket.service';
 import { AuthService } from 'src/app/services/auth.service';
+import {
+  RecipeModel,
+  ScheduleRecipeCalculationModel,
+} from 'src/models/recipeModel';
 
 @Component({
   selector: 'orderSchedules',
@@ -53,6 +62,8 @@ import { AuthService } from 'src/app/services/auth.service';
     DatePipe,
     OrderScheduleModalComponent,
     IonMenuButton,
+    KeyValuePipe,
+    DecimalPipe,
   ],
 })
 export class OrderSchedules implements OnDestroy {
@@ -71,6 +82,10 @@ export class OrderSchedules implements OnDestroy {
   isLoading: boolean = true;
   orderSchedules: OrderScheduleModel[] = [];
   editingOrderSchedule: OrderScheduleModel | null = null;
+  calculations: { [scheduleId: number]: ScheduleRecipeCalculationModel } = {};
+  showCalcs: { [scheduleId: number]: boolean } = {};
+  expandedRecipes: { [uniqueKey: string]: boolean } = {};
+  expandedGrandTotals: { [scheduleId: number]: boolean } = {};
   isProcessing: boolean = false;
   private websocketCleanup: (() => void) | null = null;
   private websocketInitialized = false;
@@ -95,8 +110,50 @@ export class OrderSchedules implements OnDestroy {
       this.orderSchedules.forEach((o) =>
         o.products.sort((a, b) => a.product_name.localeCompare(b.product_name))
       );
+      for (const orderSchedule of this.orderSchedules) {
+        this.dataService
+          .getScheduleRecipeCalculation(orderSchedule.id)
+          .subscribe({
+            next: (res: ScheduleRecipeCalculationModel) => {
+              this.calculations[orderSchedule.id] = res;
+              this.calculations[orderSchedule.id].recipes.sort((a, b) =>
+                a.recipe_name.localeCompare(b.recipe_name)
+              );
+              this.calculations[orderSchedule.id].recipes.forEach((recipe) => {
+                recipe.ingredients.sort((a, b) => a.name.localeCompare(b.name));
+              });
+              this.calculations[orderSchedule.id].grand_total_ingredients.sort(
+                (a, b) => a.name.localeCompare(b.name)
+              );
+              this.changeDetectorRef.detectChanges();
+              this.isLoading = false;
+            },
+            error: (err) => {
+              console.error('Kalkuláció betöltése sikertelen:', err);
+              this.isLoading = false;
+            },
+          });
+      }
       this.isLoading = false;
     });
+  }
+
+  toggleCalculation(scheduleId: number) {
+    if (!this.calculations[scheduleId]) {
+      this.showCalcs[scheduleId] = true;
+    } else {
+      this.showCalcs[scheduleId] = !this.showCalcs[scheduleId];
+    }
+  }
+
+  toggleRecipeAccordion(scheduleId: number, recipeName: string) {
+    const key = `${scheduleId}_${recipeName}`;
+    this.expandedRecipes[key] = !this.expandedRecipes[key];
+  }
+
+  toggleGrandTotal(scheduleId: number) {
+    this.expandedGrandTotals[scheduleId] =
+      !this.expandedGrandTotals[scheduleId];
   }
 
   refresh(event: any) {

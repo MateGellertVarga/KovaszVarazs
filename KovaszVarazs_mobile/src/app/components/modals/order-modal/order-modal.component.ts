@@ -21,6 +21,7 @@ export class OrderModalComponent implements OnInit {
     private dataService: DataService,
     private modalnavbarService: ModalNavbarService
   ) {}
+  isloading: boolean = false;
   scrollY: number = 0;
   viewportHeight: number = 0;
   productQuantities: { [product_name: string]: number } = {};
@@ -95,16 +96,19 @@ export class OrderModalComponent implements OnInit {
     }
 
     if (this.order && this.checkRequiredFields()) {
+      this.isloading = true;
       const saveObservable =
         this.order.id != 0
           ? this.dataService.updateOrder(this.order.id, this.order)
           : this.dataService.addOrder(this.order);
       saveObservable.subscribe({
         next: (order: OrderModel) => {
+          this.isloading = false;
           this.saved.emit(order);
           this.modalnavbarService.closeModal();
         },
         error: (error: any) => {
+          this.isloading = false;
           this.errorMessage = error.error?.message ?? error.message;
           console.log(error.error?.message ?? error.message);
         },

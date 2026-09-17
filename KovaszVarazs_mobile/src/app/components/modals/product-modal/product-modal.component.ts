@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { DataService } from 'src/app/services/data.service';
 import { ModalNavbarService } from 'src/app/services/modal-navbar.service';
 import { ProductModel } from 'src/models/productModel';
+import { RecipeModel } from 'src/models/recipeModel';
 
 @Component({
   selector: 'app-product-modal',
@@ -14,19 +15,41 @@ export class ProductModalComponent implements OnInit {
   @Output() canceled = new EventEmitter<void>();
   @Output() saved = new EventEmitter<ProductModel>();
 
-  constructor(
-    private dataService: DataService,
-    private modalnavbarService: ModalNavbarService
-  ) {}
-
+  recipes: RecipeModel[] = [];
   scrollY: number = 0;
   viewportHeight: number = 0;
   selectedFile: File | null = null;
   errorMessage: string = '';
 
+  constructor(
+    private dataService: DataService,
+    private modalnavbarService: ModalNavbarService
+  ) {}
+
   ngOnInit() {
     this.viewportHeight = window.innerHeight;
     this.scrollY = window.scrollY || window.pageYOffset;
+    this.initProductFormValues();
+    this.dataService.getRecipes().subscribe({
+      next: (data) => {
+        this.recipes = data;
+      },
+      error: (err) => {
+        console.error('Hiba a receptek betöltésekor:', err);
+      },
+    });
+  }
+
+  private initProductFormValues() {
+    if (
+      this.product &&
+      this.product.recipes &&
+      this.product.recipes.length > 0
+    ) {
+      const firstRecipe = this.product.recipes[0];
+      this.product.recipe_id = firstRecipe.id;
+      this.product.dough_weight = firstRecipe.pivot.quantity;
+    }
   }
 
   scrollIntoView(event: FocusEvent) {
@@ -59,15 +82,28 @@ export class ProductModalComponent implements OnInit {
       formData.append('is_used', this.product.is_used ? '1' : '0');
       formData.append('allergens', this.product.allergens ?? '');
       formData.append('description', this.product.description ?? '');
+
       if (this.selectedFile) {
         formData.append('image', this.selectedFile);
       }
+
+      let recipeSync: Array<{ recipe_id: number; quantity: number }> = [];
+      if (this.product.recipe_id && this.product.dough_weight) {
+        recipeSync = [
+          {
+            recipe_id: this.product.recipe_id,
+            quantity: this.product.dough_weight,
+          },
+        ];
+      }
+      formData.append('recipes', JSON.stringify(recipeSync));
+
       if (this.product.id !== 0) {
         formData.append('_method', 'PUT');
       }
 
       const saveObservable =
-        this.product.id != 0
+        this.product.id !== 0
           ? this.dataService.updateProduct(this.product.id, formData)
           : this.dataService.addProduct(formData);
 
@@ -92,7 +128,7 @@ export class ProductModalComponent implements OnInit {
       this.errorMessage += 'Egységár kötelező!\n';
     }
     if (this.product && this.product.price <= 0) {
-      this.errorMessage += 'Egységár nagyobb 0!\n';
+      this.errorMessage += 'Egységár nagyobb mint 0 kell legyen!\n';
     }
     return !this.errorMessage;
   }

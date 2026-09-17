@@ -158,6 +158,7 @@ export class OrderScheduleModalComponent implements OnInit {
     }
 
     if (this.orderSchedule && this.checkRequiredFields()) {
+      this.isLoading = true;
       const saveObservable =
         this.orderSchedule.id !== 0
           ? this.dataService.updateOrderSchedule(
@@ -168,12 +169,13 @@ export class OrderScheduleModalComponent implements OnInit {
 
       saveObservable.subscribe({
         next: (orderSchedule: OrderScheduleModel) => {
+          this.isLoading = false;
           this.saved.emit(orderSchedule);
           this.modalnavbarService.closeModal();
         },
         error: (error: any) => {
           console.log(error.error.message);
-
+          this.isLoading = false;
           this.errorMessage = error.error?.message ?? error.message;
         },
       });

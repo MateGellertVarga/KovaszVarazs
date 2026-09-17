@@ -40,7 +40,7 @@
     <p class="text-muted">Nincs jövőbeli sütési nap. Hozz létre!</p>
   </div>
   } @else {
-  <ion-list class="mb-20">
+  <ion-list class="mb-36">
     @for (orderSchedule of orderSchedules; track $index) {
     <ion-item class="w-full flex justify-between">
       <ion-card class="w-[90vw] p-1">
@@ -78,6 +78,125 @@
             </li>
             }
           </ul>
+
+          <div class="mt-6 pt-4 border-t border-gray-200">
+            <button
+              (click)="toggleCalculation(orderSchedule.id)"
+              class="w-full flex justify-between items-center mb-2 !bg-white"
+            >
+              <h2 class="!font-bold !text-lg text-black">Tészták</h2>
+              <ion-icon
+                [name]="showCalcs[orderSchedule.id] ? 'chevron-up-outline' : 'chevron-down-outline'"
+                class="text-2xl text-gray-500"
+              ></ion-icon>
+            </button>
+
+            @if (showCalcs[orderSchedule.id]) { @if
+            (!calculations[orderSchedule.id] && !isLoading) {
+            <div class="flex justify-center items-center py-4">
+              <img src="assets/loading.gif" alt="Loading..." class="h-6 w-6" />
+            </div>
+            } @else if (calculations[orderSchedule.id]) { @let calc =
+            calculations[orderSchedule.id]; @if (calc.missing_products.length >
+            0) {
+            <div class="mb-4 mt-2">
+              <div class="flex items-center gap-2 text-red-600 mb-1">
+                <ion-icon
+                  name="alert-circle-outline"
+                  class="text-xl"
+                ></ion-icon>
+                <span class="font-bold text-sm"
+                  >Figyelem: Hiányzó receptek</span
+                >
+              </div>
+              <p class="text-xs text-gray-500 mb-1">
+                Az alábbi termékekhez nincs recept rendelve, így kimaradtak a
+                számításból:
+              </p>
+              <ul class="list-disc ml-5 text-xs text-gray-700">
+                @for (prodName of calc.missing_products; track prodName) {
+                <li>{{ prodName }}</li>
+                }
+              </ul>
+            </div>
+            }
+
+            <div class="space-y-2 mb-4 mt-2">
+              @for (recipe of calc.recipes; track recipe.recipe_name) {
+              <div
+                class="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm"
+              >
+                <button
+                  (click)="toggleRecipeAccordion(orderSchedule.id, recipe.recipe_name)"
+                  class="w-full p-3 flex justify-between items-center bg-gray-50 hover:bg-gray-100 transition-colors"
+                >
+                  <span class="font-bold text-gray-800"
+                    >{{ recipe.recipe_name }}</span
+                  >
+                  <div class="flex items-center gap-2">
+                    <span class="font-bold text-black"
+                      >{{ recipe.total_grams |number:'1.0-0' }} g</span
+                    >
+                    <ion-icon
+                      [name]="expandedRecipes[orderSchedule.id + '_' + recipe.recipe_name] ? 'chevron-up' : 'chevron-down'"
+                      class="text-gray-500"
+                    ></ion-icon>
+                  </div>
+                </button>
+
+                @if (expandedRecipes[orderSchedule.id + '_' +
+                recipe.recipe_name]) {
+                <ul
+                  class="p-3 bg-white space-y-1 text-sm border-t border-gray-200"
+                >
+                  @for (ing of recipe.ingredients; track ing.name) {
+                  <li class="flex justify-between items-center">
+                    <span class="text-gray-600">{{ ing.name }}</span>
+                    <span class="font-semibold text-gray-800"
+                      >{{ ing.amount | number:'1.0-0' }} g</span
+                    >
+                  </li>
+                  }
+                </ul>
+                }
+              </div>
+              }
+            </div>
+
+            @if (calc.grand_total_ingredients.length > 0) {
+            <div
+              class="border border-[#e8d5c4] rounded-lg overflow-hidden bg-[#f8f5f2] shadow-sm mb-2"
+            >
+              <button
+                (click)="toggleGrandTotal(orderSchedule.id)"
+                class="w-full p-3 flex justify-between items-center hover:bg-[#f3ece6] transition-colors bg-[#f8f5f2]"
+              >
+                <span class="font-bold text-[#8c5936]"
+                  >Napi alapanyag összesítő</span
+                >
+                <ion-icon
+                  [name]="expandedGrandTotals[orderSchedule.id] ? 'chevron-up' : 'chevron-down'"
+                  class="text-[#8c5936]"
+                ></ion-icon>
+              </button>
+
+              @if (expandedGrandTotals[orderSchedule.id]) {
+              <ul
+                class="p-3 space-y-1 text-sm border-t border-[#e8d5c4] bg-[#f8f5f2]"
+              >
+                @for (grand of calc.grand_total_ingredients; track grand.name) {
+                <li class="flex justify-between items-center">
+                  <span class="text-gray-700">{{ grand.name }}</span>
+                  <span class="font-bold text-black"
+                    >{{ grand.amount | number:'1.0-0'}} g</span
+                  >
+                </li>
+                }
+              </ul>
+              }
+            </div>
+            } } }
+          </div>
 
           <div class="flex justify-evenly mt-2">
             <ion-button

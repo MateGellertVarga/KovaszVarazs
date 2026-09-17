@@ -69,15 +69,10 @@ import { UserModel } from 'src/models/userModel';
 })
 export class Requests {
   isLoading = true;
-
-  // Adatok szétválasztva modell szerint
   pendingRequests: RequestModel[] = [];
   rejectedRequests: RequestModel[] = [];
   approvedUsers: UserModel[] = [];
-
-  // Ezt jeleníti meg a felület a fül alapján
   displayedItems: any[] = [];
-
   currentSegment: 'pending' | 'approved' | 'rejected' = 'pending';
 
   constructor(
@@ -105,6 +100,7 @@ export class Requests {
         next: (users: UserModel[]) => {
           this.approvedUsers = users.filter((u) => u.is_active);
           this.displayedItems = this.approvedUsers;
+          this.displayedItems.sort((a, b) => a.name.localeCompare(b.name));
           this.isLoading = false;
           if (event) event.target.complete();
         },
@@ -122,11 +118,13 @@ export class Requests {
               (req) => req.status === 'pending'
             );
             this.displayedItems = this.pendingRequests;
+            this.displayedItems.sort((a, b) => a.name.localeCompare(b.name));
           } else {
             this.rejectedRequests = result.filter(
               (req) => req.status === 'rejected'
             );
             this.displayedItems = this.rejectedRequests;
+            this.displayedItems.sort((a, b) => a.name.localeCompare(b.name));
           }
           this.isLoading = false;
           if (event) event.target.complete();
