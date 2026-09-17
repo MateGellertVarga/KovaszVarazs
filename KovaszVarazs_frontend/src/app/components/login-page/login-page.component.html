@@ -71,18 +71,18 @@
             class="rounded-full border border-[#c68958] text-[#c68958] px-4 py-1 font-semibold hover:bg-[#c68958] hover:text-white transition shadow-sm text-sm"
             >Regisztráció</a
           >
-          <!-- <a
+          <a
             routerLink="/elfelejtett-jelszo"
             class="text-sm text-[#c68958] hover:underline transition py-1 px-2 rounded"
-            >Elfelejtett jelszó?</a
-          > -->
+            >Elfelejtett jelszó</a
+          >
         </div>
         @if (errorMessage) {
-        <div
-          class="text-center text-red-500 text-lg font-bold min-h-[1.5rem] break-keep"
-        >
-          {{ errorMessage }}
-        </div>
+          <div
+            class="text-center text-red-500 text-lg font-bold min-h-[1.5rem] break-keep"
+          >
+            {{ errorMessage }}
+          </div>
         }
       </form>
     </div>

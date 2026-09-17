@@ -7,6 +7,7 @@ import { ProductsPageComponent } from './components/products-page/products-page.
 import { ForgotPasswordPageComponent } from './components/forgot-password-page/forgot-password-page.component';
 import { UserPageComponent } from './components/user-page/user-page.component';
 import { authGuard } from './services/auth.guard';
+import { PasswordResetPageComponent } from './password-reset-page/password-reset-page.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'fooldal', pathMatch: 'full' },
@@ -14,6 +15,7 @@ export const routes: Routes = [
   { path: 'bejelentkezes', component: LoginPageComponent },
   { path: 'regisztracio', component: RegistrationPageComponent },
   { path: 'elfelejtett-jelszo', component: ForgotPasswordPageComponent },
+  { path: 'uj-jelszo', component: PasswordResetPageComponent },
   {
     path: 'rendeles',
     component: OrdersPageComponent,

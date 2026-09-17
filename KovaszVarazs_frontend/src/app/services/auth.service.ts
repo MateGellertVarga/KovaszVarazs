@@ -67,6 +67,26 @@ export class AuthService {
       );
   }
 
+  sendPasswordResetEmail(email: string): Observable<boolean> {
+    return this.http
+      .post(`${this.configService.apiUrl}/auth/send-password-reset-email`, {
+        email,
+      })
+      .pipe(map(() => true));
+  }
+
+  resetPassword(
+    email: string,
+    token: string,
+    newPassword: string,
+  ): Observable<any> {
+    return this.http.post(`${this.configService.apiUrl}/auth/reset-password`, {
+      email,
+      token,
+      newPassword,
+    });
+  }
+
   loadUserData(): Observable<UserModel | null> {
     return this.http
       .get<UserModel>(`${this.configService.apiUrl}/auth/me`)
