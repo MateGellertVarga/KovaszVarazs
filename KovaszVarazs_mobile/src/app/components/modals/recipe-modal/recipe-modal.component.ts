@@ -40,12 +40,11 @@ export class RecipeModalComponent implements OnInit {
     this.recipe.ingredients.splice(index, 1);
   }
 
-  calculateTotal(): number {
-    this.recipe.total_dough_amount = this.recipe.ingredients.reduce(
+  getCalculatedTotal(): number {
+    return this.recipe.ingredients.reduce(
       (sum, ing) => sum + Number(ing.amount || 0),
       0
     );
-    return this.recipe.total_dough_amount;
   }
 
   addProductLink() {
@@ -60,6 +59,7 @@ export class RecipeModalComponent implements OnInit {
 
   save() {
     this.errorMessage = '';
+    this.recipe.total_dough_amount = this.getCalculatedTotal();
     if (this.checkRequiredFields()) {
       this.isLoading = true;
       const saveObservable =
