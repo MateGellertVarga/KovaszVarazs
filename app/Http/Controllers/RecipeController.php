@@ -98,6 +98,7 @@ class RecipeController extends Controller
 
         foreach ($schedule->products as $scheduleProduct) {
             $maxQuantity = $scheduleProduct->pivot->max_quantity;
+            $remaining = $scheduleProduct->pivot->remaining_quantity;
             $productRecipes = $recipes->filter(function ($r) use ($scheduleProduct) {
                 return $r->products->contains('id', $scheduleProduct->id);
             });
@@ -107,7 +108,7 @@ class RecipeController extends Controller
             } else {
                 foreach ($productRecipes as $recipe) {
                     $pivot = $recipe->products->firstWhere('id', $scheduleProduct->id)->pivot;
-                    $neededDough = $maxQuantity * $pivot->quantity;
+                    $neededDough = ($maxQuantity - $remaining) * $pivot->quantity; // from orders, change back if needed
 
                     if (!isset($doughTotals[$recipe->id])) {
                         $doughTotals[$recipe->id] = [
