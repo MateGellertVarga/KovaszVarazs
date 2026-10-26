@@ -32,6 +32,7 @@ class UserController extends Controller
             'name' => $user->name,
             'email' => $user->email,
             'phone_number' => $user->phone_number,
+            'role' => $user->role,
         ]);
     }
 
@@ -56,6 +57,7 @@ class UserController extends Controller
             'name' => $user->name,
             'email' => $user->email,
             'phone_number' => $user->phone_number,
+            'role' => $user->role,
         ]);
     }
 
