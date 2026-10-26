@@ -1,0 +1,108 @@
+@if (order) {
+  <app-admin-modal
+    [title]="order.id != 0 ? 'Rendelés módosítása' : 'Új rendelés'"
+    [isSaving]="isSaving"
+    [errorMessage]="errorMessage"
+    (canceled)="canceled.emit()"
+    (saved)="save()"
+  >
+    <div class="space-y-4">
+      <div>
+        <label class="kv-label" for="admin-order-name">Név</label>
+        <input
+          id="admin-order-name"
+          name="customer_name"
+          type="text"
+          class="kv-input"
+          [(ngModel)]="order.customer_name"
+        />
+      </div>
+      <div>
+        <label class="kv-label" for="admin-order-phone">Telefonszám</label>
+        <input
+          id="admin-order-phone"
+          name="phone_number"
+          type="tel"
+          placeholder="Opcionális"
+          class="kv-input"
+          [(ngModel)]="order.phone_number"
+        />
+      </div>
+      <div>
+        <label class="kv-label" for="admin-order-note">Megjegyzés</label>
+        <textarea
+          id="admin-order-note"
+          name="note"
+          rows="2"
+          placeholder="Opcionális"
+          class="kv-input"
+          [(ngModel)]="order.note"
+        ></textarea>
+      </div>
+      <div class="flex justify-between">
+        <label class="flex cursor-pointer items-center gap-2">
+          <input
+            name="is_paying"
+            type="checkbox"
+            class="kv-checkbox"
+            [(ngModel)]="order.is_paying"
+          />
+          <span class="font-medium text-gray-700">Fizet-e</span>
+        </label>
+        @if (order.is_paying == true) {
+          <label class="flex cursor-pointer items-center gap-2">
+            <input
+              name="already_paid"
+              type="checkbox"
+              class="kv-checkbox"
+              [(ngModel)]="order.already_paid"
+            />
+            <span class="font-medium text-gray-700">Fizetve</span>
+          </label>
+        }
+      </div>
+      <div>
+        <span class="kv-label">Termékek</span>
+        <div class="space-y-2">
+          @for (item of products; track item.id) {
+            <div
+              class="flex items-center justify-between gap-3 rounded-2xl border border-gray-200 bg-[#f8eada]/30 px-3 py-2"
+            >
+              <span class="min-w-0 break-words">{{ item.product_name }}</span>
+              <div class="flex shrink-0 items-center gap-2">
+                <button
+                  type="button"
+                  class="kv-qty-btn"
+                  aria-label="Csökkentés"
+                  (click)="decreaseQuantity(item.id)"
+                >
+                  <span class="pi pi-minus text-xs!"></span>
+                </button>
+                <input
+                  type="number"
+                  min="0"
+                  class="kv-input-sm kv-no-spin w-12"
+                  [attr.aria-label]="item.product_name + ' mennyiség'"
+                  [value]="productQuantities[item.id]"
+                  (change)="onQuantityChange(item.id, $event)"
+                />
+                <button
+                  type="button"
+                  class="kv-qty-btn"
+                  aria-label="Növelés"
+                  (click)="increaseQuantity(item.id)"
+                >
+                  <span class="pi pi-plus text-xs!"></span>
+                </button>
+              </div>
+            </div>
+          } @empty {
+            <p class="text-sm text-gray-500 italic">
+              Ehhez a sütési naphoz nincs termék rendelve.
+            </p>
+          }
+        </div>
+      </div>
+    </div>
+  </app-admin-modal>
+}

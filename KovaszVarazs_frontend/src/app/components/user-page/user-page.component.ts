@@ -36,7 +36,7 @@ export class UserPageComponent implements OnInit {
       const payload: any = { ...this.user };
       if (!hasPwd) delete payload.password;
       this.authservice.updateUserData(payload).subscribe({
-        next: () => this.router.navigate(['/fooldal']),
+        next: () => this.router.navigateByUrl(this.authservice.homeUrl),
         error: (error: any) => {
           this.errorMessage = error?.error?.message ?? 'Hiba történt.';
         },

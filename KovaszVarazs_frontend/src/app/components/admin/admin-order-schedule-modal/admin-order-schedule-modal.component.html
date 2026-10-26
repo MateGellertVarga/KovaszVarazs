@@ -1,0 +1,59 @@
+@if (orderSchedule) {
+  <app-admin-modal
+    [title]="
+      orderSchedule.id !== 0 ? 'Sütési nap módosítása' : 'Új sütési nap'
+    "
+    [isLoading]="isLoading"
+    [isSaving]="isSaving"
+    [errorMessage]="errorMessage"
+    (canceled)="canceled.emit()"
+    (saved)="save()"
+  >
+    <div class="space-y-4">
+      <div>
+        <label class="kv-label" for="schedule-date">Dátum</label>
+        <input
+          id="schedule-date"
+          name="available_date"
+          type="date"
+          class="kv-input cursor-pointer"
+          [(ngModel)]="dateValue"
+        />
+      </div>
+      <div>
+        <label class="kv-label" for="schedule-note">Megjegyzés</label>
+        <textarea
+          id="schedule-note"
+          name="note"
+          rows="2"
+          placeholder="Opcionális"
+          class="kv-input"
+          [(ngModel)]="orderSchedule.note"
+        ></textarea>
+      </div>
+      <div>
+        <div class="mb-1 flex items-end justify-between">
+          <span class="kv-label mb-0">Termékek</span>
+          <span class="text-xs text-gray-500">Max. darabszám</span>
+        </div>
+        <div class="space-y-2">
+          @for (product of products; track product.id) {
+            <div
+              class="flex items-center justify-between gap-3 rounded-2xl border border-gray-200 bg-[#f8eada]/30 px-3 py-2"
+            >
+              <span class="min-w-0 break-words">{{ product.name }}</span>
+              <input
+                type="number"
+                min="0"
+                class="kv-input-sm kv-no-spin w-16 shrink-0"
+                [attr.aria-label]="product.name + ' maximum darabszám'"
+                [value]="productMaxQuantities[product.id]"
+                (change)="onQuantityChange(product.id, $event)"
+              />
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </app-admin-modal>
+}

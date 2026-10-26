@@ -31,7 +31,7 @@ export class LoginPageComponent {
           this.errorMessage = 'Hiba!';
           return;
         }
-        this.router.navigate(['/']);
+        this.router.navigateByUrl(this.authService.homeUrl);
       },
       error: (error: any) => {
         this.errorMessage = error.error.message;

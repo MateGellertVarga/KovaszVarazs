@@ -1,0 +1,147 @@
+<app-navbar></app-navbar>
+
+<div class="mx-auto max-w-screen-2xl px-4 pb-10 sm:px-6 lg:px-8">
+  <app-admin-page-header
+    title="Felhasználók"
+    (refresh)="loadDataForCurrentSegment()"
+  ></app-admin-page-header>
+
+  <div class="mb-6 flex justify-center">
+    <div
+      role="tablist"
+      class="inline-flex rounded-full border-2 border-[#c68958] bg-white p-1 shadow"
+    >
+      @for (segment of segments; track segment.value) {
+        <button
+          type="button"
+          role="tab"
+          class="rounded-full px-5 py-2 font-semibold transition"
+          [class]="
+            currentSegment === segment.value
+              ? 'bg-[#c68958] text-white shadow'
+              : 'text-[#c68958] hover:bg-[#f8eada]'
+          "
+          [attr.aria-selected]="currentSegment === segment.value"
+          (click)="segmentChanged(segment.value)"
+        >
+          {{ segment.label }}
+        </button>
+      }
+    </div>
+  </div>
+
+  @if (isLoading) {
+    <div class="mt-10 flex w-full items-center justify-center">
+      <img src="loading.gif" alt="Betöltés..." />
+    </div>
+  } @else if (displayedCount === 0) {
+    <p class="mt-10 text-center text-gray-500 italic">
+      Nincs megjeleníthető elem ebben a kategóriában.
+    </p>
+  } @else {
+    <div class="grid grid-cols-1 items-start gap-6 md:grid-cols-2 xl:grid-cols-3">
+      @if (currentSegment === "approved") {
+        @for (user of approvedUsers; track user.id) {
+          <div
+            class="flex flex-col rounded-3xl border border-gray-200 bg-white p-6 shadow-lg"
+          >
+            <ng-container
+              *ngTemplateOutlet="contact; context: { $implicit: user }"
+            ></ng-container>
+
+            <div
+              class="mt-4 flex items-center justify-between gap-2 border-t border-gray-100 pt-3"
+            >
+              <span class="text-sm font-medium text-gray-600"
+                >Emlékeztető e-mailek</span
+              >
+              <button
+                type="button"
+                role="switch"
+                class="inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full transition-colors"
+                [class]="user.wants_reminder ? 'bg-[#c68958]' : 'bg-gray-300'"
+                [attr.aria-checked]="!!user.wants_reminder"
+                aria-label="Emlékeztető e-mailek"
+                (click)="toggleReminder(user)"
+              >
+                <span
+                  class="inline-block size-5 rounded-full bg-white shadow transition-transform"
+                  [class]="
+                    user.wants_reminder ? 'translate-x-5.5' : 'translate-x-0.5'
+                  "
+                ></span>
+              </button>
+            </div>
+
+            <div class="flex justify-end pt-3">
+              <button
+                type="button"
+                class="flex items-center gap-2 rounded-full px-4 py-2 font-semibold text-red-700 transition hover:bg-red-100"
+                (click)="deactivateUser(user)"
+              >
+                <span class="pi pi-times-circle"></span>
+                Letiltás
+              </button>
+            </div>
+          </div>
+        }
+      } @else {
+        @for (request of requests; track request.id) {
+          <div
+            class="flex flex-col rounded-3xl border border-gray-200 bg-white p-6 shadow-lg"
+          >
+            <ng-container
+              *ngTemplateOutlet="contact; context: { $implicit: request }"
+            ></ng-container>
+
+            <div
+              class="mt-4 flex justify-end gap-3 border-t border-gray-100 pt-3"
+            >
+              @if (currentSegment === "pending") {
+                <button
+                  type="button"
+                  class="flex items-center gap-2 rounded-full px-4 py-2 font-semibold text-green-700 transition hover:bg-green-100"
+                  (click)="submitRequest(request, 'approve')"
+                >
+                  <span class="pi pi-check-circle"></span>
+                  Engedélyez
+                </button>
+                <button
+                  type="button"
+                  class="flex items-center gap-2 rounded-full px-4 py-2 font-semibold text-red-700 transition hover:bg-red-100"
+                  (click)="submitRequest(request, 'reject')"
+                >
+                  <span class="pi pi-times-circle"></span>
+                  Elutasít
+                </button>
+              } @else {
+                <button
+                  type="button"
+                  class="flex items-center gap-2 rounded-full px-4 py-2 font-semibold text-green-700 transition hover:bg-green-100"
+                  (click)="submitRequest(request, 'approve')"
+                >
+                  <span class="pi pi-check-circle"></span>
+                  Újraengedélyez
+                </button>
+              }
+            </div>
+          </div>
+        }
+      }
+    </div>
+  }
+</div>
+
+<ng-template #contact let-item>
+  <div class="text-xl font-bold break-words text-gray-900">
+    {{ item.name }}
+  </div>
+  <div class="mt-2 flex flex-col gap-1 text-gray-600">
+    <span class="flex items-center gap-2 break-all">
+      <span class="pi pi-envelope text-sm!"></span> {{ item.email }}
+    </span>
+    <span class="flex items-center gap-2">
+      <span class="pi pi-phone text-sm!"></span> {{ item.phone_number }}
+    </span>
+  </div>
+</ng-template>

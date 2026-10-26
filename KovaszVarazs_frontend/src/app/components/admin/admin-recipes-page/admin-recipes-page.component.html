@@ -1,0 +1,98 @@
+<app-navbar></app-navbar>
+
+<div class="mx-auto max-w-screen-2xl px-4 pb-10 sm:px-6 lg:px-8">
+  <app-admin-page-header
+    title="Receptek"
+    addLabel="Új recept"
+    (add)="newRecipe()"
+    (refresh)="loadData()"
+  ></app-admin-page-header>
+
+  @if (isLoading) {
+    <div class="mt-4 flex w-full items-center justify-center">
+      <img src="loading.gif" alt="Betöltés..." />
+    </div>
+  } @else if (recipes.length === 0) {
+    <p class="mt-4 text-center text-gray-500">Nincs recept. Hozz létre!</p>
+  } @else {
+    <div class="grid grid-cols-1 items-start gap-6 md:grid-cols-2 xl:grid-cols-3">
+      @for (recipe of recipes; track recipe.id) {
+        <div
+          class="flex flex-col rounded-3xl border border-gray-200 bg-white p-6 shadow-lg"
+        >
+          <h2 class="mb-4 text-center text-xl font-bold text-gray-900">
+            {{ recipe.name }}
+          </h2>
+
+          <div class="mb-4">
+            <h3
+              class="mb-1 border-b border-[#c68958]/40 pb-1 font-bold text-gray-700"
+            >
+              Alapanyagok ({{ recipe.ingredients.length }})
+            </h3>
+            <ul class="space-y-1">
+              @for (ing of recipe.ingredients; track $index) {
+                <li class="flex justify-between">
+                  <span>{{ ing.name }}</span>
+                  <span class="font-bold">{{ ing.amount }}g</span>
+                </li>
+              } @empty {
+                <li class="text-gray-400 italic">Nincs összetevő</li>
+              }
+            </ul>
+          </div>
+
+          <div class="mb-4">
+            <h3
+              class="mb-1 border-b border-[#c68958]/40 pb-1 font-bold text-gray-700"
+            >
+              Termékek ({{ recipe.products.length }})
+            </h3>
+            <ul class="space-y-1">
+              @for (prod of recipe.products; track prod.product_id) {
+                <li class="flex justify-between">
+                  <span>{{ prod.product_name }}</span>
+                  <span class="font-bold text-gray-500"
+                    >{{ prod.quantity }}g / db</span
+                  >
+                </li>
+              } @empty {
+                <li class="text-gray-400 italic">Nincs kapcsolt termék</li>
+              }
+            </ul>
+          </div>
+
+          <div class="mt-auto flex justify-evenly border-t border-gray-100 pt-4">
+            <button
+              type="button"
+              class="flex items-center justify-center rounded-full bg-red-100 px-6 py-2 text-xl text-red-700 shadow transition hover:bg-red-200"
+              title="Törlés"
+              aria-label="Törlés"
+              (click)="deleteRecipe(recipe)"
+            >
+              <span class="pi pi-trash"></span>
+            </button>
+            <button
+              type="button"
+              class="flex items-center justify-center rounded-full bg-[#c68958] px-6 py-2 text-xl text-white shadow transition hover:bg-[#a96e34]"
+              title="Szerkesztés"
+              aria-label="Szerkesztés"
+              (click)="modifyRecipe(recipe)"
+            >
+              <span class="pi pi-pencil"></span>
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+@if (editingRecipe) {
+  <app-admin-recipe-modal
+    [recipe]="editingRecipe"
+    [products]="products"
+    (canceled)="editingRecipe = null"
+    (saved)="saveRecipe($event)"
+  ></app-admin-recipe-modal>
+}

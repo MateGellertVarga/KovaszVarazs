@@ -1,0 +1,242 @@
+<app-navbar></app-navbar>
+
+<div class="mx-auto max-w-screen-2xl px-4 pb-10 sm:px-6 lg:px-8">
+  <app-admin-page-header
+    title="Sütések"
+    addLabel="Új sütési nap"
+    (add)="newOrderSchedule()"
+    (refresh)="loadOrderSchedules()"
+  ></app-admin-page-header>
+
+  @if (isLoading) {
+    <div class="mt-4 flex w-full items-center justify-center">
+      <img src="loading.gif" alt="Betöltés..." />
+    </div>
+  } @else if (orderSchedules.length === 0) {
+    <p class="mt-4 text-center text-gray-500">
+      Nincs jövőbeli sütési nap. Hozz létre!
+    </p>
+  } @else {
+    <div class="grid grid-cols-1 items-start gap-6 md:grid-cols-2 xl:grid-cols-3">
+      @for (orderSchedule of orderSchedules; track orderSchedule.id) {
+        <div
+          class="flex flex-col rounded-3xl border border-gray-200 bg-white p-6 shadow-lg"
+        >
+          <div class="mb-3 text-center">
+            <div class="text-lg font-bold text-gray-800">
+              {{ orderSchedule.available_date | date: "yyyy.MM.dd EEEE" }}
+            </div>
+            @if (orderSchedule.note) {
+              <div class="mt-1 text-sm break-words text-gray-600">
+                {{ orderSchedule.note }}
+              </div>
+            }
+          </div>
+
+          <div class="space-y-1.5">
+            <div
+              class="flex border-b-2 border-[#c68958]/40 px-3 pb-1 font-bold text-gray-900"
+            >
+              <span class="flex-1 text-left">Termék</span>
+              <span class="flex-1 text-center">Max</span>
+              <span class="flex-1 text-right">Szabad</span>
+            </div>
+            @for (product of orderSchedule.products; track product.id) {
+              <div
+                class="flex items-center rounded-lg bg-[#f8eada]/40 px-3 py-2 text-gray-900"
+              >
+                <span class="flex-1 text-left">{{ product.product_name }}</span>
+                <span class="flex-1 text-center"
+                  >{{ product.max_quantity }} db</span
+                >
+                <span class="flex-1 text-right"
+                  >{{ product.remaining_quantity }} db</span
+                >
+              </div>
+            }
+          </div>
+
+          <div class="mt-5 border-t border-gray-200 pt-4">
+            <button
+              type="button"
+              class="mb-2 flex w-full items-center justify-between"
+              [attr.aria-expanded]="!!showCalcs[orderSchedule.id]"
+              (click)="toggleCalculation(orderSchedule.id)"
+            >
+              <span class="text-lg font-bold text-gray-900">Tészták</span>
+              <span
+                class="pi text-gray-500"
+                [class.pi-chevron-up]="showCalcs[orderSchedule.id]"
+                [class.pi-chevron-down]="!showCalcs[orderSchedule.id]"
+              ></span>
+            </button>
+
+            @if (showCalcs[orderSchedule.id]) {
+              @if (calculations[orderSchedule.id]; as calc) {
+                @if (calc.missing_products.length > 0) {
+                  <div class="mt-2 mb-4">
+                    <div class="mb-1 flex items-center gap-2 text-red-600">
+                      <span class="pi pi-exclamation-circle"></span>
+                      <span class="text-sm font-bold"
+                        >Figyelem: Hiányzó receptek</span
+                      >
+                    </div>
+                    <p class="mb-1 text-xs text-gray-500">
+                      Az alábbi termékekhez nincs recept rendelve, így
+                      kimaradtak a számításból:
+                    </p>
+                    <ul class="ml-5 list-disc text-xs text-gray-700">
+                      @for (prodName of calc.missing_products; track prodName) {
+                        <li>{{ prodName }}</li>
+                      }
+                    </ul>
+                  </div>
+                }
+
+                <div class="mt-2 mb-4 space-y-2">
+                  @for (recipe of calc.recipes; track recipe.recipe_name) {
+                    <div
+                      class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm"
+                    >
+                      <button
+                        type="button"
+                        class="flex w-full items-center justify-between bg-gray-50 p-3 transition-colors hover:bg-gray-100"
+                        (click)="
+                          toggleRecipeAccordion(
+                            orderSchedule.id,
+                            recipe.recipe_name
+                          )
+                        "
+                      >
+                        <span class="font-bold text-gray-800">{{
+                          recipe.recipe_name
+                        }}</span>
+                        <span class="flex items-center gap-2">
+                          <span class="font-bold text-black"
+                            >{{ recipe.total_grams | number: "1.0-0" }} g</span
+                          >
+                          <span
+                            class="pi text-xs! text-gray-500"
+                            [class.pi-chevron-up]="
+                              expandedRecipes[
+                                orderSchedule.id + '_' + recipe.recipe_name
+                              ]
+                            "
+                            [class.pi-chevron-down]="
+                              !expandedRecipes[
+                                orderSchedule.id + '_' + recipe.recipe_name
+                              ]
+                            "
+                          ></span>
+                        </span>
+                      </button>
+
+                      @if (
+                        expandedRecipes[
+                          orderSchedule.id + "_" + recipe.recipe_name
+                        ]
+                      ) {
+                        <ul
+                          class="space-y-1 border-t border-gray-200 bg-white p-3 text-sm"
+                        >
+                          @for (ing of recipe.ingredients; track ing.name) {
+                            <li class="flex items-center justify-between">
+                              <span class="text-gray-600">{{ ing.name }}</span>
+                              <span class="font-semibold text-gray-800"
+                                >{{ ing.amount | number: "1.0-0" }} g</span
+                              >
+                            </li>
+                          }
+                        </ul>
+                      }
+                    </div>
+                  }
+                </div>
+
+                @if (calc.grand_total_ingredients.length > 0) {
+                  <div
+                    class="mb-2 overflow-hidden rounded-2xl border border-[#c68958]/30 bg-[#fff7ec] shadow-sm"
+                  >
+                    <button
+                      type="button"
+                      class="flex w-full items-center justify-between p-3 transition-colors hover:bg-[#f8eada]"
+                      (click)="toggleGrandTotal(orderSchedule.id)"
+                    >
+                      <span class="font-bold text-[#7a5334]"
+                        >Napi alapanyag összesítő</span
+                      >
+                      <span
+                        class="pi text-xs! text-[#7a5334]"
+                        [class.pi-chevron-up]="
+                          expandedGrandTotals[orderSchedule.id]
+                        "
+                        [class.pi-chevron-down]="
+                          !expandedGrandTotals[orderSchedule.id]
+                        "
+                      ></span>
+                    </button>
+
+                    @if (expandedGrandTotals[orderSchedule.id]) {
+                      <ul
+                        class="space-y-1 border-t border-[#c68958]/30 p-3 text-sm"
+                      >
+                        @for (
+                          grand of calc.grand_total_ingredients;
+                          track grand.name
+                        ) {
+                          <li class="flex items-center justify-between">
+                            <span class="text-gray-700">{{ grand.name }}</span>
+                            <span class="font-bold text-black"
+                              >{{ grand.amount | number: "1.0-0" }} g</span
+                            >
+                          </li>
+                        }
+                      </ul>
+                    }
+                  </div>
+                }
+              } @else if (calculationErrors[orderSchedule.id]) {
+                <p class="py-2 text-center text-sm text-red-600">
+                  Nem sikerült betölteni a kalkulációt.
+                </p>
+              } @else {
+                <div class="flex items-center justify-center py-4">
+                  <img src="loading.gif" alt="Betöltés..." class="h-6 w-6" />
+                </div>
+              }
+            }
+          </div>
+
+          <div class="mt-4 flex justify-evenly">
+            <button
+              type="button"
+              class="flex items-center justify-center rounded-full bg-red-100 px-6 py-2 text-xl text-red-700 shadow transition hover:bg-red-200"
+              title="Törlés"
+              aria-label="Törlés"
+              (click)="deleteOrderSchedule(orderSchedule)"
+            >
+              <span class="pi pi-trash"></span>
+            </button>
+            <button
+              type="button"
+              class="flex items-center justify-center rounded-full bg-[#c68958] px-6 py-2 text-xl text-white shadow transition hover:bg-[#a96e34]"
+              title="Szerkesztés"
+              aria-label="Szerkesztés"
+              (click)="modifyOrderSchedule(orderSchedule)"
+            >
+              <span class="pi pi-pencil"></span>
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+@if (editingOrderSchedule != null) {
+  <app-admin-order-schedule-modal
+    [orderSchedule]="editingOrderSchedule"
+    (canceled)="editingOrderSchedule = null"
+    (saved)="saveOrderSchedule($event)"
+  ></app-admin-order-schedule-modal>
+}

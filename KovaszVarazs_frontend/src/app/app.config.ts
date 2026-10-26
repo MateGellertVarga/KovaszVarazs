@@ -15,6 +15,7 @@ import {
   withInterceptors,
 } from '@angular/common/http';
 import { credentialsInterceptor } from './services/credentials.interceptor';
+import { authErrorInterceptor } from './services/auth-error.interceptor';
 import { LOCALE_ID } from '@angular/core';
 import { AuthService } from './services/auth.service';
 
@@ -26,7 +27,10 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
-    provideHttpClient(withFetch(), withInterceptors([credentialsInterceptor])),
+    provideHttpClient(
+      withFetch(),
+      withInterceptors([credentialsInterceptor, authErrorInterceptor]),
+    ),
     provideAnimationsAsync(),
     providePrimeNG({
       theme: {

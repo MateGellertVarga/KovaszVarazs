@@ -1,5 +1,6 @@
 export interface OrderScheduleModel {
   id: number;
+  user_id?: number;
   available_date: Date;
   note?: string;
   products: Product[];
@@ -11,5 +12,5 @@ export interface Product {
   max_quantity: number;
   remaining_quantity: number;
   unit_price: number;
-  image_url: string;
+  image_url?: string;
 }

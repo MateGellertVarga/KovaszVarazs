@@ -1,2 +1,35 @@
 @import 'tailwindcss';
 @import "primeicons/primeicons.css";
+
+/* Admin űrlapmezők – a vásárlói oldalak inputjainak kinézetével. */
+@layer components {
+  .kv-label {
+    @apply mb-1 block text-sm font-medium text-gray-700;
+  }
+
+  .kv-input {
+    @apply w-full rounded-2xl border-2 border-gray-300 bg-white px-4 py-2 text-gray-900 transition placeholder:text-gray-400 focus:border-[#c68958] focus:ring-2 focus:ring-[#c68958] focus:outline-none;
+  }
+
+  .kv-input-sm {
+    @apply rounded-xl border-2 border-gray-300 bg-white px-2 py-1 text-center text-gray-900 transition focus:border-[#c68958] focus:ring-1 focus:ring-[#c68958] focus:outline-none;
+  }
+
+  .kv-qty-btn {
+    @apply flex size-8 shrink-0 items-center justify-center rounded-full bg-[#c68958] text-white transition hover:bg-[#a96e34] disabled:opacity-40;
+  }
+
+  .kv-checkbox {
+    @apply size-4 cursor-pointer accent-[#c68958];
+  }
+
+  input[type='number'].kv-no-spin::-webkit-inner-spin-button,
+  input[type='number'].kv-no-spin::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  input[type='number'].kv-no-spin {
+    -moz-appearance: textfield;
+  }
+}

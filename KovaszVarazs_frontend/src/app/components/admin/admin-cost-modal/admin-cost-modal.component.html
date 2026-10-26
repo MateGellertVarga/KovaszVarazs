@@ -1,0 +1,37 @@
+@if (cost) {
+  <app-admin-modal
+    [title]="cost.id != 0 ? 'Kiadás módosítása' : 'Új kiadás'"
+    [isSaving]="isSaving"
+    [errorMessage]="errorMessage"
+    (canceled)="canceled.emit()"
+    (saved)="save()"
+  >
+    <div class="space-y-4">
+      <div>
+        <label class="kv-label" for="cost-name">Tétel</label>
+        <input
+          id="cost-name"
+          name="name"
+          type="text"
+          class="kv-input"
+          [(ngModel)]="cost.name"
+        />
+      </div>
+      <div>
+        <label class="kv-label" for="cost-amount">Ár</label>
+        <div class="flex items-center gap-2">
+          <input
+            id="cost-amount"
+            name="amount"
+            type="number"
+            min="0"
+            step="0.01"
+            class="kv-input kv-no-spin w-32 text-center"
+            [(ngModel)]="cost.amount"
+          />
+          <span class="text-lg text-gray-700">€</span>
+        </div>
+      </div>
+    </div>
+  </app-admin-modal>
+}

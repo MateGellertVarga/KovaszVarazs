@@ -6,5 +6,6 @@ export interface UserModel {
   password?: string;
   role: string;
   is_active: boolean;
+  wants_reminder?: boolean;
   token?: string;
 }

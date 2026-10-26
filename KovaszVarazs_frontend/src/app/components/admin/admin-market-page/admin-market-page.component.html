@@ -1,0 +1,217 @@
+<app-navbar></app-navbar>
+
+<div class="mx-auto max-w-screen-2xl px-4 pb-10 sm:px-6 lg:px-8">
+  <app-admin-page-header [title]="toolbarTitle" (refresh)="loadSchedules()">
+    @if (selectedSchedule) {
+      <button
+        type="button"
+        class="flex items-center gap-2 rounded-full border-2 border-[#c68958] bg-white px-4 py-2 font-semibold text-[#c68958] shadow-sm transition hover:bg-[#f8eada]"
+        (click)="backToScheduleSelection()"
+      >
+        <span class="pi pi-chevron-left text-sm!"></span>
+        Másik nap
+      </button>
+    }
+  </app-admin-page-header>
+
+  @if (isLoading) {
+    <div class="mt-10 flex w-full items-center justify-center">
+      <img src="loading.gif" alt="Betöltés..." class="w-16" />
+    </div>
+  } @else if (!selectedSchedule) {
+    <h2 class="mt-2 mb-6 text-center text-xl font-bold text-gray-700">
+      Válassz napot!
+    </h2>
+    <div
+      class="mx-auto grid max-w-5xl grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
+    >
+      @for (schedule of availableOrderSchedules; track schedule.id) {
+        <button
+          type="button"
+          class="flex w-full items-center justify-between rounded-3xl border border-gray-200 bg-white px-6 py-4 shadow-lg transition hover:border-[#c68958]/60 active:scale-95"
+          (click)="selectOrderSchedule(schedule)"
+        >
+          <span class="text-lg font-bold text-gray-900">
+            {{ schedule.available_date | date: "yyyy.MM.dd EEEE" }}
+          </span>
+          <span class="pi pi-chevron-right text-gray-400"></span>
+        </button>
+      } @empty {
+        <p class="col-span-full text-center text-gray-500">
+          Nincs elérhető sütési nap.
+        </p>
+      }
+    </div>
+  } @else {
+    <div
+      class="sticky top-0 z-10 mb-6 flex items-center justify-between rounded-3xl border border-gray-200 bg-white p-3 shadow-lg"
+    >
+      <button
+        type="button"
+        class="flex size-14 items-center justify-center rounded-full text-red-600 transition hover:bg-red-50 disabled:opacity-30 disabled:hover:bg-transparent"
+        title="Kosár ürítése"
+        aria-label="Kosár ürítése"
+        [disabled]="!order?.order_items?.length"
+        (click)="clearCart()"
+      >
+        <span class="pi pi-trash text-3xl!"></span>
+      </button>
+
+      <div class="flex flex-col items-center">
+        <span class="text-xs font-bold tracking-wider text-gray-500 uppercase"
+          >Fizetendő</span
+        >
+        <span class="text-3xl font-black tracking-tight text-black"
+          >{{ order?.total_price | number: "1.0-2" }} €</span
+        >
+      </div>
+
+      <button
+        type="button"
+        class="h-14 rounded-2xl bg-gradient-to-r from-[#c68958] to-[#a96e34] px-4 text-lg font-bold text-white shadow-md transition hover:from-[#a96e34] hover:to-[#7a5334] disabled:opacity-40 sm:px-8"
+        [disabled]="!order?.order_items?.length"
+        (click)="confirmCheckout()"
+      >
+        FIZETÉS
+      </button>
+    </div>
+
+    <div
+      class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6"
+    >
+      @for (product of selectedSchedule.products; track product.id) {
+        @let count = getCartCount(product.id);
+        @let available = product.remaining_quantity || 0;
+        @let outOfStock = available === 0;
+        @let isSelected = count > 0;
+
+        <div
+          role="button"
+          class="relative flex min-h-36 flex-col justify-between rounded-3xl border-2 p-4 transition-all duration-150 select-none"
+          [class]="
+            outOfStock
+              ? 'cursor-not-allowed border-gray-200 bg-gray-100 opacity-50'
+              : isSelected
+                ? 'cursor-pointer border-[#c68958] bg-[#f8eada] shadow-md active:scale-95'
+                : 'cursor-pointer border-gray-200 bg-white shadow-md hover:border-[#c68958]/50 active:scale-95'
+          "
+          [attr.tabindex]="outOfStock ? -1 : 0"
+          [attr.aria-disabled]="outOfStock"
+          (click)="!outOfStock && addToCart(product)"
+          (keydown.enter)="!outOfStock && addToCart(product)"
+        >
+          <div class="flex items-start justify-between gap-2">
+            <h2 class="text-lg leading-tight font-bold text-gray-800 sm:text-xl">
+              {{ product.product_name }}
+            </h2>
+            @if (isSelected) {
+              <div
+                class="flex-shrink-0 rounded-lg bg-[#c68958] px-2 py-0.5 text-lg font-black text-white shadow-sm"
+              >
+                {{ count }}x
+              </div>
+            }
+          </div>
+
+          <div class="z-10 mt-4 flex items-end justify-between">
+            <div class="flex flex-col">
+              <span
+                class="text-[10px] font-bold tracking-wide text-gray-400 uppercase"
+                >Szabad</span
+              >
+              <span
+                class="text-base font-bold"
+                [class]="outOfStock ? 'text-red-500' : 'text-gray-600'"
+              >
+                {{ available }} db
+              </span>
+            </div>
+
+            @if (isSelected) {
+              <button
+                type="button"
+                class="flex size-10 items-center justify-center rounded-full border-2 border-red-100 bg-white text-red-500 shadow-sm transition hover:bg-red-50"
+                aria-label="Egy darab eltávolítása"
+                (click)="removeFromCart($event, product.id)"
+                (keydown.enter)="$event.stopPropagation()"
+              >
+                <span class="pi pi-minus"></span>
+              </button>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+@if (isConfirmModalOpen) {
+  <div role="dialog" aria-modal="true" class="fixed inset-0 z-[1000]">
+    <div class="fixed inset-0 bg-black/60" (click)="cancelCheckout()"></div>
+    <div
+      class="pointer-events-none relative flex h-full items-center justify-center p-4"
+    >
+      <div
+        class="pointer-events-auto flex max-h-full w-full max-w-lg flex-col overflow-hidden rounded-3xl bg-white shadow-xl"
+      >
+        <div class="flex-shrink-0 bg-[#c68958] p-4 text-center">
+          <h2 class="text-xl font-bold tracking-wide text-white">
+            Jóváhagyás
+          </h2>
+        </div>
+
+        <div class="min-h-0 flex-1 overflow-y-auto p-5">
+          <div class="divide-y divide-gray-100">
+            @for (item of order?.order_items; track item.product_id) {
+              <div class="flex items-center justify-between py-3">
+                <span class="text-lg font-semibold text-gray-800">{{
+                  item.product_name
+                }}</span>
+                <span class="text-xl font-black text-[#c68958]"
+                  >{{ item.quantity }}x</span
+                >
+              </div>
+            }
+          </div>
+          <div
+            class="mt-6 flex items-center justify-between border-t-2 border-gray-100 pt-4"
+          >
+            <span class="text-sm font-bold text-gray-400 uppercase"
+              >Összesen</span
+            >
+            <span class="text-3xl font-black text-black"
+              >{{ order?.total_price | number: "1.0-2" }} €</span
+            >
+          </div>
+        </div>
+
+        @if (errorMessage) {
+          <div
+            class="mx-5 mb-3 flex-shrink-0 rounded-lg bg-red-100 px-3 py-1.5 text-center text-sm font-semibold text-red-700 shadow"
+          >
+            {{ errorMessage }}
+          </div>
+        }
+
+        <div class="flex flex-shrink-0 gap-3 border-t border-gray-100 bg-gray-50 p-4">
+          <button
+            type="button"
+            class="flex-1 rounded-full border border-gray-300 bg-white py-3 font-bold text-gray-700 transition hover:bg-gray-100 disabled:opacity-50"
+            [disabled]="isProcessing"
+            (click)="cancelCheckout()"
+          >
+            Mégse
+          </button>
+          <button
+            type="button"
+            class="flex-1 rounded-full bg-[#c68958] py-3 font-bold text-white shadow transition hover:bg-[#a96e34] disabled:opacity-50"
+            [disabled]="isProcessing"
+            (click)="sendOrder()"
+          >
+            Fizetve
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

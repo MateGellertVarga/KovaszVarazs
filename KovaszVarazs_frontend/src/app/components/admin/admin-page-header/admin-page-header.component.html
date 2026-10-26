@@ -1,0 +1,29 @@
+<div
+  class="mt-6 mb-6 flex flex-col items-center gap-4 sm:flex-row sm:justify-between"
+>
+  <h1 class="text-2xl font-bold text-[#c68958] sm:text-3xl">{{ title }}</h1>
+  <div class="flex flex-wrap items-center justify-center gap-3">
+    <ng-content></ng-content>
+    @if (showRefresh) {
+      <button
+        type="button"
+        class="flex size-11 items-center justify-center rounded-full border-2 border-[#c68958] bg-white text-[#c68958] shadow-sm transition hover:bg-[#f8eada]"
+        title="Frissítés"
+        aria-label="Frissítés"
+        (click)="refresh.emit()"
+      >
+        <span class="pi pi-refresh text-lg!"></span>
+      </button>
+    }
+    @if (addLabel) {
+      <button
+        type="button"
+        class="flex items-center gap-2 rounded-full bg-gradient-to-r from-[#c68958] to-[#a96e34] px-6 py-2.5 font-semibold text-white shadow-lg shadow-[#c68958]/40 transition hover:scale-105 hover:from-[#a96e34] hover:to-[#7a5334] active:scale-95"
+        (click)="add.emit()"
+      >
+        <span class="text-xl leading-none font-bold">+</span>
+        {{ addLabel }}
+      </button>
+    }
+  </div>
+</div>

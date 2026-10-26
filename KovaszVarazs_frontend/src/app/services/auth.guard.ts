@@ -1,18 +1,34 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { AuthService } from './auth.service';
-import { catchError, map, of } from 'rxjs';
+import { AuthService, UserRole } from './auth.service';
+import { map } from 'rxjs';
 
-export const authGuard: CanActivateFn = (route, state) => {
-  const router = inject(Router);
-  const authService = inject(AuthService);
+// Csak a felsorolt szerepkörök léphetnek be, mindenki mást a saját kezdőoldalára irányít
+// (admin -> Rendelések, felhasználó / vendég -> Főoldal).
+export const roleGuard =
+  (...allowedRoles: UserRole[]): CanActivateFn =>
+  () => {
+    const router = inject(Router);
+    const authService = inject(AuthService);
 
-  if (authService.loggedInUser) {
-    return of(true);
-  }
+    return authService
+      .resolveUser()
+      .pipe(
+        map(() =>
+          allowedRoles.includes(authService.role)
+            ? true
+            : router.parseUrl(authService.homeUrl),
+        ),
+      );
+  };
 
-  return authService.loadUserData().pipe(
-    map((user) => (user ? true : router.parseUrl('/fooldal'))),
-    catchError(() => of(router.parseUrl('/fooldal'))),
-  );
-};
+// Nyilvános vásárlói oldalak (főoldal, galéria) – az admin nem látja őket.
+export const publicGuard = roleGuard('guest', 'user');
+// Csak kijelentkezve (bejelentkezés, regisztráció, elfelejtett jelszó).
+export const guestGuard = roleGuard('guest');
+// Belépett vásárló (rendelés leadása).
+export const userGuard = roleGuard('user');
+// Bármely belépett felhasználó (profil).
+export const authGuard = roleGuard('user', 'admin');
+// Admin felület.
+export const adminGuard = roleGuard('admin');

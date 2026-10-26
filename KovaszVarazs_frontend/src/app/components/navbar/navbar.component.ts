@@ -10,6 +10,7 @@ import { MenubarModule } from 'primeng/menubar';
 import { TieredMenuModule } from 'primeng/tieredmenu';
 import { AuthService } from '../../services/auth.service';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { ADMIN_NAV_ITEMS } from './admin-nav-items';
 
 @Component({
   selector: 'app-navbar',
@@ -34,10 +35,14 @@ export class NavbarComponent {
 
   dropDownOpen = false;
   mobileMenuOpen = false;
+  adminNavItems = ADMIN_NAV_ITEMS;
 
+  // Csak a kijelentkezés után navigálunk, különben a guard még a régi (pl. admin) szerepkört látná.
   logout() {
-    this.authService.logout();
-    this.router.navigate(['/fooldal']);
+    this.dropDownOpen = false;
+    this.authService.logout().subscribe(() => {
+      this.router.navigate(['/fooldal']);
+    });
   }
 
   toggleDropdown() {

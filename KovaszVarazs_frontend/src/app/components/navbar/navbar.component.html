@@ -1,12 +1,15 @@
 <nav class="bg-[#c68958] text-white z-10">
   <div class="mx-auto px-2 sm:px-6 lg:px-8">
     <div class="relative flex h-16 items-center justify-between">
-      <div class="absolute inset-y-0 left-0 flex items-center sm:hidden">
+      <div
+        class="absolute inset-y-0 left-0 flex items-center"
+        [class]="authService.isAdmin ? 'xl:hidden' : 'sm:hidden'"
+      >
         <!-- Mobile menu button-->
         <button
           type="button"
           aria-controls="mobile-menu"
-          aria-expanded="false"
+          [attr.aria-expanded]="mobileMenuOpen"
           class="relative inline-flex items-center justify-center rounded-md p-2 hover:bg-gray-700 focus:ring-2 focus:ring-white focus:outline-hidden focus:ring-inset"
           (click)="toggleMobileMenu()"
         >
@@ -29,51 +32,85 @@
         </button>
       </div>
       <div
-        class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start"
+        class="flex flex-1 items-center justify-center"
+        [class]="
+          authService.isAdmin
+            ? 'xl:items-stretch xl:justify-start'
+            : 'sm:items-stretch sm:justify-start'
+        "
       >
         <div class="flex shrink-0 items-center">
-          <a routerLink="/fooldal"
+          <a [routerLink]="authService.homeUrl"
             ><span class="h-8 w-auto text-2xl title">Kovászvarázs</span></a
           >
         </div>
-        <div class="hidden sm:ml-6 sm:block">
-          <div class="flex space-x-4">
-            <a
-              routerLink="/fooldal"
-              routerLinkActive="bg-yellow-900"
-              aria-current="page"
-              class="rounded-md bg-brown px-3 py-2 font-medium text-white hover:bg-yellow-900"
-              >Főoldal</a
-            >
-            @if (this.authService.loggedInUser) {
-              <a
-                routerLink="/termekek"
-                routerLinkActive="bg-yellow-900"
-                aria-current="page"
-                class="rounded-md bg-brown px-3 py-2 font-medium text-white hover:bg-yellow-900"
-                >Termékek</a
-              >
-              <a
-                routerLink="/rendeles"
-                routerLinkActive="bg-yellow-900"
-                aria-current="page"
-                class="rounded-md bg-brown px-3 py-2 font-medium text-white hover:bg-yellow-900"
-                >Rendelés</a
-              >
-            } @else {
-              <a
-                routerLink="/termekek"
-                routerLinkActive="bg-yellow-900"
-                aria-current="page"
-                class="rounded-md bg-brown px-3 py-2 font-medium text-white hover:bg-yellow-900"
-                >Galéria</a
-              >
-            }
+        @if (authService.isAdmin) {
+          <div class="hidden xl:ml-6 xl:block">
+            <div class="flex space-x-1 2xl:space-x-2">
+              @for (item of adminNavItems; track item.route) {
+                <a
+                  [routerLink]="item.route"
+                  routerLinkActive="bg-yellow-900"
+                  class="flex items-center gap-1.5 rounded-md px-3 py-2 font-medium whitespace-nowrap text-white hover:bg-yellow-900"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    [attr.viewBox]="item.iconViewBox"
+                    class="hidden size-5 shrink-0 2xl:block"
+                    aria-hidden="true"
+                  >
+                    <path fill="currentColor" [attr.d]="item.iconPath" />
+                  </svg>
+                  {{ item.label }}
+                </a>
+              }
+            </div>
           </div>
-        </div>
+        } @else {
+          <div class="hidden sm:ml-6 sm:block">
+            <div class="flex space-x-4">
+              <a
+                routerLink="/fooldal"
+                routerLinkActive="bg-yellow-900"
+                aria-current="page"
+                class="rounded-md bg-brown px-3 py-2 font-medium text-white hover:bg-yellow-900"
+                >Főoldal</a
+              >
+              @if (this.authService.loggedInUser) {
+                <a
+                  routerLink="/termekek"
+                  routerLinkActive="bg-yellow-900"
+                  aria-current="page"
+                  class="rounded-md bg-brown px-3 py-2 font-medium text-white hover:bg-yellow-900"
+                  >Termékek</a
+                >
+                <a
+                  routerLink="/rendeles"
+                  routerLinkActive="bg-yellow-900"
+                  aria-current="page"
+                  class="rounded-md bg-brown px-3 py-2 font-medium text-white hover:bg-yellow-900"
+                  >Rendelés</a
+                >
+              } @else {
+                <a
+                  routerLink="/termekek"
+                  routerLinkActive="bg-yellow-900"
+                  aria-current="page"
+                  class="rounded-md bg-brown px-3 py-2 font-medium text-white hover:bg-yellow-900"
+                  >Galéria</a
+                >
+              }
+            </div>
+          </div>
+        }
       </div>
       <div
-        class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0"
+        class="absolute inset-y-0 right-0 flex items-center pr-2"
+        [class]="
+          authService.isAdmin
+            ? 'xl:static xl:inset-auto xl:ml-6 xl:pr-0'
+            : 'sm:static sm:inset-auto sm:ml-6 sm:pr-0'
+        "
       >
         <!-- Profile dropdown -->
         <div class="relative ml-3" #profileWrap>
@@ -81,7 +118,7 @@
             <button
               id="user-menu-button"
               type="button"
-              aria-expanded="false"
+              [attr.aria-expanded]="dropDownOpen"
               aria-haspopup="true"
               class="relative flex rounded-full bg-gray-800 text-sm focus:outline-hidden focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-gray-800"
               (click)="toggleDropdown()"
@@ -115,7 +152,7 @@
                   id="user-menu-item-1"
                   role="menuitem"
                   tabindex="-1"
-                  class="block px-4 py-2 text-sm text-gray-700"
+                  class="block cursor-pointer px-4 py-2 text-sm text-gray-700"
                   (click)="logout()"
                   >Kijelentkezés</a
                 >
@@ -138,40 +175,64 @@
 
   <!-- Mobile menu -->
   @if (mobileMenuOpen) {
-    <div id="mobile-menu" class="sm:hidden" #mobileWrap>
-      <div class="space-y-1 px-2 pt-2 pb-3">
-        <a
-          routerLink="/fooldal"
-          routerLinkActive="bg-yellow-900"
-          aria-current="page"
-          class="block rounded-md bg-brown px-3 py-2 text-base font-medium text-white"
-          >Főoldal</a
-        >
-        @if (this.authService.loggedInUser) {
-          <a
-            routerLink="/termekek"
-            routerLinkActive="bg-yellow-900"
-            aria-current="page"
-            class="block rounded-md bg-brown px-3 py-2 text-base font-medium text-white"
-            >Termékek</a
-          >
-          <a
-            routerLink="/rendeles"
-            routerLinkActive="bg-yellow-900"
-            aria-current="page"
-            class="rounded-md bg-brown px-3 py-2 font-medium text-white hover:bg-yellow-900"
-            >Rendelés</a
-          >
-        } @else {
-          <a
-            routerLink="/termekek"
-            routerLinkActive="bg-yellow-900"
-            aria-current="page"
-            class="block rounded-md bg-brown px-3 py-2 text-base font-medium text-white"
-            >Galéria</a
-          >
-        }
+    @if (authService.isAdmin) {
+      <div id="mobile-menu" class="xl:hidden" #mobileWrap>
+        <div class="space-y-1 px-2 pt-2 pb-3">
+          @for (item of adminNavItems; track item.route) {
+            <a
+              [routerLink]="item.route"
+              routerLinkActive="bg-yellow-900"
+              class="flex items-center gap-3 rounded-md px-3 py-2 text-base font-medium text-white hover:bg-yellow-900"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                [attr.viewBox]="item.iconViewBox"
+                class="size-6 shrink-0"
+                aria-hidden="true"
+              >
+                <path fill="currentColor" [attr.d]="item.iconPath" />
+              </svg>
+              {{ item.label }}
+            </a>
+          }
+        </div>
       </div>
-    </div>
+    } @else {
+      <div id="mobile-menu" class="sm:hidden" #mobileWrap>
+        <div class="space-y-1 px-2 pt-2 pb-3">
+          <a
+            routerLink="/fooldal"
+            routerLinkActive="bg-yellow-900"
+            aria-current="page"
+            class="block rounded-md bg-brown px-3 py-2 text-base font-medium text-white"
+            >Főoldal</a
+          >
+          @if (this.authService.loggedInUser) {
+            <a
+              routerLink="/termekek"
+              routerLinkActive="bg-yellow-900"
+              aria-current="page"
+              class="block rounded-md bg-brown px-3 py-2 text-base font-medium text-white"
+              >Termékek</a
+            >
+            <a
+              routerLink="/rendeles"
+              routerLinkActive="bg-yellow-900"
+              aria-current="page"
+              class="rounded-md bg-brown px-3 py-2 font-medium text-white hover:bg-yellow-900"
+              >Rendelés</a
+            >
+          } @else {
+            <a
+              routerLink="/termekek"
+              routerLinkActive="bg-yellow-900"
+              aria-current="page"
+              class="block rounded-md bg-brown px-3 py-2 text-base font-medium text-white"
+              >Galéria</a
+            >
+          }
+        </div>
+      </div>
+    }
   }
 </nav>

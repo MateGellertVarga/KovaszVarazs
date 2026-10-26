@@ -1,0 +1,92 @@
+<app-navbar></app-navbar>
+
+<div class="mx-auto max-w-screen-2xl px-4 pb-10 sm:px-6 lg:px-8">
+  <app-admin-page-header
+    title="Termékek"
+    addLabel="Új termék"
+    (add)="newProduct()"
+    (refresh)="loadProducts()"
+  ></app-admin-page-header>
+
+  @if (isLoading) {
+    <div class="mt-4 flex w-full items-center justify-center">
+      <img src="loading.gif" alt="Betöltés..." />
+    </div>
+  } @else if (products.length === 0) {
+    <p class="mt-4 text-center text-gray-500">Nincs termék</p>
+  } @else {
+    <div
+      class="grid grid-cols-1 gap-6 min-[440px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6"
+    >
+      @for (product of products; track product.id) {
+        <div
+          class="flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-lg"
+        >
+          <div
+            class="flex aspect-[9/16] w-full items-center justify-center bg-gray-200"
+          >
+            @if (product.image_url) {
+              <img
+                [src]="product.image_url"
+                [alt]="product.name"
+                class="h-full w-full object-cover"
+              />
+            } @else {
+              <span class="pi pi-image text-4xl! text-gray-400"></span>
+            }
+          </div>
+
+          <div class="flex flex-1 flex-col px-4 py-3">
+            <div class="flex items-start justify-between gap-2">
+              <span class="text-lg font-bold break-words text-gray-900">{{
+                product.name
+              }}</span>
+              <span class="shrink-0 text-lg text-gray-900"
+                >{{ product.price | number: "1.0-2" }} €/db</span
+              >
+            </div>
+            <div
+              class="mt-2 flex items-center justify-between gap-2 text-sm text-gray-700"
+            >
+              <span
+                >Kategória: <b>{{ product.category }}</b></span
+              >
+              @if (!product.is_used) {
+                <span class="font-bold text-red-500">(inaktív)</span>
+              }
+            </div>
+
+            <div class="mt-auto flex justify-evenly pt-4">
+              <button
+                type="button"
+                class="flex items-center justify-center rounded-full bg-red-100 px-5 py-2 text-lg text-red-700 shadow transition hover:bg-red-200"
+                title="Törlés"
+                aria-label="Törlés"
+                (click)="deleteProduct(product)"
+              >
+                <span class="pi pi-trash"></span>
+              </button>
+              <button
+                type="button"
+                class="flex items-center justify-center rounded-full bg-[#c68958] px-5 py-2 text-lg text-white shadow transition hover:bg-[#a96e34]"
+                title="Szerkesztés"
+                aria-label="Szerkesztés"
+                (click)="modifyProduct(product)"
+              >
+                <span class="pi pi-pencil"></span>
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+@if (editingProduct !== null) {
+  <app-admin-product-modal
+    [product]="editingProduct"
+    (canceled)="editingProduct = null"
+    (saved)="saveProduct($event)"
+  ></app-admin-product-modal>
+}
