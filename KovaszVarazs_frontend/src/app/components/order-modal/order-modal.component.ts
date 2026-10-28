@@ -274,6 +274,15 @@ export class OrderModalComponent implements OnChanges {
       }));
   }
 
+  get hasBabkaInOrder(): boolean {
+    if (!this.selectedOrderSchedule) return false;
+    return this.selectedOrderSchedule.products.some(
+      (p) =>
+        (this.productQuantities[p.id] ?? 0) > 0 &&
+        p.product_name.toLowerCase().includes('babka')
+    );
+  }
+
   getOrderTotal(): number {
     if (!this.order || !this.selectedOrderSchedule) return 0;
     let total = 0;

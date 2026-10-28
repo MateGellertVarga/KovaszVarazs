@@ -63,7 +63,9 @@
             @if (i === 1 && selectedOrderSchedule) {
               <div class="flex flex-col gap-3 items-center">
                 @if (isSelectedScheduleExpired) {
-                  <div class="w-full max-w-xs mb-2 text-center bg-[#fff7ec] border border-[#c68958]/50 text-[#7a5334] font-semibold rounded-2xl py-2 px-4 shadow-sm text-sm">
+                  <div
+                    class="w-full max-w-xs mb-2 text-center bg-[#fff7ec] border border-[#c68958]/50 text-[#7a5334] font-semibold rounded-2xl py-2 px-4 shadow-sm text-sm"
+                  >
                     Rendelés már csak üzenetben
                   </div>
                 }
@@ -175,7 +177,7 @@
                   <label
                     for="order-phone"
                     class="absolute left-4 -top-3.5 bg-white px-1 text-gray-600 text-sm pointer-events-none peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-2.5 sm:peer-placeholder-shown:top-3 transition-all peer-focus:-top-3.5 peer-focus:text-[#c68958] peer-focus:text-sm"
-                    >Telefonszám (opcionális)</label
+                    >Telefonszám</label
                   >
                 </div>
                 <div class="relative">
@@ -183,8 +185,16 @@
                     id="order-note"
                     name="order-note"
                     type="text"
-                    class="pl-4 peer placeholder-transparent h-16 w-full border-2 border-gray-300 rounded-2xl text-gray-900 focus:outline-none focus:border-[#c68958] focus:ring-2 focus:ring-[#c68958] bg-transparent transition pt-2"
-                    placeholder="Megjegyzés"
+                    class="pl-4 pr-3 peer placeholder-transparent h-16 w-full border-2 border-gray-300 rounded-2xl text-gray-900 focus:outline-none focus:border-[#c68958] focus:ring-2 focus:ring-[#c68958] bg-transparent transition pt-2"
+                    [ngClass]="{
+                      'placeholder-gray-400! placeholder:text-sm':
+                        hasBabkaInOrder,
+                    }"
+                    [placeholder]="
+                      hasBabkaInOrder
+                        ? 'Babka ízesítését kérjük megadni (nutellás, mákos, diós, pisztáciás)!'
+                        : 'Megjegyzés'
+                    "
                     [(ngModel)]="order!.note"
                     rows="2"
                   >
@@ -192,6 +202,7 @@
                   <label
                     for="order-note"
                     class="absolute left-4 -top-3.5 bg-white px-1 text-gray-600 text-sm pointer-events-none peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-3 transition-all peer-focus:-top-3.5 peer-focus:text-[#c68958] peer-focus:text-sm"
+                    [ngClass]="{ '-top-3.5! text-sm!': hasBabkaInOrder }"
                     >Megjegyzés (opcionális)</label
                   >
                 </div>
@@ -225,9 +236,14 @@
                       <span>{{ order!.note }}</span>
                     </div>
                   }
-                  <div class="flex gap-2 mb-1 border-t border-[#c68958]/30 pt-1 mt-1">
+                  <div
+                    class="flex gap-2 mb-1 border-t border-[#c68958]/30 pt-1 mt-1"
+                  >
                     <span class="w-20 sm:w-24 text-gray-600">Dátum:</span>
-                    <span class="font-medium text-[#c68958]">{{ selectedOrderSchedule?.available_date | date: "yyyy.MM.dd EEEE" }}</span>
+                    <span class="font-medium text-[#c68958]">{{
+                      selectedOrderSchedule?.available_date
+                        | date: "yyyy.MM.dd EEEE"
+                    }}</span>
                   </div>
                 </div>
                 <div
